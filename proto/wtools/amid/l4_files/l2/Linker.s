@@ -182,7 +182,7 @@ function multiple( o, link )
 
     if( !record.stat || !_.files.stat.areHardLinked( mostLinkedRecord.stat, record.stat ) )
     {
-      let linkOptions = _.mapExtend( null, o );
+      let linkOptions = _.props.extend( null, o );
       linkOptions.allowingMissed = 0; // Vova : hardLink does not allow missing srcPath
       linkOptions.dstPath = record.absolute;
       linkOptions.srcPath = mostLinkedRecord.absolute;
@@ -240,7 +240,7 @@ function verify1( args )
   _.assert( args.length === 1, 'Expects single argument' );
   _.assert( _.routineIs( c.linkDo ), 'method', c.actMethodName, 'is not implemented' );
   _.assert( _.objectIs( c.linkDo.defaults ), 'method', c.actMethodName, 'does not have defaults, but should' );
-  _.assertRoutineOptions( c.linkBody, args );
+  _.routine.assertOptions( c.linkBody, args );
   _.assert( _.boolLike( o.resolvingSrcSoftLink ) || _.numberIs( o.resolvingSrcSoftLink ) );
   _.assert( _.boolLike( o.resolvingSrcTextLink ) || _.numberIs( o.resolvingSrcTextLink ) );
   _.assert( _.boolLike( o.resolvingDstSoftLink ) || _.numberIs( o.resolvingDstSoftLink ) );
@@ -564,6 +564,7 @@ function linksResolve()
         resolvingTextLink : o.resolvingDstTextLink,
         allowingCycled : 1,
         allowingMissed : 1,
+        preservingRelative : 1,
       }
       let resolved = self.pathResolveLinkFull( o2 );
       o.dstPath = resolved.absolutePath;
@@ -585,18 +586,28 @@ function linksResolve()
         resolvingTextLink : o.resolvingSrcTextLink,
         allowingCycled : o.allowingCycled,
         allowingMissed : o.allowingMissed,
-        throwing : o.throwing
+        throwing : o.throwing,
+        preservingRelative : 1,
       }
       let resolved = self.pathResolveLinkFull( o2 );
       o.srcPath = resolved.absolutePath;
 
-      if( resolved.relativePath )
+      if( ( resolved.filePath !== null && path.isRelative( resolved.filePath ) ) || path.isRelative( o.relativeSrcPath ) )
       {
-        if( path.isRelative( resolved.relativePath ) || path.isRelative( o.relativeSrcPath ) )
         o.relativeSrcPath = path.relative( o.dstPath, resolved.absolutePath );
-        else
-        o.relativeSrcPath = resolved.relativePath;
       }
+      else /* xxx : qqq : ? */
+      {
+        o.relativeSrcPath = resolved.filePath;
+      }
+
+      // if( resolved.relativePath )
+      // {
+      //   if( path.isRelative( resolved.relativePath ) || path.isRelative( o.relativeSrcPath ) )
+      //   o.relativeSrcPath = path.relative( o.dstPath, resolved.absolutePath );
+      //   else
+      //   o.relativeSrcPath = resolved.relativePath;
+      // }
 
       c.srcStat = o2.stat;
 
@@ -659,6 +670,7 @@ function linksResolveAsync()
         sync : 0,
         allowingCycled : 1,
         allowingMissed : 1,
+        preservingRelative : 1,
       }
       return self.pathResolveLinkFull( o2 ).then( ( resolved ) =>
       {
@@ -689,6 +701,7 @@ function linksResolveAsync()
         allowingCycled : o.allowingCycled,
         allowingMissed : o.allowingMissed,
         sync : 0,
+        preservingRelative : 1,
         throwing : o.throwing
       }
 
@@ -697,13 +710,32 @@ function linksResolveAsync()
       {
         o.srcPath = resolved.absolutePath;
 
-        if( resolved.relativePath )
+        if( ( resolved.filePath !== null && path.isRelative( resolved.filePath ) ) || path.isRelative( o.relativeSrcPath ) )
         {
-          if( path.isRelative( resolved.relativePath ) || path.isRelative( o.relativeSrcPath ) )
           o.relativeSrcPath = path.relative( o.dstPath, resolved.absolutePath );
-          else
-          o.relativeSrcPath = resolved.relativePath;
         }
+        else /* xxx : qqq : ? */
+        {
+          o.relativeSrcPath = resolved.filePath;
+        }
+
+        // debugger;
+        // if( resolved.filePath !== null && path.isRelative( resolved.filePath ) )
+        // {
+        //   o.relativeSrcPath = path.relative( o.dstPath, resolved.absolutePath );
+        // }
+        // else /* xxx : qqq : bad */
+        // {
+        //   o.relativeSrcPath = resolved.filePath;
+        // }
+
+        // if( resolved.relativePath )
+        // {
+        //   if( path.isRelative( resolved.relativePath ) || path.isRelative( o.relativeSrcPath ) )
+        //   o.relativeSrcPath = path.relative( o.dstPath, resolved.absolutePath );
+        //   else
+        //   o.relativeSrcPath = resolved.relativePath;
+        // }
 
         c.srcStat = o2.stat;
         return true;
@@ -1065,7 +1097,7 @@ function end( r )
 function contextMake( o )
 {
   _.assert( arguments.length === 1 );
-  _.routineOptions( contextMake, o );
+  _.routine.options_( contextMake, o );
 
   let fop = o.fop;
   let options = o.options;
@@ -1169,7 +1201,7 @@ function functor( fop )
   */
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.routineOptions( functor, fop );
+  _.routine.options_( functor, fop );
 
   let onDo = fop.onDo;
   let actMethodName = fop.actMethodName;
@@ -1193,7 +1225,7 @@ function functor( fop )
   _.assert( onSizeCheck === null || _.routineIs( onSizeCheck ) );
 
   _.routineExtend( link_body, onDo );
-  link_body.defaults = _.mapExtend( null, link_body.defaults ); /* xxx qqq : redundant? */
+  link_body.defaults = _.props.extend( null, link_body.defaults ); /* xxx qqq : redundant? */
   delete link_body.defaults.originalSrcPath;
   delete link_body.defaults.originalDstPath;
   delete link_body.defaults.relativeSrcPath;
@@ -1206,7 +1238,7 @@ function functor( fop )
 
   let linkEntry = _.routine.uniteReplacing({ head : functor_head, body : link_body, name : entryMethodName });
 
-  var having = linkEntry.having = _.mapExtend( null, linkEntry.having );
+  var having = linkEntry.having = _.props.extend( null, linkEntry.having );
   having.aspect = 'entry';
 
   return linkEntry;
@@ -1259,7 +1291,7 @@ function functor( fop )
       if( c.ended )
       return c.end();
 
-      o2 = c.options2 = _.mapExtend( c.options2, _.mapOnly_( null, o, c.linkDo.defaults ) );
+      o2 = c.options2 = _.props.extend( c.options2, _.mapOnly_( null, o, c.linkDo.defaults ) );
       o2.context = c.options2.context = c;
 
       try
@@ -1324,7 +1356,7 @@ function functor( fop )
         if( c.result !== undefined )
         return c.result;
         /* prepare options map and launch main part */
-        o2 = c.options2 = _.mapExtend( c.options2, _.mapOnly_( null, o, c.linkDo.defaults ) );
+        o2 = c.options2 = _.props.extend( c.options2, _.mapOnly_( null, o, c.linkDo.defaults ) );
         o2.context = c.options2.context = c;
         /* main part */
         return mainPartAsync();
@@ -1462,6 +1494,6 @@ let Proto =
 
 }
 
-_.mapExtend( Self, Proto )
+_.props.extend( Self, Proto )
 
 })()

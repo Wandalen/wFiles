@@ -20,7 +20,7 @@ const Self = _.files.encoder = _.files.encoder || Object.create( null );
 function normalize( o )
 {
 
-  o = _.routineOptions( normalize, o );
+  o = _.routine.options_( normalize, o );
   if( _.strIs( o.exts ) )
   o.exts = [ o.exts ];
   else if( o.exts === null )
@@ -287,7 +287,7 @@ function deduce( o )
 {
   let result = [];
 
-  o = _.routineOptions( deduce, arguments );
+  o = _.routine.options_( deduce, arguments );
 
   if( o.filePath && !o.ext )
   o.ext = _.path.ext( o.filePath );
@@ -373,9 +373,10 @@ function deduce( o )
   {
     if( o.feature === null )
     return encoders;
-    if( _.mapKeys( o.feature ).length === 0 )
+    if( _.props.keys( o.feature ).length === 0 )
     return encoders;
-    return _.filter_( encoders, ( encoder ) =>
+    // return _.filter_( encoders, ( encoder ) =>
+    return _.filter_( encoders, encoders, ( encoder ) =>
     {
       let satisfied = _.objectSatisfy
       ({
@@ -426,7 +427,7 @@ let Extension =
 
 }
 
-_.mapSupplement( Self, Extension );
+_.props.supplement( Self, Extension );
 
 // --
 // export

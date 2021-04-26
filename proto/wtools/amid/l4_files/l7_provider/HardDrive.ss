@@ -142,7 +142,7 @@ let buffer;
 // {
 //   let self = this;
 
-//   _.assertRoutineOptions( pathResolveTextLinkAct, arguments );
+//   _.routine.assertOptions( pathResolveTextLinkAct, arguments );
 //   _.assert( arguments.length === 1 );
 //   _.assert( _.arrayIs( o.visited ) );
 
@@ -216,7 +216,7 @@ let buffer;
 
 //       /* */
 
-//       let o2 = _.mapExtend( null, o );
+//       let o2 = _.props.extend( null, o );
 //       o2.filePath = self.path.join( m[ 1 ], parts.slice( p+1 ).join( '/' ) );
 
 //       if( o2.filePath[ 0 ] === '.' )
@@ -262,7 +262,7 @@ function pathResolveTextLinkAct( o )
 {
   let self = this;
 
-  _.assertRoutineOptions( pathResolveTextLinkAct, arguments );
+  _.routine.assertOptions( pathResolveTextLinkAct, arguments );
   _.assert( arguments.length === 1 );
 
   let result;
@@ -316,7 +316,7 @@ function pathResolveTextLinkAct( o )
   function resolveIntermediateDirectories()
   {
     let splits = self.path.split( o.filePath );
-    let o2 = _.mapExtend( null, o );
+    let o2 = _.props.extend( null, o );
 
     o2.resolvingIntermediateDirectories = 0;
     o2.filePath = '/';
@@ -341,7 +341,7 @@ function pathResolveTextLinkAct( o )
     result = self.path.join( o.filePath, self.path.normalize( result ) );
     if( !self.isTextLink( result ) )
     return result;
-    let o2 = _.mapExtend( null, o );
+    let o2 = _.props.extend( null, o );
     o2.filePath = result;
     return self.pathResolveTextLinkAct( o2 );
   }
@@ -403,7 +403,7 @@ function pathResolveSoftLinkAct( o )
     return File.realpathSync( self.path.nativize( o.filePath ) );
 
     let splits = path.split( o.filePath );
-    let o2 = _.mapExtend( null, o );
+    let o2 = _.props.extend( null, o );
 
     o2.resolvingIntermediateDirectories = 0;
     o2.filePath = '/';
@@ -428,7 +428,7 @@ function pathResolveSoftLinkAct( o )
     result = path.join( o.filePath, path.normalize( result ) );
     if( !self.isSoftLink( result ) )
     return result;
-    let o2 = _.mapExtend( null, o );
+    let o2 = _.props.extend( null, o );
     o2.filePath = result;
     return self.pathResolveSoftLinkAct( o2 );
   }
@@ -500,7 +500,7 @@ function fileReadAct( o )
   let stack = null;
   let result = null;
 
-  _.assertRoutineOptions( fileReadAct, arguments );
+  _.routine.assertOptions( fileReadAct, arguments );
   _.assert( self.path.isNormalized( o.filePath ) );
 
   let filePath = self.path.nativize( o.filePath );
@@ -620,7 +620,7 @@ function streamReadAct( o )
   let result;
   let encoder = fileReadAct.encoders[ o.encoding ];
 
-  _.assertRoutineOptions( streamReadAct, arguments );
+  _.routine.assertOptions( streamReadAct, arguments );
 
   let filePath = self.path.nativize( o.filePath );
 
@@ -701,7 +701,7 @@ function dirReadAct( o )
   let self = this;
   let result = null;
 
-  _.assertRoutineOptions( dirReadAct, arguments );
+  _.routine.assertOptions( dirReadAct, arguments );
 
   let nativizedFilePath = self.path.nativize( o.filePath );
 
@@ -796,7 +796,7 @@ function statReadAct( o )
 
   _.assert( self.path.isAbsolute( o.filePath ), 'Expects absolute {-o.FilePath-}, but got', o.filePath );
   _.assert( self.path.isNormalized( o.filePath ), 'Expects normalized {-o.FilePath-}, but got', o.filePath );
-  _.assertRoutineOptions( statReadAct, arguments );
+  _.routine.assertOptions( statReadAct, arguments );
 
   let nativizedFilePath = self.path.nativize( o.filePath );
   let args = [ nativizedFilePath ];
@@ -915,7 +915,7 @@ function statReadAct( o )
       isHardLink,
       isLink : _.FileStat.prototype.isLink,
     }
-    _.mapExtend( stat, extend );
+    _.props.extend( stat, extend );
     return stat;
   }
 
@@ -964,7 +964,7 @@ _.routineExtend( fileExistsAct, Parent.prototype.fileExistsAct );
 //   let self = this;
 //   let nativizedFilePath = self.path.nativize( o.filePath );
 //
-//   _.assertRoutineOptions( rightsReadAct, o );
+//   _.routine.assertOptions( rightsReadAct, o );
 //
 //   debugger;
 //   let result = File.accessSync( nativizedFilePath );
@@ -1029,7 +1029,7 @@ function fileWriteAct( o )
 {
   let self = this;
 
-  _.assertRoutineOptions( fileWriteAct, arguments );
+  _.routine.assertOptions( fileWriteAct, arguments );
   // _.assert( _.strIs( o.filePath ) );
   _.assert( self.path.isNormalized( o.filePath ) );
   _.assert( self.WriteMode.indexOf( o.writeMode ) !== -1 );
@@ -1143,7 +1143,7 @@ function streamWriteAct( o )
 {
   let self = this;
 
-  _.assertRoutineOptions( streamWriteAct, arguments );
+  _.routine.assertOptions( streamWriteAct, arguments );
 
   let filePath = self.path.nativize( o.filePath );
 
@@ -1167,7 +1167,7 @@ function timeWriteAct( o )
 {
   let self = this;
 
-  _.assertRoutineOptions( timeWriteAct, arguments );
+  _.routine.assertOptions( timeWriteAct, arguments );
 
   // File.utimesSync( o.filePath, o.atime, o.mtime );
 
@@ -1213,7 +1213,7 @@ function rightsWriteAct( o )
     Node caveats: on Windows only the write permission can be changed, and the distinction among the permissions of group, owner or others is not implemented.
   */
 
-  _.assertRoutineOptions( rightsWriteAct, o );
+  _.routine.assertOptions( rightsWriteAct, o );
 
   if( o.addRights !== null || o.delRights !== null )
   {
@@ -1286,7 +1286,7 @@ function fileDeleteAct( o )
 {
   let self = this;
 
-  _.assertRoutineOptions( fileDeleteAct, arguments );
+  _.routine.assertOptions( fileDeleteAct, arguments );
   _.assert( self.path.isAbsolute( o.filePath ) );
   _.assert( self.path.isNormalized( o.filePath ) );
 
@@ -1413,7 +1413,7 @@ function dirMakeAct( o )
   let self = this;
   let nativizedFilePath = self.path.nativize( o.filePath );
 
-  _.assertRoutineOptions( dirMakeAct, arguments );
+  _.routine.assertOptions( dirMakeAct, arguments );
   _.assert
   (
     self._pathHasDriveLetter( nativizedFilePath ),
@@ -1467,7 +1467,7 @@ function fileLockAct( o )
   _.assert( !o.sharing || o.sharing === 'process', 'not implemented' );
   _.assert( self.path.isNormalized( o.filePath ) );
   _.assert( !o.waiting || o.timeOut >= 1000 );
-  _.assertRoutineOptions( fileLockAct, arguments );
+  _.routine.assertOptions( fileLockAct, arguments );
   _.assert
   (
     self._pathHasDriveLetter( nativizedFilePath ),
@@ -1546,7 +1546,7 @@ function fileUnlockAct( o )
   let nativizedFilePath = self.path.nativize( o.filePath );
 
   _.assert( self.path.isNormalized( o.filePath ) );
-  _.assertRoutineOptions( fileUnlockAct, arguments );
+  _.routine.assertOptions( fileUnlockAct, arguments );
   _.assert
   (
     self._pathHasDriveLetter( nativizedFilePath ),
@@ -1605,7 +1605,7 @@ function fileIsLockedAct( o )
   let self = this;
   let nativizedFilePath = self.path.nativize( o.filePath );
 
-  _.assertRoutineOptions( fileIsLockedAct, arguments );
+  _.routine.assertOptions( fileIsLockedAct, arguments );
   _.assert( self.path.isNormalized( o.filePath ) );
 
   let con = _.Consequence.Try( () =>
@@ -1636,7 +1636,7 @@ function fileRenameAct( o )
 {
   let self = this;
 
-  _.assertRoutineOptions( fileRenameAct, arguments );
+  _.routine.assertOptions( fileRenameAct, arguments );
   _.assert( self.path.isNormalized( o.srcPath ) );
   _.assert( self.path.isNormalized( o.dstPath ) );
 
@@ -1678,7 +1678,7 @@ function fileCopyAct( o )
 {
   let self = this;
 
-  _.assertRoutineOptions( fileCopyAct, arguments );
+  _.routine.assertOptions( fileCopyAct, arguments );
   _.assert( self.path.isNormalized( o.srcPath ) );
   _.assert( self.path.isNormalized( o.dstPath ) );
 
@@ -1788,7 +1788,7 @@ _.routineExtend( fileCopyAct, Parent.prototype.fileCopyAct );
 //   let srcIsAbsolute = self.path.isAbsolute( o.relativeSrcPath );
 //   let srcPath = o.srcPath;
 //
-//   _.assertRoutineOptions( softLinkAct, arguments );
+//   _.routine.assertOptions( softLinkAct, arguments );
 //   _.assert( self.path.isAbsolute( o.dstPath ) );
 //   _.assert( self.path.isNormalized( o.srcPath ) );
 //   _.assert( self.path.isNormalized( o.dstPath ) );
@@ -1970,7 +1970,7 @@ function softLinkAct_functor()
     let srcIsAbsolute = self.path.isAbsolute( o.relativeSrcPath );
     let srcPath = o.srcPath;
 
-    _.assertRoutineOptions( softLinkAct, arguments );
+    _.routine.assertOptions( softLinkAct, arguments );
     _.assert( self.path.isAbsolute( o.dstPath ) );
     _.assert( self.path.isNormalized( o.srcPath ) );
     _.assert( self.path.isNormalized( o.dstPath ) );
@@ -2080,7 +2080,7 @@ function hardLinkAct( o )
 {
   let self = this;
 
-  _.assertRoutineOptions( hardLinkAct, arguments ); debugger;
+  _.routine.assertOptions( hardLinkAct, arguments ); debugger;
 
   let dstPath = self.path.nativize( o.dstPath );
   let srcPath = self.path.nativize( o.srcPath );
@@ -2288,7 +2288,7 @@ function areHardLinkedAct( o )
 {
   let self = this;
 
-  _.assertRoutineOptions( areHardLinkedAct, arguments );
+  _.routine.assertOptions( areHardLinkedAct, arguments );
   _.assert( o.filePath.length === 2, 'Expects exactly two arguments' );
 
   if( o.filePath[ 0 ] === o.filePath[ 1 ] )

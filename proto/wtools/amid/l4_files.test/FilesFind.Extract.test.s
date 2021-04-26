@@ -50,7 +50,7 @@ function onSuiteEnd()
 {
   let context = this;
   let path = this.provider.path;
-  _.assert( _.mapKeys( context.provider.filesTree ).length === 1, context.provider.filesTree );
+  _.assert( _.props.keys( context.provider.filesTree ).length === 1, context.provider.filesTree );
   return Parent.onSuiteEnd.apply( this, arguments );
 }
 

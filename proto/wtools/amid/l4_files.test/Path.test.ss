@@ -37,7 +37,9 @@ function onSuiteBegin()
     this.assetsOriginalPath = _.path.join( __dirname, '_asset' );
   }
   else
-  this.suiteTempPath = _.path.current();
+  {
+    this.suiteTempPath = _.path.current();
+  }
 }
 
 //
@@ -52,7 +54,7 @@ function onSuiteEnd()
 }
 
 // --
-// routines
+// implementation
 // --
 
 function createTestsDirectory( path, rmIfExists )
@@ -1194,7 +1196,7 @@ function pathDirTemp( test )
     extract.path.tempClose();
     extract.path.tempClose();
   })
-  test.identical( _.mapKeys( cache ).length, 0 );
+  test.identical( _.props.keys( cache ).length, 0 );
 
   test.case = 'no args';
   var got = extract.path.tempOpen();
@@ -1292,7 +1294,7 @@ function pathDirTempReturnResolved( test )
 
   clear();
   var filePath1 = '/temp/dir1'
-  var got1 = extract.path.tempOpen({ filePath : filePath1, name, returnResolved : 0 });
+  var got1 = extract.path.tempOpen({ filePath : filePath1, name, resolving : 0 });
   test.identical( cache[ filePath1 ], got1 );
   test.true( _.strBegins( got1, '/temp' ) );
   test.true( _.strHas( got1, name ) );
@@ -1302,7 +1304,7 @@ function pathDirTempReturnResolved( test )
 
   clear();
   var filePath1 = '/temp/dir2'
-  var got1 = extract.path.tempOpen({ filePath : filePath1, name, returnResolved : 1 });
+  var got1 = extract.path.tempOpen({ filePath : filePath1, name, resolving : 1 });
   test.identical( cache[ filePath1 ], got1 );
   test.true( _.strBegins( got1, '/_temp' ) );
   test.true( _.strHas( got1, name ) );
@@ -1314,7 +1316,7 @@ function pathDirTempReturnResolved( test )
   var filePath1 = '/dir1/dir2'
   extract.dirMake( '/dir3' );
   extract.softLink( '/dir1', '/dir3' );
-  var got1 = extract.path.tempOpen({ filePath : filePath1, name, returnResolved : 0 });
+  var got1 = extract.path.tempOpen({ filePath : filePath1, name, resolving : 0 });
   test.identical( cache[ filePath1 ], got1 );
   test.true( _.strBegins( got1, '/dir1' ) );
   test.true( _.strHas( got1, name ) );
@@ -1326,7 +1328,7 @@ function pathDirTempReturnResolved( test )
   var filePath1 = '/dir2/dir3'
   extract.dirMake( '/dir4' );
   extract.softLink( '/dir2', '/dir4' );
-  var got1 = extract.path.tempOpen({ filePath : filePath1, name, returnResolved : 1 });
+  var got1 = extract.path.tempOpen({ filePath : filePath1, name, resolving : 1 });
   test.identical( cache[ filePath1 ], got1 );
   test.true( _.strBegins( got1, '/dir4' ) );
   test.true( _.strHas( got1, name ) );
@@ -1375,7 +1377,7 @@ function tempOpenSystemPath( test )
   test.true( provider.isDir( got ) );
   provider.path.tempClose();
 
-  //
+  /* */
 
   test.case = 'target path exists'
   var filePath = '/dir1';
@@ -1386,7 +1388,7 @@ function tempOpenSystemPath( test )
   test.true( _.strEnds( got, '.tmp' ) );
   test.true( provider.isDir( got ) );
 
-  //
+  /* */
 
   test.case = 'target path is an empty soft link'
   var filePath = '/dir1/' + _.idWithDateAndTime();
@@ -1597,8 +1599,8 @@ function nextPathDirTemp( test )
     extract.path.tempClose();
     extract.path.tempClose();
   })
-  test.identical( _.mapKeys( extract.path.Index.tempDir ).length, 0 );
-  test.identical( _.mapKeys( extract.path.Index.count ).length, 0 );
+  test.identical( _.props.keys( extract.path.Index.tempDir ).length, 0 );
+  test.identical( _.props.keys( extract.path.Index.count ).length, 0 );
 
   test.case = 'no args';
   var got = extract.path.tempOpen();
@@ -1648,7 +1650,7 @@ function nextPathDirTempMultipleNamespacesSamePath( test )
   test.identical( tempDir, { namespace : [ name1, name2 ], tempPath : got1 } );
   test.identical( tempDir, { namespace : [ name1, name2 ], tempPath : got2 } );
 
-  var namespaces = _.mapKeys( extract.path.Index.namespace );
+  var namespaces = _.props.keys( extract.path.Index.namespace );
   test.identical( namespaces, [ 'space1', 'space2' ] );
 
   test.identical( extract.path.Index.namespace.space1, { tempDir : filePath1, tempPath : got1 } )
@@ -1684,7 +1686,7 @@ function nextPathDirTempMultipleNamespacesDiffPath( test )
   var tempDir = extract.path.Index.tempDir[ filePath2 ];
   test.identical( tempDir, { namespace : name2, tempPath : got2 } );
 
-  var namespaces = _.mapKeys( extract.path.Index.namespace );
+  var namespaces = _.props.keys( extract.path.Index.namespace );
   test.identical( namespaces, [ 'space1', 'space2' ] );
 
   test.identical( extract.path.Index.namespace.space1, { tempDir : filePath1, tempPath : got1 } )
@@ -1719,7 +1721,7 @@ function nextPathDirTempMultiplePathSameNamespace( test )
   var tempDir = extract.path.Index.tempDir[ filePath2 ];
   test.identical( tempDir, { namespace : name, tempPath : got2 } );
 
-  var namespaces = _.mapKeys( extract.path.Index.namespace );
+  var namespaces = _.props.keys( extract.path.Index.namespace );
   test.identical( namespaces, [ 'space' ] );
   var space = extract.path.Index.namespace.space;
   test.identical( space, { tempDir : [ filePath1, filePath2 ], tempPath : [ got1, got2 ] } )

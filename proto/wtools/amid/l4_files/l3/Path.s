@@ -45,7 +45,7 @@ let vectorizeNone = _.files._.vectorizeNone;
 // zzz : clean
 
 // --
-// routines
+// implementation
 // --
 
 /**
@@ -238,7 +238,7 @@ let Extension =
 
 }
 
-_.mapExtend( Self, Extension );
+_.props.extend( Self, Extension );
 
 // --
 // export

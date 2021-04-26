@@ -478,6 +478,28 @@ function _pathRelocalize( r, provider )
 
 //
 
+function _pathPrepend( provider, filePath )
+{
+  let self = this;
+  let path = self.path;
+
+  _.assert( arguments.length === 2 );
+  _.assert( _.strIs( filePath ) || filePath === null );
+
+  if( filePath === null )
+  return filePath;
+  if( !provider.originPath )
+  return filePath;
+  if( provider.originPath === self.defaultOrigin )
+  return filePath;
+  if( _.strBegins( filePath, provider.originPath ) )
+  return filePath;
+
+  return path.join( provider.originPath, filePath );
+}
+
+//
+
 function pathNativizeAct( filePath )
 {
   let self = this;
@@ -556,7 +578,9 @@ function pathResolveLinkFull_body( o )
   let r = self._pathLocalize( o.filePath );
   o.filePath = r.localPath;
 
+  // debugger;
   let result = r.provider.pathResolveLinkFull.body.call( r.provider, o );
+  // debugger;
 
   if( o.sync )
   {
@@ -575,9 +599,26 @@ function pathResolveLinkFull_body( o )
     if( result === null )
     return null;
 
-    result.filePath = self.path.join( r.provider.originPath, result.filePath );
-    result.relativePath = self.path.join( r.provider.originPath, result.relativePath );
-    result.absolutePath = self.path.join( r.provider.originPath, result.absolutePath );
+    // xxx
+    result.filePath = self._pathPrepend( r.provider, result.filePath );
+    result.relativePath = self._pathPrepend( r.provider, result.relativePath );
+    result.absolutePath = self._pathPrepend( r.provider, result.absolutePath );
+
+    // result.filePath = self.path.join( r.provider.originPath, result.filePath );
+    // result.relativePath = self.path.join( r.provider.originPath, result.relativePath );
+    // result.absolutePath = self.path.join( r.provider.originPath, result.absolutePath );
+
+    /* xxx : qqq : cover pathResolveLinkFull, take into account all branches of _pathPrepend. use:
+
+    a.fileProvider = _.FileProvider.System({ providers : [] });
+    _.FileProvider.Git().providerRegisterTo( a.fileProvider );
+    _.FileProvider.Npm().providerRegisterTo( a.fileProvider );
+    _.FileProvider.Http().providerRegisterTo( a.fileProvider );
+    let defaultProvider = _.FileProvider.Default();
+    defaultProvider.providerRegisterTo( a.fileProvider );
+    a.fileProvider.defaultProvider = defaultProvider;
+
+    */
 
     return result;
   }
@@ -586,7 +627,7 @@ function pathResolveLinkFull_body( o )
 // _.assert( _.entity.identicalShallow( Parent.prototype.pathResolveLinkFull.body.defaults, Parent.prototype.pathResolveLinkFull.defaults ) );
 _.routineExtend( pathResolveLinkFull_body, Parent.prototype.pathResolveLinkFull.body );
 
-let pathResolveLinkFull = _.routine.uniteCloning_( Parent.prototype.pathResolveLinkFull.head, pathResolveLinkFull_body );
+let pathResolveLinkFull = _.routine.uniteCloning_replaceByUnite( Parent.prototype.pathResolveLinkFull.head, pathResolveLinkFull_body );
 
 //
 
@@ -607,15 +648,19 @@ function pathResolveLinkTail_body( o )
   if( result.filePath === null )
   return null;
 
-  result.filePath = self.path.join( r.provider.originPath, result.filePath );
-  result.absolutePath = self.path.join( r.provider.originPath, result.absolutePath );
+  result.filePath = self._pathPrepend( r.provider, result.filePath );
+  result.absolutePath = self._pathPrepend( r.provider, result.absolutePath );
+
+  // result.filePath = self.path.join( r.provider.originPath, result.filePath );
+  // result.absolutePath = self.path.join( r.provider.originPath, result.absolutePath );
+  /* qqq : cover pathResolveLinkTail, take into account all branches of _pathPrepend */
 
   return result;
 }
 
 _.routineExtend( pathResolveLinkTail_body, Parent.prototype.pathResolveLinkTail.body );
 
-let pathResolveLinkTail = _.routine.uniteCloning_( Parent.prototype.pathResolveLinkTail.head, pathResolveLinkTail_body );
+let pathResolveLinkTail = _.routine.uniteCloning_replaceByUnite( Parent.prototype.pathResolveLinkTail.head, pathResolveLinkTail_body );
 
 //
 
@@ -636,7 +681,8 @@ function pathResolveSoftLink_body( o )
 
   _.assert( !!result );
 
-  result = self.path.join( r.provider.originPath, result );
+  result = self._pathPrepend( r.provider, result ); /* qqq : cover pathResolveSoftLink, take into account all branches of _pathPrepend */
+  // result = self.path.join( r.provider.originPath, result );
 
   if( result === o.filePath )
   {
@@ -650,7 +696,7 @@ function pathResolveSoftLink_body( o )
 
 _.routineExtend( pathResolveSoftLink_body, Parent.prototype.pathResolveSoftLink.body );
 
-let pathResolveSoftLink = _.routine.uniteCloning_( Parent.prototype.pathResolveSoftLink.head, pathResolveSoftLink_body );
+let pathResolveSoftLink = _.routine.uniteCloning_replaceByUnite( Parent.prototype.pathResolveSoftLink.head, pathResolveSoftLink_body );
 
 //
 
@@ -671,7 +717,9 @@ function pathResolveTextLink_body( o )
 
   _.assert( !!result );
 
-  result = self.path.join( r.provider.originPath, result );
+  result = self._pathPrepend( r.provider, result );
+  // result = self.path.join( r.provider.originPath, result );
+  /* qqq : cover pathResolveTextLink, take into account all branches of _pathPrepend */
 
   if( result === o.filePath )
   {
@@ -685,7 +733,7 @@ function pathResolveTextLink_body( o )
 
 _.routineExtend( pathResolveTextLink_body, Parent.prototype.pathResolveTextLink.body );
 
-let pathResolveTextLink = _.routine.uniteCloning_( Parent.prototype.pathResolveTextLink.head, pathResolveTextLink_body );
+let pathResolveTextLink = _.routine.uniteCloning_replaceByUnite( Parent.prototype.pathResolveTextLink.head, pathResolveTextLink_body );
 
 //
 
@@ -705,7 +753,7 @@ function fileRead_body( o )
   o.filePath = o.filePath.absolutePath;
 
   let r = self._pathLocalize( o.filePath );
-  let o2 = _.mapExtend( null, o );
+  let o2 = _.props.extend( null, o );
 
   o2.resolvingSoftLink = 0;
   o2.filePath = r.localPath;
@@ -716,7 +764,7 @@ function fileRead_body( o )
 
 _.routineExtend( fileRead_body, Parent.prototype.fileRead.body );
 
-const fileRead = _.routine.uniteCloning_( Parent.prototype.fileRead.head, fileRead_body );
+const fileRead = _.routine.uniteCloning_replaceByUnite( Parent.prototype.fileRead.head, fileRead_body );
 
 // --
 // linker
@@ -724,7 +772,7 @@ const fileRead = _.routine.uniteCloning_( Parent.prototype.fileRead.head, fileRe
 
 function _link_functor( fop )
 {
-  fop = _.routineOptions( _link_functor, arguments );
+  fop = _.routine.options_( _link_functor, arguments );
 
   let routine = fop.routine;
   let routineName = routine.name;
@@ -758,7 +806,7 @@ function _link_functor( fop )
     let self = this;
     let op = Object.create( null );
     op.continue = true;
-    op.options = _.mapExtend( null, o );
+    op.options = _.props.extend( null, o );
     op.routineName = routineName;
     op.end = function end()
     {
@@ -993,7 +1041,7 @@ function hardLinkBreak_body( o )
   _.assert( arguments.length === 1, 'Expects single argument' );
 
   let r = self._pathLocalize( o.filePath );
-  let o2 = _.mapExtend( null, o );
+  let o2 = _.props.extend( null, o );
 
   o2.filePath = r.localPath;
 
@@ -1002,7 +1050,7 @@ function hardLinkBreak_body( o )
 
 _.routineExtend( hardLinkBreak_body, Parent.prototype.hardLinkBreak.body );
 
-let hardLinkBreak = _.routine.uniteCloning_( Parent.prototype._preFilePathScalarWithProviderDefaults, hardLinkBreak_body );
+let hardLinkBreak = _.routine.uniteCloning_replaceByUnite( Parent.prototype._preFilePathScalarWithProviderDefaults, hardLinkBreak_body );
 
 //
 
@@ -1010,7 +1058,7 @@ function areHardLinkedAct( o )
 {
   let self = this;
 
-  _.assertRoutineOptions( areHardLinkedAct, arguments );
+  _.routine.assertOptions( areHardLinkedAct, arguments );
   _.assert( o.filePath.length === 2, 'Expects exactly two arguments' );
 
   let dst = self._pathLocalize( o.filePath[ 0 ] );
@@ -1036,14 +1084,14 @@ function dirMake_body( o )
   _.assert( arguments.length === 1 );
 
   let r = self._pathLocalize( o.filePath );
-  let o2 = _.mapExtend( null, o );
+  let o2 = _.props.extend( null, o );
   o2.filePath = r.localPath;
   return r.provider.dirMake.body.call( r.provider, o2 );
 }
 
 _.routineExtend( dirMake_body, Parent.prototype.dirMake.body );
 
-let dirMake = _.routine.uniteCloning_( Parent.prototype.dirMake.head, dirMake_body );
+let dirMake = _.routine.uniteCloning_replaceByUnite( Parent.prototype.dirMake.head, dirMake_body );
 
 // --
 // accessor
@@ -1223,7 +1271,7 @@ function _Setup1()
     let hubResolving = having.hubResolving;
     let havingBare = having.driving;
     var operates = original.operates;
-    let operatesLength = operates ? _.mapKeys( operates ).length : 0;
+    let operatesLength = operates ? _.props.keys( operates ).length : 0;
     let head = original.head;
     let body = original.body;
 
@@ -1290,11 +1338,11 @@ function _Setup1()
         if( head )
         o = head.call( this, wrap, arguments );
 
-        let o2 = _.mapExtend( null, o );
+        let o2 = _.props.extend( null, o );
 
         if( !head && wrap.defaults )
         if( !wrap.having || !wrap.having.driving )
-        _.routineOptions( wrap, o2 );
+        _.routine.options_( wrap, o2 );
 
         let provider = self;
 
@@ -1335,7 +1383,7 @@ function Init()
     missingMap[ r ] = 'Routines.' + r;
   }
 
-  _.assert( !_.mapKeys( missingMap ).length, 'routine(s) were not written into Extension explicitly', '\n', _.entity.exportString( missingMap, { stringWrapper : '' } ) );
+  _.assert( !_.props.keys( missingMap ).length, 'routine(s) were not written into Extension explicitly', '\n', _.entity.exportString( missingMap, { stringWrapper : '' } ) );
   _.assert( !FilteredRoutines.pathResolveLinkFull );
   _.assert( !( 'pathResolveLinkFull' in FilteredRoutines ) );
   _.map.assertHasNoUndefine( FilteredRoutines );
@@ -1516,6 +1564,7 @@ let Extension =
   _pathLocalize,
   _pathLocalizeMaybe,
   _pathRelocalize,
+  _pathPrepend,
 
   pathCurrentAct,
   pathDirTempAct,

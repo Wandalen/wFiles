@@ -269,10 +269,11 @@ function filesReflectSingle_body( o )
   let path = self.path;
   let con = new _.Consequence();
 
-  o.extra = o.extra || Object.create( null );
-  _.routineOptions( filesReflectSingle_body, o.extra, filesReflectSingle_body.extra );
+  o.extra = _.routine.options_( { defaults : filesReflectSingle_body.extra }, o.extra || null );
+  // o.extra = o.extra || Object.create( null );
+  // _.routine.options_( filesReflectSingle_body, o.extra, filesReflectSingle_body.extra );
 
-  _.assertRoutineOptions( filesReflectSingle_body, o );
+  _.routine.assertOptions( filesReflectSingle_body, o );
   // _.assert( o.mandatory === undefined )
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.routineIs( o.onUp ) && o.onUp.composed && o.onUp.composed.elements.length === 0, 'Not supported options' );
@@ -301,9 +302,9 @@ function filesReflectSingle_body( o )
 
   // if( _.mapIs( srcPath ) )
   // {
-  //   _.assert( _.mapVals( srcPath ).length === 1 );
-  //   _.assert( _.mapVals( srcPath )[ 0 ] === true || _.mapVals( srcPath )[ 0 ] === dstPath );
-  //   srcPath = _.mapKeys( srcPath )[ 0 ];
+  //   _.assert( _.props.vals( srcPath ).length === 1 );
+  //   _.assert( _.props.vals( srcPath )[ 0 ] === true || _.props.vals( srcPath )[ 0 ] === dstPath );
+  //   srcPath = _.props.keys( srcPath )[ 0 ];
   // }
 
   let parsed = self.pathParse( srcPath );
@@ -586,7 +587,7 @@ extra.stashing = 0;
 
 var defaults = filesReflectSingle_body.defaults;
 let filesReflectSingle =
-_.routine.uniteCloning_( _.FileProvider.FindMixin.prototype.filesReflectSingle.head, filesReflectSingle_body );
+_.routine.uniteCloning_replaceByUnite( _.FileProvider.FindMixin.prototype.filesReflectSingle.head, filesReflectSingle_body );
 
 // --
 // relationship

@@ -98,7 +98,7 @@ function _routineDrivingAndChanging( routine )
 
   _.assert( _.objectIs( routine.operates ), () => 'Method ' + routine.name + ' does not have map {-operates-}' );
 
-  if( _.mapKeys( routine.operates ).length === 0 )
+  if( _.props.keys( routine.operates ).length === 0 )
   return false;
 
   return true;
@@ -116,7 +116,7 @@ function _routineFunctor( routine, routineName )
   _.assert( !!routine.having.reading || !!routine.having.writing );
   _.assert( !!routine.having.driving );
   _.assert( !!routine.operates );
-  _.assert( _.mapKeys( routine.operates ).length > 0 );
+  _.assert( _.props.keys( routine.operates ).length > 0 );
   _.assert( _.strDefined( routineName ) );
   _.assert( routine.name === routineName );
 
@@ -135,7 +135,7 @@ function _routineFunctor( routine, routineName )
   {
     let op2 = this;
     _.assert( arguments.length === 0, 'Expects no arguments' );
-    _.assert( _.arrayLike( op2.args ) );
+    _.assert( _.argumentsArray.like( op2.args ) );
     op2.result = op2.originalBody.apply( op2.image, op2.args );
   }
 
@@ -152,10 +152,10 @@ function _routineFunctor( routine, routineName )
   {
     [ routineName ] : function()
     {
-      let op2 = _.mapExtend( null, op );
+      let op2 = _.props.extend( null, op );
       op2.originalFileProvider = this.originalFileProvider;
       op2.originalBody = body;
-      op2.args = _.unrollFrom( arguments );
+      op2.args = _.unroll.from( arguments );
       op2.result = undefined;
 
       if( head )
@@ -164,7 +164,7 @@ function _routineFunctor( routine, routineName )
         // _.assert( 0, 'not tested' );
         op2.args = head.call( this.originalFileProvider, resultRoutine, op2.args );
         if( !_.unrollIs( op2.args ) )
-        op2.args = _.unrollFrom([ op2.args ]);
+        op2.args = _.unroll.from([ op2.args ]);
       }
 
       if( this.onCallBegin )
@@ -174,7 +174,7 @@ function _routineFunctor( routine, routineName )
       }
 
       if( !_.unrollIs( op2.args ) )
-      op2.args = _.unrollFrom([ op2.args ]);
+      op2.args = _.unroll.from([ op2.args ]);
 
       _.assert( !_.argumentsArrayIs( op2.args ), 'Does not expect arguments array' );
       let r = this.image.onCall( op2 );

@@ -161,7 +161,7 @@ function filesReadOld( test )
 //   }
 
 //   var combinations = [];
-//   var keys = _.mapOnlyOwnKeys( map );
+//   var keys = _.props.onlyOwnKeys( map );
 
 //   function combine( i, o )
 //   {
@@ -181,7 +181,7 @@ function filesReadOld( test )
 //       if( i + 1 < keys.length )
 //       combine( i + 1, o )
 //       else
-//       combinations.push( _.mapSupplement( {}, o ) )
+//       combinations.push( _.props.supplement( {}, o ) )
 //     });
 //   }
 
@@ -223,7 +223,7 @@ function filesReadOld( test )
 
 //   function flatMapToTree( map, o )
 //   {
-//     var paths = _.mapOnlyOwnKeys( map );
+//     var paths = _.props.onlyOwnKeys( map );
 //     _.arrayRemoveElementOnce( paths, currentTestDir );
 //     var result = Object.create( null );
 //     var tree = new _.FileProvider.Extract({ filesTree : result })
@@ -312,12 +312,12 @@ function filesReadOld( test )
 //   combine();
 //   combinations.forEach( ( c ) =>
 //   {
-//     var info = _.mapSupplement( {}, c );
+//     var info = _.props.supplement( {}, c );
 //     info.number = ++n;
 //     test.case = _.entity.exportString( info, { levels : 3 } )
 //     var checks = [];
-//     var options = _.mapSupplement( {}, c );
-//     _.mapSupplement( options, filesTreeReadFixedOptions );
+//     var options = _.props.supplement( {}, c );
+//     _.props.supplement( options, filesTreeReadFixedOptions );
 
 //     options.srcPath = currentTestDir;
 //     options.srcProvider = provider;
@@ -408,7 +408,7 @@ function filesReadOld( test )
 //   ]
 
 //   var combinations = [];
-//   var keys = _.mapOnlyOwnKeys( map );
+//   var keys = _.props.onlyOwnKeys( map );
 
 //   function combine( i, o )
 //   {
@@ -428,7 +428,7 @@ function filesReadOld( test )
 //       if( i + 1 < keys.length )
 //       combine( i + 1, o )
 //       else
-//       combinations.push( _.mapSupplement( {}, o ) )
+//       combinations.push( _.props.supplement( {}, o ) )
 //     });
 //   }
 
@@ -442,12 +442,12 @@ function filesReadOld( test )
 //   {
 //     combinations.forEach( ( c ) =>
 //     {
-//       var info = _.mapSupplement( {}, c );
+//       var info = _.props.supplement( {}, c );
 //       info.number = ++n;
 //       test.case = _.entity.exportString( info, { levels : 3 } )
 //       var checks = [];
-//       var options = _.mapSupplement( {}, c );
-//       _.mapSupplement( options, fixedOptions );
+//       var options = _.props.supplement( {}, c );
+//       _.props.supplement( options, fixedOptions );
 
 //       provider.filesDelete( currentTestDir );
 //       options.dstPath = currentTestDir;

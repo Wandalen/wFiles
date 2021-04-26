@@ -47,7 +47,7 @@ function onRoutineEnd( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  _.sure( _.entityIdentical( _.mapKeys( system.providersWithProtocolMap ), [ 'current' ] ), test.name, 'has not restored system!' );
+  _.sure( _.entityIdentical( _.props.keys( system.providersWithProtocolMap ), [ 'current' ] ), test.name, 'has not restored system!' );
 }
 
 //
@@ -339,7 +339,7 @@ function makeStandardExtract( o )
   });
 
   if( o )
-  _.mapExtend( extract, o )
+  _.props.extend( extract, o )
 
   return extract;
 }
@@ -401,7 +401,7 @@ function filesFindTrivial( test )
   clean();
   var o1 = { filePath : path.join( routinePath ), outputFormat : 'relative', onUp, onDown }
   var o2 = { filter : { recursive : 2 }, withTransient : 1, withTerminals : 1, withDirs : 1 }
-  var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
+  var got = provider.filesFind( _.props.extend( null, o1, o2 ) );
   var expected = [ '.' ];
   test.identical( got, expected );
 
@@ -411,7 +411,7 @@ function filesFindTrivial( test )
   clean();
   var o1 = { filePath : path.join( routinePath ), outputFormat : 'relative', onUp, onDown }
   var o2 = { filter : { recursive : 2 }, withTransient : 1, withStem : 0, withTerminals : 1 }
-  var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
+  var got = provider.filesFind( _.props.extend( null, o1, o2 ) );
   var expected = [];
   test.identical( got, expected );
   var expected = [ '.' ];
@@ -425,7 +425,7 @@ function filesFindTrivial( test )
   clean();
   var o1 = { filePath : path.join( routinePath ), outputFormat : 'relative', onUp, onDown }
   var o2 = { filter : { recursive : 2 }, withStem : 0, withTransient : 1, withTerminals : 1 }
-  var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
+  var got = provider.filesFind( _.props.extend( null, o1, o2 ) );
   var expected = [];
   test.identical( got, expected );
   var expected = [ '.' ];
@@ -439,7 +439,7 @@ function filesFindTrivial( test )
   clean();
   var o1 = { filePath : path.join( routinePath ), outputFormat : 'relative', onUp, onDown }
   var o2 = { filter : { recursive : 2 }, withStem : 0, withTerminals : 1 }
-  var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
+  var got = provider.filesFind( _.props.extend( null, o1, o2 ) );
   var expected = [];
   test.identical( got, expected );
   var expected = [ '.' ];
@@ -478,7 +478,7 @@ function filesFindTrivial( test )
   clean();
   var o1 = { filePath : path.join( routinePath, 'f' ), outputFormat : 'relative', onUp, onDown }
   var o2 = { filter : { recursive : 2 }, withTransient : 1, withTerminals : 1 }
-  var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
+  var got = provider.filesFind( _.props.extend( null, o1, o2 ) );
   var expected = [ '.' ];
   test.identical( got, expected );
   var expected = [ '.' ];
@@ -492,7 +492,7 @@ function filesFindTrivial( test )
   clean();
   var o1 = { filePath : path.join( routinePath, 'f' ), outputFormat : 'relative', onUp, onDown }
   var o2 = { filter : { recursive : 2 }, withTransient : 1, withTerminals : 0 }
-  var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
+  var got = provider.filesFind( _.props.extend( null, o1, o2 ) );
   var expected = [];
   test.identical( got, expected );
   var expected = [ '.' ];
@@ -506,7 +506,7 @@ function filesFindTrivial( test )
   clean();
   var o1 = { filePath : path.join( routinePath, 'f' ), outputFormat : 'relative', onUp, onDown }
   var o2 = { filter : { recursive : 2 }, withStem : 0, withTransient : 1, withTerminals : 1 }
-  var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
+  var got = provider.filesFind( _.props.extend( null, o1, o2 ) );
   var expected = [];
   test.identical( got, expected );
   var expected = [ '.' ];
@@ -545,7 +545,7 @@ function filesFindTrivial( test )
   clean();
   var o1 = { filePath : path.join( routinePath ), outputFormat : 'relative', onUp, onDown }
   var o2 = { filter : { recursive : 2 }, withTransient : 1, withTerminals : 1, withDirs : 1 }
-  var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
+  var got = provider.filesFind( _.props.extend( null, o1, o2 ) );
   var expected =
   [
     '.',
@@ -589,7 +589,7 @@ function filesFindTrivial( test )
   clean();
   var o1 = { filePath : path.join( routinePath ), outputFormat : 'relative', onUp, onDown }
   var o2 = { filter : { recursive : 2 }, withStem : 0, withTransient : 1, withTerminals : 1, withDirs : 1 }
-  var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
+  var got = provider.filesFind( _.props.extend( null, o1, o2 ) );
   var expected =
   [
     './d',
@@ -632,7 +632,7 @@ function filesFindTrivial( test )
   clean();
   var o1 = { filePath : path.join( routinePath ), outputFormat : 'relative', onUp, onDown }
   var o2 = { filter : { recursive : 2 }, withTransient : 1, withTerminals : 1, withDirs : 0 }
-  var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
+  var got = provider.filesFind( _.props.extend( null, o1, o2 ) );
   var expected =
   [
     './d',
@@ -672,7 +672,7 @@ function filesFindTrivial( test )
   clean();
   var o1 = { filePath : path.join( routinePath ), outputFormat : 'relative', onUp, onDown }
   var o2 = { filter : { recursive : 2 }, withTransient : 1, withTerminals : 0, withDirs : 1 }
-  var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
+  var got = provider.filesFind( _.props.extend( null, o1, o2 ) );
   var expected = [ '.', './dir1', './dir1/dir11', './dir2' ];
   test.identical( got, expected );
   var expected =
@@ -708,7 +708,7 @@ function filesFindTrivial( test )
   var filter = { prefixPath : path.join( routinePath ), filePath, recursive : 2 }
   var o1 = { filter, outputFormat : 'relative', onUp, onDown }
   var o2 = { withTransient : 1, withTerminals : 1, withDirs : 1 }
-  var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
+  var got = provider.filesFind( _.props.extend( null, o1, o2 ) );
   var expected = [ '.', './a', './dir11' ];
   test.identical( got, expected );
   var expected = [ '.', './a', './dir11' ];
@@ -724,7 +724,7 @@ function filesFindTrivial( test )
   var filter = { prefixPath : path.join( routinePath ), filePath, recursive : 2 }
   var o1 = { filter, outputFormat : 'relative', onUp, onDown }
   var o2 = { withTransient : 1, withTerminals : 1, withDirs : 1 }
-  var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
+  var got = provider.filesFind( _.props.extend( null, o1, o2 ) );
   var expected = [ '.', './a', './dir11' ];
   test.identical( got, expected );
   var expected = [ '.', './a', './dir11' ];
@@ -740,7 +740,7 @@ function filesFindTrivial( test )
   var filter = { prefixPath : path.join( routinePath ), filePath, recursive : 2 }
   var o1 = { filter, outputFormat : 'relative', onUp, onDown }
   var o2 = { withTransient : 1, withTerminals : 1, withDirs : 1 }
-  var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
+  var got = provider.filesFind( _.props.extend( null, o1, o2 ) );
   var expected = [ '.', './a', './dir11' ]
   test.identical( got, expected );
   var expected = [ '.', './a', './dir11' ];
@@ -756,7 +756,7 @@ function filesFindTrivial( test )
   var filter = { prefixPath : path.join( routinePath ), filePath, recursive : 2 }
   var o1 = { filter, outputFormat : 'relative', onUp, onDown }
   var o2 = { withTransient : 1, withTerminals : 1, withDirs : 1 }
-  var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
+  var got = provider.filesFind( _.props.extend( null, o1, o2 ) );
   var expected = [ '.', './a', './dir11' ];
   test.identical( got, expected );
   var expected = [ '.', './a', './dir11' ];
@@ -786,7 +786,7 @@ function filesFindTrivial( test )
   var filter = { filePath, recursive : 2 }
   var o1 = { filter, outputFormat : 'relative', onUp, onDown }
   var o2 = { withTransient : 0, withStem : 1, withTerminals : 1, withDirs : 1 }
-  var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
+  var got = provider.filesFind( _.props.extend( null, o1, o2 ) );
   var expected = [ './a', './b', './dir11/a', './dir11/b', './dira', './dirb' ];
   test.identical( got, expected );
   var expected =
@@ -820,7 +820,7 @@ function filesFindTrivial( test )
   var filter = { filePath, recursive : 2 }
   var o1 = { filter, outputFormat : 'relative', onUp, onDown }
   var o2 = { withTransient : 0, withStem : 1, withTerminals : 1, withDirs : 1 }
-  var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
+  var got = provider.filesFind( _.props.extend( null, o1, o2 ) );
   var expected = [ './dir2/b', './dir1/a', './dir1/dir11/a', './dir1/dira' ];
   test.identical( got, expected );
   var expected =
@@ -856,7 +856,7 @@ function filesFindTrivial( test )
   var filter = { filePath, recursive : 2 }
   var o1 = { filter, outputFormat : 'relative', onUp, onDown }
   var o2 = { withTransient : 1, withStem : 0, withTerminals : 1, withDirs : 0 }
-  var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
+  var got = provider.filesFind( _.props.extend( null, o1, o2 ) );
   var expected = [ './dir2/b', './dir1/a', './dir1/dir11/a' ]
   test.identical( got, expected );
   var expected =
@@ -942,7 +942,7 @@ function filesFindTrivialAsync( test )
       withDirs : 1
     }
 
-    return provider.filesFind( _.mapExtend( null, o ) )
+    return provider.filesFind( _.props.extend( null, o ) )
     .finally( ( err, got ) =>
     {
       test.identical( err, undefined );
@@ -1509,8 +1509,8 @@ function filesFind( test )
   // });
   //
   // test.true( got.length > 0 );
-  // test.identical( got.length + 1, _.mapOnlyOwnKeys( onUpMap ).length );
-  // test.identical( got.length + 1, _.mapOnlyOwnKeys( onDownMap ).length );
+  // test.identical( got.length + 1, _.props.onlyOwnKeys( onUpMap ).length );
+  // test.identical( got.length + 1, _.props.onlyOwnKeys( onDownMap ).length );
 
   /* */
 
@@ -1581,8 +1581,8 @@ function filesFind( test )
               if( o.outputFormat !== 'nothing' )
               o.glob = glob;
 
-              _.mapSupplement( o, fixedOptions );
-              _.mapSupplement( o.filter, fixedOptions.filter );
+              _.props.supplement( o, fixedOptions );
+              _.props.supplement( o.filter, fixedOptions.filter );
               combinations.push( o );
             })
           });
@@ -1687,7 +1687,7 @@ function filesFind( test )
       }
     };
 
-    _.mapSupplement( o, fixedOptions );
+    _.props.supplement( o, fixedOptions );
 
     var info = _.cloneJust( o );
     info.level = levels;
@@ -1933,7 +1933,7 @@ function filesFind( test )
 
     for( var i = 0; i < numberOfDuplicates; i++ )
     {
-      var keys = _.mapOnlyOwnKeys( tree );
+      var keys = _.props.onlyOwnKeys( tree );
       var key = keys.pop();
       tree[ String.fromCharCode( key.charCodeAt(0) + 1 ) ] = _.cloneJust( tree[ key ] );
     }
@@ -1943,7 +1943,7 @@ function filesFind( test )
 
     function makePaths( test, _path )
     {
-      var keys = _.mapOnlyOwnKeys( test );
+      var keys = _.props.onlyOwnKeys( test );
       keys.forEach( ( key ) =>
       {
         if( _.objectIs( test[ key ] ) )
@@ -4797,7 +4797,7 @@ function filesFindResolving( test )
     resolvingSoftLink : 0,
     resolvingTextLink : 0,
   }
-  var options = _.mapExtend( o, fixedOptions );
+  var options = _.props.extend( o, fixedOptions );
   provider.fieldPush( 'usingTextLink', 0 );
   var files = provider.filesFind( options );
   var filtered = files.map( recordSimplify );
@@ -4828,7 +4828,7 @@ function filesFindResolving( test )
     resolvingSoftLink : 1,
     resolvingTextLink : 0,
   }
-  var options = _.mapExtend( o, fixedOptions );
+  var options = _.props.extend( o, fixedOptions );
   provider.fieldPush( 'usingTextLink', 0 );
   var files = provider.filesFind( options );
   var filtered = files.map( recordSimplify );
@@ -4859,7 +4859,7 @@ function filesFindResolving( test )
     resolvingSoftLink : 1,
     resolvingTextLink : 1,
   }
-  var options = _.mapExtend( o, fixedOptions );
+  var options = _.props.extend( o, fixedOptions );
   provider.fieldPush( 'usingTextLink', 0 );
   var files = provider.filesFind( options );
   var filtered = files.map( recordSimplify );
@@ -4890,7 +4890,7 @@ function filesFindResolving( test )
     resolvingSoftLink : 1,
     resolvingTextLink : 1,
   }
-  var options = _.mapExtend( o, fixedOptions );
+  var options = _.props.extend( o, fixedOptions );
   provider.fieldPush( 'usingTextLink', 1 );
   var files = provider.filesFind( options );
   var filtered = files.map( recordSimplify );
@@ -4925,7 +4925,7 @@ function filesFindResolving( test )
     resolvingSoftLink : 0,
     resolvingTextLink : 0,
   }
-  var options = _.mapExtend( o, fixedOptions );
+  var options = _.props.extend( o, fixedOptions );
   provider.fileWrite( textLinkPath, 'link ' + srcFilePath );
 
   var files = provider.filesFind( options );
@@ -4970,7 +4970,7 @@ function filesFindResolving( test )
     resolvingSoftLink : 0,
     resolvingTextLink : 1,
   }
-  var options = _.mapExtend( o, fixedOptions );
+  var options = _.props.extend( o, fixedOptions );
   provider.fileWrite( textLinkPath, 'link ' + srcFilePath );
 
   var files = provider.filesFind( options );
@@ -5014,7 +5014,7 @@ function filesFindResolving( test )
     resolvingSoftLink : 0,
     resolvingTextLink : 1,
   }
-  var options = _.mapExtend( o, fixedOptions );
+  var options = _.props.extend( o, fixedOptions );
   provider.fileWrite( textLinkPath, 'link ' + srcFilePath );
 
   var files = provider.filesFind( options );
@@ -5058,7 +5058,7 @@ function filesFindResolving( test )
     resolvingSoftLink : 1,
     resolvingTextLink : 1,
   }
-  var options = _.mapExtend( o, fixedOptions );
+  var options = _.props.extend( o, fixedOptions );
   provider.fileWrite( textLinkPath, 'link ' + srcFilePath );
 
   var files = provider.filesFind( options );
@@ -5102,7 +5102,7 @@ function filesFindResolving( test )
     resolvingSoftLink : 1,
     resolvingTextLink : 1,
   }
-  var options = _.mapExtend( o, fixedOptions );
+  var options = _.props.extend( o, fixedOptions );
   provider.fileWrite( textLinkPath, 'link ' + srcFilePath );
 
   var files = provider.filesFind( options );
@@ -5147,7 +5147,7 @@ function filesFindResolving( test )
     resolvingSoftLink : 1,
     resolvingTextLink : 1,
   }
-  var options = _.mapExtend( o, fixedOptions );
+  var options = _.props.extend( o, fixedOptions );
   provider.fileWrite( textLinkPath, 'link ' + srcFilePath );
   provider.fileWrite( textLink2Path, 'link ' + srcFilePath );
 
@@ -5199,7 +5199,7 @@ function filesFindResolving( test )
     resolvingSoftLink : 0,
     resolvingTextLink : 0,
   }
-  var o2 = _.mapExtend( o, fixedOptions );
+  var o2 = _.props.extend( o, fixedOptions );
   provider.fieldPush( 'usingTextLink', 0 );
   var softLink = path.join( routinePath, 'link' );
   var srcPath = terminalPath;
@@ -5241,7 +5241,7 @@ function filesFindResolving( test )
     resolvingSoftLink : 1,
     resolvingTextLink : 0,
   }
-  var options = _.mapExtend( o, fixedOptions );
+  var options = _.props.extend( o, fixedOptions );
   provider.fieldPush( 'usingTextLink', 0 );
   var softLink = path.join( routinePath, 'link' );
   var srcPath = terminalPath;
@@ -5284,7 +5284,7 @@ function filesFindResolving( test )
     resolvingTextLink : 0,
   }
 
-  var options = _.mapExtend( o, fixedOptions );
+  var options = _.props.extend( o, fixedOptions );
   provider.fieldPush( 'usingTextLink', 1 );
   var softLink = path.join( routinePath, 'link' );
   var srcPath = terminalPath;
@@ -5332,7 +5332,7 @@ function filesFindResolving( test )
     resolvingTextLink : 0,
     withTransient : 0
   }
-  var options = _.mapExtend( o, fixedOptions );
+  var options = _.props.extend( o, fixedOptions );
   provider.softLink( softLink, srcDirPath );
 
   var files = provider.filesFind(options );
@@ -5387,7 +5387,7 @@ function filesFindResolving( test )
     resolvingSoftLink : 1,
     resolvingTextLink : 1,
   }
-  var options = _.mapExtend( o, fixedOptions );
+  var options = _.props.extend( o, fixedOptions );
   provider.softLink( softLink, srcDirPath );
 
   var files = provider.filesFind( options );
@@ -5443,7 +5443,7 @@ function filesFindResolving( test )
     resolvingTextLink : 0,
   }
 
-  var options = _.mapExtend( o, fixedOptions );
+  var options = _.props.extend( o, fixedOptions );
   provider.fieldPush( 'usingTextLink', 0 );
   var softLink = path.join( routinePath, 'link' );
   var softLink2 = path.join( routinePath, 'link2' );
@@ -5497,7 +5497,7 @@ function filesFindResolving( test )
     resolvingTextLink : 1,
   }
 
-  var options = _.mapExtend( o, fixedOptions );
+  var options = _.props.extend( o, fixedOptions );
   provider.fieldPush( 'usingTextLink', 1 );
   var softLink = path.join( routinePath, 'link' );
   var softLink2 = path.join( routinePath, 'link2' );
@@ -5551,7 +5551,7 @@ function filesFindResolving( test )
     resolvingTextLink : 0,
   }
 
-  var options = _.mapExtend( o, fixedOptions );
+  var options = _.props.extend( o, fixedOptions );
   provider.fieldPush( 'usingTextLink', 0 );
   var softLink = path.join( routinePath, 'link' );
   var softLink2 = path.join( routinePath, 'link2' );
@@ -5605,7 +5605,7 @@ function filesFindResolving( test )
     resolvingTextLink : 1,
   }
 
-  var options = _.mapExtend( o, fixedOptions );
+  var options = _.props.extend( o, fixedOptions );
   provider.fieldPush( 'usingTextLink', 1 );
   var softLink = path.join( routinePath, 'link' );
   var softLink2 = path.join( routinePath, 'link2' );
@@ -5662,7 +5662,7 @@ function filesFindResolving( test )
     resolvingSoftLink : 1,
     resolvingTextLink : 1,
   }
-  var options = _.mapExtend( o, fixedOptions );
+  var options = _.props.extend( o, fixedOptions );
   provider.fileWrite( textLinkPath, 'link ' + srcFilePath );
   provider.softLink( softLinkPath, textLinkPath );
 
@@ -5716,7 +5716,7 @@ function filesFindResolving( test )
     resolvingSoftLink : 1,
     resolvingTextLink : 1,
   }
-  var options = _.mapExtend( o, fixedOptions );
+  var options = _.props.extend( o, fixedOptions );
   provider.fileWrite( textLinkPath, 'link ' + srcDirPath );
   provider.softLink( softLinkPath, textLinkPath );
 
@@ -8214,7 +8214,7 @@ function filesGlob( test )
 
   function completeOptions( glob )
   {
-    var options = _.mapExtend( null, commonOptions );
+    var options = _.props.extend( null, commonOptions );
     options.filePath = path.join( routinePath, glob );
     return options
   }
@@ -8489,7 +8489,7 @@ function filesFindDistinct( test )
     filter,
   }
 
-  var got = provider.filesFind( _.mapExtend( null, o1 ) );
+  var got = provider.filesFind( _.props.extend( null, o1 ) );
   var expected = abs([ 'dir1' ]);
   test.identical( got, expected );
 
@@ -8510,7 +8510,7 @@ function filesFindDistinct( test )
     filter,
   }
 
-  var got = provider.filesFind( _.mapExtend( null, o1 ) );
+  var got = provider.filesFind( _.props.extend( null, o1 ) );
   var expected = abs([]);
   test.identical( got, expected );
 
@@ -8530,7 +8530,7 @@ function filesFindDistinct( test )
     filter,
   }
 
-  var got = provider.filesFind( _.mapExtend( null, o1 ) );
+  var got = provider.filesFind( _.props.extend( null, o1 ) );
   var expected = abs([ 'dir1/t1', 'dir1/t2', 'dir1/dir11/t3' ]);
   test.identical( got, expected );
 
@@ -8551,7 +8551,7 @@ function filesFindDistinct( test )
     filter,
   }
 
-  var got = provider.filesFind( _.mapExtend( null, o1 ) );
+  var got = provider.filesFind( _.props.extend( null, o1 ) );
   var expected = abs([ 'dir1/t1', 'dir1/t2', 'dir1/dir11/t3' ]);
   test.identical( got, expected );
 
@@ -8572,7 +8572,7 @@ function filesFindDistinct( test )
     filter,
   }
 
-  var got = provider.filesFind( _.mapExtend( null, o1 ) );
+  var got = provider.filesFind( _.props.extend( null, o1 ) );
   var expected = abs([ 'dir1', 'dir1/t1', 'dir1/t2', 'dir1/dir11', 'dir1/dir11/t3' ]);
   test.identical( got, expected );
 
@@ -8593,7 +8593,7 @@ function filesFindDistinct( test )
     filter,
   }
 
-  var got = provider.filesFind( _.mapExtend( null, o1 ) );
+  var got = provider.filesFind( _.props.extend( null, o1 ) );
   var expected = abs([]);
   test.identical( got, expected );
 
@@ -8611,7 +8611,7 @@ function filesFindDistinct( test )
     filter,
   }
 
-  var got = provider.filesFind( _.mapExtend( null, o1 ) );
+  var got = provider.filesFind( _.props.extend( null, o1 ) );
   var expected = abs([ 'dirX' ]);
   test.identical( got, expected );
 
@@ -8631,7 +8631,7 @@ function filesFindDistinct( test )
     filter,
   }
 
-  var got = provider.filesFind( _.mapExtend( null, o1 ) );
+  var got = provider.filesFind( _.props.extend( null, o1 ) );
   var expected = abs([ 'dirX/dirY' ]);
   test.identical( got, expected );
 
@@ -8654,7 +8654,7 @@ function filesFindDistinct( test )
 
   test.shouldThrowErrorSync( () =>
   {
-    var got = provider.filesFind( _.mapExtend( null, o1 ) );
+    var got = provider.filesFind( _.props.extend( null, o1 ) );
     var expected = abs([]);
     test.identical( got, expected );
   });
@@ -8677,7 +8677,7 @@ function filesFindDistinct( test )
 
   test.shouldThrowErrorSync( () =>
   {
-    var got = provider.filesFind( _.mapExtend( null, o1 ) );
+    var got = provider.filesFind( _.props.extend( null, o1 ) );
     var expected = abs([]);
     test.identical( got, expected );
   });
@@ -8699,7 +8699,7 @@ function filesFindDistinct( test )
     filter,
   }
 
-  var got = provider.filesFind( _.mapExtend( null, o1 ) );
+  var got = provider.filesFind( _.props.extend( null, o1 ) );
   var expected = abs([]);
   test.identical( got, expected );
 
@@ -8722,7 +8722,7 @@ function filesFindDistinct( test )
     filter,
   }
 
-  var got = provider.filesFind( _.mapExtend( null, o1 ) );
+  var got = provider.filesFind( _.props.extend( null, o1 ) );
   var expected = abs([]);
   test.identical( got, expected );
 
@@ -8746,7 +8746,7 @@ function filesFindDistinct( test )
     filter,
   }
 
-  var got = provider.filesFind( _.mapExtend( null, o1 ) );
+  var got = provider.filesFind( _.props.extend( null, o1 ) );
   var expected = abs([ 'dir1/t2', 'dir1/dir11/t3' ]);
   test.identical( got, expected );
 
@@ -8770,7 +8770,7 @@ function filesFindDistinct( test )
     filter,
   }
 
-  var got = provider.filesFind( _.mapExtend( null, o1 ) );
+  var got = provider.filesFind( _.props.extend( null, o1 ) );
   var expected = abs([ 'dir1/t2', 'dir1/dir11/t3' ]);
   test.identical( got, expected );
 
@@ -8922,7 +8922,7 @@ function filesFindSimplifyGlob( test )
   test.identical( o.withActual, true );
   test.identical( o.withTransient, false );
 
-  test.true( _.arraySetIdentical( _.mapKeys( o.filter.formedMasksMap ), [ abs( 'dir1' ) ] ) );
+  test.true( _.arraySetIdentical( _.props.keys( o.filter.formedMasksMap ), [ abs( 'dir1' ) ] ) );
   test.identical( o.filter.formedMasksMap[ abs( 'dir1' ) ].maskAll.includeAll.length, 0 );
   test.identical( o.filter.formedMasksMap[ abs( 'dir1' ) ].maskAll.includeAny.length, 1 );
   test.identical( o.filter.formed, 5 );
@@ -9918,7 +9918,7 @@ function filesFindMandatoryString( test )
   /**/
 
   test.case = 'default';
-  var o2 = _.mapExtend( null, o1 );
+  var o2 = _.props.extend( null, o1 );
   var found = provider.filesFind( o2 );
   var expected = abs([]);
   test.identical( found, expected );
@@ -9926,8 +9926,8 @@ function filesFindMandatoryString( test )
   /**/
 
   test.case = 'withDefunct : 0, mandatory : 0, filter : { recursive : 0 }';
-  var o2 = _.mapExtend( null, o1 );
-  o2.filter = _.mapExtend( null, o2.filter );
+  var o2 = _.props.extend( null, o1 );
+  o2.filter = _.props.extend( null, o2.filter );
   o2.withDefunct = 0;
   o2.mandatory = 0;
   o2.filter.recursive = 0;
@@ -9938,8 +9938,8 @@ function filesFindMandatoryString( test )
   /**/
 
   test.case = 'withDefunct : 0, mandatory : 0, filter : { recursive : 1 }';
-  var o2 = _.mapExtend( null, o1 );
-  o2.filter = _.mapExtend( null, o2.filter );
+  var o2 = _.props.extend( null, o1 );
+  o2.filter = _.props.extend( null, o2.filter );
   o2.withDefunct = 0;
   o2.mandatory = 0;
   o2.filter.recursive = 1;
@@ -9950,8 +9950,8 @@ function filesFindMandatoryString( test )
   /**/
 
   test.case = 'withDefunct : 0, mandatory : 1, filter : { recursive : 0 }';
-  var o2 = _.mapExtend( null, o1 );
-  o2.filter = _.mapExtend( null, o2.filter );
+  var o2 = _.props.extend( null, o1 );
+  o2.filter = _.props.extend( null, o2.filter );
   o2.withDefunct = 0;
   o2.mandatory = 1;
   o2.filter.recursive = 0;
@@ -9965,8 +9965,8 @@ function filesFindMandatoryString( test )
   /**/
 
   test.case = 'withDefunct : 0, mandatory : 1, filter : { recursive : 1 }';
-  var o2 = _.mapExtend( null, o1 );
-  o2.filter = _.mapExtend( null, o2.filter );
+  var o2 = _.props.extend( null, o1 );
+  o2.filter = _.props.extend( null, o2.filter );
   o2.withDefunct = 0;
   o2.mandatory = 1;
   o2.filter.recursive = 1;
@@ -9980,8 +9980,8 @@ function filesFindMandatoryString( test )
   /**/
 
   test.case = 'withDefunct : 1, mandatory : 0, filter : { recursive : 0 }';
-  var o2 = _.mapExtend( null, o1 );
-  o2.filter = _.mapExtend( null, o2.filter );
+  var o2 = _.props.extend( null, o1 );
+  o2.filter = _.props.extend( null, o2.filter );
   o2.withDefunct = 1;
   o2.mandatory = 0;
   o2.filter.recursive = 0;
@@ -9992,8 +9992,8 @@ function filesFindMandatoryString( test )
   /**/
 
   test.case = 'withDefunct : 1, mandatory : 0, filter : { recursive : 1 }';
-  var o2 = _.mapExtend( null, o1 );
-  o2.filter = _.mapExtend( null, o2.filter );
+  var o2 = _.props.extend( null, o1 );
+  o2.filter = _.props.extend( null, o2.filter );
   o2.withDefunct = 1;
   o2.mandatory = 0;
   o2.filter.recursive = 1;
@@ -10004,8 +10004,8 @@ function filesFindMandatoryString( test )
   /**/
 
   test.case = 'withDefunct : 1, mandatory : 1, filter : { recursive : 0 }';
-  var o2 = _.mapExtend( null, o1 );
-  o2.filter = _.mapExtend( null, o2.filter );
+  var o2 = _.props.extend( null, o1 );
+  o2.filter = _.props.extend( null, o2.filter );
   o2.withDefunct = 1;
   o2.mandatory = 1;
   o2.filter.recursive = 0;
@@ -10019,8 +10019,8 @@ function filesFindMandatoryString( test )
   /**/
 
   test.case = 'withDefunct : 1, mandatory : 1, filter : { recursive : 1 }';
-  var o2 = _.mapExtend( null, o1 );
-  o2.filter = _.mapExtend( null, o2.filter );
+  var o2 = _.props.extend( null, o1 );
+  o2.filter = _.props.extend( null, o2.filter );
   o2.withDefunct = 1;
   o2.mandatory = 1;
   o2.filter.recursive = 1;
@@ -10117,8 +10117,8 @@ function filesFindMandatoryMap( test )
   /* - */
 
   test.case = 'default';
-  var o2 = _.mapExtend( null, o1 );
-  o2.filter = _.mapExtend( null, o2.filter );
+  var o2 = _.props.extend( null, o1 );
+  o2.filter = _.props.extend( null, o2.filter );
   var found = provider.filesFind( o2 );
   var expected = abs
   ([
@@ -10136,8 +10136,8 @@ function filesFindMandatoryMap( test )
   /**/
 
   test.case = 'recursive:0 mandatory:0 withDefunct:0';
-  var o2 = _.mapExtend( null, o1 );
-  o2.filter = _.mapExtend( null, o2.filter );
+  var o2 = _.props.extend( null, o1 );
+  o2.filter = _.props.extend( null, o2.filter );
   o2.filter.recursive = 0;
   o2.mandatory = 0;
   o2.withDefunct = 0;
@@ -10155,8 +10155,8 @@ function filesFindMandatoryMap( test )
   /**/
 
   test.case = 'recursive:0 mandatory:0 withDefunct:1';
-  var o2 = _.mapExtend( null, o1 );
-  o2.filter = _.mapExtend( null, o2.filter );
+  var o2 = _.props.extend( null, o1 );
+  o2.filter = _.props.extend( null, o2.filter );
   o2.filter.recursive = 0;
   o2.mandatory = 0;
   o2.withDefunct = 1;
@@ -10175,8 +10175,8 @@ function filesFindMandatoryMap( test )
   /**/
 
   test.case = 'recursive:0 mandatory:1 withDefunct:0';
-  var o2 = _.mapExtend( null, o1 );
-  o2.filter = _.mapExtend( null, o2.filter );
+  var o2 = _.props.extend( null, o1 );
+  o2.filter = _.props.extend( null, o2.filter );
   o2.filter.recursive = 0;
   o2.mandatory = 1;
   o2.withDefunct = 0;
@@ -10197,8 +10197,8 @@ function filesFindMandatoryMap( test )
   /**/
 
   test.case = 'recursive:0 mandatory:1 withDefunct:1';
-  var o2 = _.mapExtend( null, o1 );
-  o2.filter = _.mapExtend( null, o2.filter );
+  var o2 = _.props.extend( null, o1 );
+  o2.filter = _.props.extend( null, o2.filter );
   o2.filter.recursive = 0;
   o2.mandatory = 1;
   o2.withDefunct = 1;
@@ -10220,8 +10220,8 @@ function filesFindMandatoryMap( test )
   /**/
 
   test.case = 'recursive:1 mandatory:0 withDefunct:0';
-  var o2 = _.mapExtend( null, o1 );
-  o2.filter = _.mapExtend( null, o2.filter );
+  var o2 = _.props.extend( null, o1 );
+  o2.filter = _.props.extend( null, o2.filter );
   o2.filter.recursive = 1;
   o2.mandatory = 0;
   o2.withDefunct = 0;
@@ -10242,8 +10242,8 @@ function filesFindMandatoryMap( test )
   /**/
 
   test.case = 'recursive:1 mandatory:0 withDefunct:1';
-  var o2 = _.mapExtend( null, o1 );
-  o2.filter = _.mapExtend( null, o2.filter );
+  var o2 = _.props.extend( null, o1 );
+  o2.filter = _.props.extend( null, o2.filter );
   o2.filter.recursive = 1;
   o2.mandatory = 0;
   o2.withDefunct = 1;
@@ -10265,8 +10265,8 @@ function filesFindMandatoryMap( test )
   /**/
 
   test.case = 'recursive:1 mandatory:1 withDefunct:0';
-  var o2 = _.mapExtend( null, o1 );
-  o2.filter = _.mapExtend( null, o2.filter );
+  var o2 = _.props.extend( null, o1 );
+  o2.filter = _.props.extend( null, o2.filter );
   o2.filter.recursive = 1;
   o2.mandatory = 1;
   o2.withDefunct = 0;
@@ -10290,8 +10290,8 @@ function filesFindMandatoryMap( test )
   /**/
 
   test.case = 'recursive:1 mandatory:1 withDefunct:1';
-  var o2 = _.mapExtend( null, o1 );
-  o2.filter = _.mapExtend( null, o2.filter );
+  var o2 = _.props.extend( null, o1 );
+  o2.filter = _.props.extend( null, o2.filter );
   o2.filter.recursive = 1;
   o2.mandatory = 1;
   o2.withDefunct = 1;
@@ -10315,8 +10315,8 @@ function filesFindMandatoryMap( test )
   /**/
 
   test.case = 'recursive:2 mandatory:0 withDefunct:0';
-  var o2 = _.mapExtend( null, o1 );
-  o2.filter = _.mapExtend( null, o2.filter );
+  var o2 = _.props.extend( null, o1 );
+  o2.filter = _.props.extend( null, o2.filter );
   o2.filter.recursive = 2;
   o2.mandatory = 0;
   o2.withDefunct = 0;
@@ -10334,8 +10334,8 @@ function filesFindMandatoryMap( test )
   /**/
 
   test.case = 'recursive:2 mandatory:0 withDefunct:1';
-  var o2 = _.mapExtend( null, o1 );
-  o2.filter = _.mapExtend( null, o2.filter );
+  var o2 = _.props.extend( null, o1 );
+  o2.filter = _.props.extend( null, o2.filter );
   o2.filter.recursive = 2;
   o2.mandatory = 0;
   o2.withDefunct = 1;
@@ -10353,8 +10353,8 @@ function filesFindMandatoryMap( test )
   /**/
 
   test.case = 'recursive:2 mandatory:1 withDefunct:0';
-  var o2 = _.mapExtend( null, o1 );
-  o2.filter = _.mapExtend( null, o2.filter );
+  var o2 = _.props.extend( null, o1 );
+  o2.filter = _.props.extend( null, o2.filter );
   o2.filter.recursive = 2;
   o2.mandatory = 1;
   o2.withDefunct = 0;
@@ -10368,8 +10368,8 @@ function filesFindMandatoryMap( test )
   /**/
 
   test.case = 'recursive:2 mandatory:1 withDefunct:1';
-  var o2 = _.mapExtend( null, o1 );
-  o2.filter = _.mapExtend( null, o2.filter );
+  var o2 = _.props.extend( null, o1 );
+  o2.filter = _.props.extend( null, o2.filter );
   o2.filter.recursive = 2;
   o2.mandatory = 1;
   o2.withDefunct = 1;
@@ -15006,7 +15006,7 @@ function filesFindGroups( test )
     'errors' : [],
     'options' : true,
   }
-  var src2 = _.mapExtend( null, src );
+  var src2 = _.props.extend( null, src );
   src2.recursive = 1;
   var o2 =
   {
@@ -15040,7 +15040,7 @@ function filesFindGroups( test )
     'options' : true,
   }
 
-  var src2 = _.mapExtend( null, src );
+  var src2 = _.props.extend( null, src );
   src2.recursive = 0;
 
   var o2 =
@@ -15061,7 +15061,7 @@ function filesFindGroups( test )
     test.case = 'filter : { recursive : 0 }, mandatory : 1';
     test.shouldThrowErrorSync( () =>
     {
-      var src2 = _.mapExtend( null, src );
+      var src2 = _.props.extend( null, src );
       src2.recursive = 0;
       var o2 =
       {
@@ -15231,7 +15231,7 @@ function filesReflectEvaluate( test )
     dst : abs( './dir/dst' ),
   }
 
-  var records = provider.filesReflectEvaluate( _.mapExtend( null, o1 ) );
+  var records = provider.filesReflectEvaluate( _.props.extend( null, o1 ) );
 
   var expectedDstRelative = [ '.', './a', './b', './c', './c/a' ];
   var expectedSrcRelative = [ '.', './a', './b', './c', './c/a' ];
@@ -17661,7 +17661,7 @@ function _filesReflectWithFilter( test, o )
 
   test.case = 'trivial \n' + _.entity.exportString( o2 );
 
-  var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
+  var records = p.system.filesReflect( _.props.extend( null, o1, o2 ) );
 
   var expected = _.FileProvider.Extract
   ({
@@ -17782,7 +17782,7 @@ function _filesReflectWithFilter( test, o )
 
   test.case = 'trivial \n' + _.entity.exportString( o2 );
 
-  var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
+  var records = p.system.filesReflect( _.props.extend( null, o1, o2 ) );
 
   var expected = _.FileProvider.Extract
   ({
@@ -17916,7 +17916,7 @@ function _filesReflectWithFilter( test, o )
 
   test.case = 'dir by term and vice-versa \n' + _.entity.exportString( o2 );
 
-  var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
+  var records = p.system.filesReflect( _.props.extend( null, o1, o2 ) );
 
   var expected = _.FileProvider.Extract
   ({
@@ -18101,7 +18101,7 @@ function filesReflect( test )
 
     test.case = 'complex move\n' + _.entity.exportString( o2 );
 
-    var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
+    var records = p.system.filesReflect( _.props.extend( null, o1, o2 ) );
 
     var expected = _.FileProvider.Extract
     ({
@@ -18170,7 +18170,7 @@ function filesReflect( test )
 
     test.case = 'complex move with linking : softLink\n' + _.entity.exportString( o2 );
 
-    var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
+    var records = p.system.filesReflect( _.props.extend( null, o1, o2 ) );
 
     var expected = _.FileProvider.Extract
     ({
@@ -18233,7 +18233,7 @@ function filesReflect( test )
 
     test.case = 'complex move with dstRewriting:0, includingNonAllowed:0\n' + _.entity.exportString( o2 );
 
-    var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
+    var records = p.system.filesReflect( _.props.extend( null, o1, o2 ) );
 
     var expected = _.FileProvider.Extract
     ({
@@ -18283,7 +18283,7 @@ function filesReflect( test )
 
     test.case = 'complex move with dstRewriting:0, includingNonAllowed:1\n' + _.entity.exportString( o2 );
 
-    var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
+    var records = p.system.filesReflect( _.props.extend( null, o1, o2 ) );
 
     var expected = _.FileProvider.Extract
     ({
@@ -18339,7 +18339,7 @@ function filesReflect( test )
 
     test.case = 'complex move with writing : 0\n' + _.entity.exportString( o2 );
 
-    var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
+    var records = p.system.filesReflect( _.props.extend( null, o1, o2 ) );
 
     var expected = _.FileProvider.Extract
     ({
@@ -18395,7 +18395,7 @@ function filesReflect( test )
 
     test.case = 'complex move with writing : 1, linking : nop\n' + _.entity.exportString( o2 );
 
-    var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
+    var records = p.system.filesReflect( _.props.extend( null, o1, o2 ) );
 
     var expected = _.FileProvider.Extract
     ({
@@ -18467,7 +18467,7 @@ function filesReflect( test )
 
     test.case = 'complex move with writing : 1, dstRewriting : 0, includingNonAllowed : 0, linking : nop\n' + _.entity.exportString( o2 );
 
-    var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
+    var records = p.system.filesReflect( _.props.extend( null, o1, o2 ) );
 
     var expected = _.FileProvider.Extract
     ({
@@ -18520,7 +18520,7 @@ function filesReflect( test )
 
     test.case = 'complex move with writing : 1, dstRewriting : 0, includingNonAllowed : 1, linking : nop\n' + _.entity.exportString( o2 );
 
-    var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
+    var records = p.system.filesReflect( _.props.extend( null, o1, o2 ) );
 
     var expected = _.FileProvider.Extract
     ({
@@ -18579,7 +18579,7 @@ function filesReflect( test )
 
     test.case = 'complex move with preservingSame : 1, linking : fileCopy\n' + _.entity.exportString( o2 );
 
-    var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
+    var records = p.system.filesReflect( _.props.extend( null, o1, o2 ) );
 
     var expected = _.FileProvider.Extract
     ({
@@ -18643,7 +18643,7 @@ function filesReflect( test )
 
     test.case = 'complex move with srcDeleting : 1\n' + _.entity.exportString( o2 );
 
-    var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
+    var records = p.system.filesReflect( _.props.extend( null, o1, o2 ) );
 
     var expected = _.FileProvider.Extract
     ({
@@ -18709,7 +18709,7 @@ function filesReflect( test )
 
     test.case = 'complex move with srcDeleting : 1, dstRewriting : 0\n' + _.entity.exportString( o2 );
 
-    var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
+    var records = p.system.filesReflect( _.props.extend( null, o1, o2 ) );
 
     var expected = _.FileProvider.Extract
     ({
@@ -18777,7 +18777,7 @@ function filesReflect( test )
 
     test.case = 'complex move with srcDeleting : 1, dstRewriting : 0, includingNonAllowed : 0\n' + _.entity.exportString( o2 );
 
-    var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
+    var records = p.system.filesReflect( _.props.extend( null, o1, o2 ) );
 
     var expected = _.FileProvider.Extract
     ({
@@ -18832,7 +18832,7 @@ function filesReflect( test )
 
     test.case = 'complex move with dstDeleting : 1\n' + _.entity.exportString( o2 );
 
-    var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
+    var records = p.system.filesReflect( _.props.extend( null, o1, o2 ) );
 
     var expected = _.FileProvider.Extract
     ({
@@ -18901,7 +18901,7 @@ function filesReflect( test )
 
     test.case = 'complex move with dstDeleting : 1, dstRewriting : 0, srcDeleting : 1, includingNonAllowed : 0\n' + _.entity.exportString( o2 );
 
-    var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
+    var records = p.system.filesReflect( _.props.extend( null, o1, o2 ) );
 
     var expected = _.FileProvider.Extract
     ({
@@ -18983,7 +18983,7 @@ function filesReflect( test )
 
     test.case = 'several srcs, dsts\n' + _.entity.exportString( o2 );
 
-    var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
+    var records = p.system.filesReflect( _.props.extend( null, o1, o2 ) );
 
     var expected = _.FileProvider.Extract
     ({
@@ -19082,7 +19082,7 @@ function filesReflect( test )
 
     test.case = 'several srcs, dsts\n' + _.entity.exportString( o2 );
 
-    var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
+    var records = p.system.filesReflect( _.props.extend( null, o1, o2 ) );
 
     var expected = _.FileProvider.Extract
     ({
@@ -19161,7 +19161,7 @@ function filesReflect( test )
 
     test.case = 'several srcs, dsts\n' + _.entity.exportString( o2 );
 
-    var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
+    var records = p.system.filesReflect( _.props.extend( null, o1, o2 ) );
 
     var expected = _.FileProvider.Extract
     ({
@@ -19258,7 +19258,7 @@ function filesReflect( test )
 
     test.case = 'base marker *()\n' + _.entity.exportString( o2 );
 
-    var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
+    var records = p.system.filesReflect( _.props.extend( null, o1, o2 ) );
 
     var expected = _.FileProvider.Extract
     ({
@@ -19367,7 +19367,7 @@ function filesReflect( test )
 
     test.case = 'several srcs, dsts\n' + _.entity.exportString( o2 );
 
-    var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
+    var records = p.system.filesReflect( _.props.extend( null, o1, o2 ) );
 
     var expected = _.FileProvider.Extract
     ({
@@ -19452,7 +19452,7 @@ function filesReflect( test )
 
     test.case = 'several srcs, dsts\n' + _.entity.exportString( o2 );
 
-    var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
+    var records = p.system.filesReflect( _.props.extend( null, o1, o2 ) );
 
     var expected = _.FileProvider.Extract
     ({
@@ -19545,7 +19545,7 @@ function filesReflect( test )
 
     test.case = 'several srcs, dsts\n' + _.entity.exportString( o2 );
 
-    var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
+    var records = p.system.filesReflect( _.props.extend( null, o1, o2 ) );
 
     var expected = _.FileProvider.Extract
     ({
@@ -19632,7 +19632,7 @@ function filesReflect( test )
 
     test.case = 'base marker *()\n' + _.entity.exportString( o2 );
 
-    var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
+    var records = p.system.filesReflect( _.props.extend( null, o1, o2 ) );
 
     var expected = _.FileProvider.Extract
     ({
@@ -19754,7 +19754,7 @@ function filesReflectOverlap( test )
     dst : abs( './dir/dst' ),
   }
 
-  var records = provider.filesReflect( _.mapExtend( null, o1 ) );
+  var records = provider.filesReflect( _.props.extend( null, o1 ) );
 
   var expectedDstRelative = [ '.', './a', './b', './c', './c/a' ];
   var expectedSrcRelative = [ '.', './a', './b', './c', './c/a' ];
@@ -19833,7 +19833,7 @@ function filesReflectOverlap( test )
     }
   }
 
-  var records = provider.filesReflect( _.mapExtend( null, o1 ) );
+  var records = provider.filesReflect( _.props.extend( null, o1 ) );
 
   var expectedDstRelative = [ './File.js', './File.s' ];
   var expectedSrcRelative = [ './File.js', './File.s' ];
@@ -19867,7 +19867,7 @@ function filesReflectOverlap( test )
     }
   }
 
-  test.shouldThrowErrorSync( () => provider.filesReflect( _.mapExtend( null, o1 ) ) );
+  test.shouldThrowErrorSync( () => provider.filesReflect( _.props.extend( null, o1 ) ) );
 
   /*
   "#foreground : blue#module::reflect-inherit / reflector::reflect.files1#foreground : default#
@@ -20881,7 +20881,7 @@ function filesReflectWithSystem( test )
     dstRewriting : 1
   }
 
-  var records = system.filesReflect( _.mapExtend( null, o1, o2 ) );
+  var records = system.filesReflect( _.props.extend( null, o1, o2 ) );
   test.true( records.length >= 0 );
 
   var extract2 = dstProvider.filesExtract( dstPath );
@@ -20909,7 +20909,7 @@ function filesReflectWithSystem( test )
     dstRewriting : 1
   }
 
-  var records = system.filesReflect( _.mapExtend( null, o1, o2 ) );
+  var records = system.filesReflect( _.props.extend( null, o1, o2 ) );
   test.true( records.length >= 0 );
 
   var extract2 = dstProvider.filesExtract( dstPath );
@@ -27543,7 +27543,6 @@ function filesReflectToWithSoftLinksRebasing( test )
 
   var extract = new _.FileProvider.Extract({ filesTree });
   var extract2 = new _.FileProvider.Extract();
-  debugger;
   extract.filesReflectTo
   ({
     dstProvider : extract2,
@@ -33133,7 +33132,7 @@ function filesReflectHardlinkingBreaking( test )
   // }
   var got = a.fileProvider.filesExtract( a.abs( '.' ) ).filesTree;
   // test.identical( got, exp );
-  test.identical( _.mapKeys( got ), [ 'dst1', 'dst2', 'src1', 'src2' ] );
+  test.identical( _.props.keys( got ), [ 'dst1', 'dst2', 'src1', 'src2' ] );
   test.identical( got.dst1, _.bufferTypedIs( got.dst1 ) ? new U8x([ 52 ]) : '4' );
   test.identical( got.dst2, _.bufferTypedIs( got.dst2 ) ? new U8x([ 50 ]) : '2' );
   test.identical( got.src1, _.bufferTypedIs( got.src1 ) ? new U8x([ 52 ]) : '4' );
@@ -33169,7 +33168,7 @@ function filesReflectHardlinkingBreaking( test )
   // }
   var got = a.fileProvider.filesExtract( a.abs( '.' ) ).filesTree;
   // test.identical( got, exp );
-  test.identical( _.mapKeys( got ), [ 'dst1', 'dst2', 'src1', 'src2' ] );
+  test.identical( _.props.keys( got ), [ 'dst1', 'dst2', 'src1', 'src2' ] );
   test.identical( got.dst1, _.bufferTypedIs( got.dst1 ) ? new U8x([ 52 ]) : '4' );
   test.identical( got.dst2, _.bufferTypedIs( got.dst2 ) ? new U8x([ 50 ]) : '2' );
   test.identical( got.src1, _.bufferTypedIs( got.src1 ) ? new U8x([ 52 ]) : '4' );
@@ -33203,7 +33202,7 @@ function filesReflectHardlinkingBreaking( test )
   // }
   var got = a.fileProvider.filesExtract( a.abs( '.' ) ).filesTree;
   // test.identical( got, exp );
-  test.identical( _.mapKeys( got ), [ 'dst1', 'dst2', 'src1', 'src2' ] );
+  test.identical( _.props.keys( got ), [ 'dst1', 'dst2', 'src1', 'src2' ] );
   test.identical( got.dst1, _.bufferTypedIs( got.dst1 ) ? new U8x([ 52 ]) : '4' );
   test.identical( got.dst2, _.bufferTypedIs( got.dst2 ) ? new U8x([ 50 ]) : '2' );
   test.identical( got.src1, _.bufferTypedIs( got.src1 ) ? new U8x([ 52 ]) : '4' );
@@ -33239,7 +33238,7 @@ function filesReflectHardlinkingBreaking( test )
   // }
   var got = a.fileProvider.filesExtract( a.abs( '.' ) ).filesTree;
   // test.identical( got, exp );
-  test.identical( _.mapKeys( got ), [ 'dst1', 'dst2', 'src1', 'src2' ] );
+  test.identical( _.props.keys( got ), [ 'dst1', 'dst2', 'src1', 'src2' ] );
   test.identical( got.dst1, _.bufferTypedIs( got.dst1 ) ? new U8x([ 52 ]) : '4' );
   test.identical( got.dst2, _.bufferTypedIs( got.dst2 ) ? new U8x([ 52 ]) : '4' );
   test.identical( got.src1, _.bufferTypedIs( got.src1 ) ? new U8x([ 52 ]) : '4' );
@@ -33286,7 +33285,7 @@ function filesReflectHardlinkingBreaking( test )
   // }
   var got = a.fileProvider.filesExtract( a.abs( '.' ) ).filesTree;
   // test.identical( got, exp );
-  test.identical( _.mapKeys( got ), [ 'f1', 'dst', 'src' ] );
+  test.identical( _.props.keys( got ), [ 'f1', 'dst', 'src' ] );
   test.identical( got.f1, _.bufferTypedIs( got.f1 ) ? new U8x([ 49 ]) : '1' );
   test.identical( got.dst.f1, _.bufferTypedIs( got.dst.f1 ) ? new U8x([ 49 ]) : '1' );
   test.identical( got.src.f1, _.bufferTypedIs( got.src.f1 ) ? new U8x([ 49 ]) : '1' );
@@ -33354,7 +33353,7 @@ function filesReflectHardlinkingBreakingOptionDstRewritingOnlyPreserving( test )
   // }
   var got = a.fileProvider.filesExtract( a.abs( '.' ) ).filesTree;
   // test.identical( got, exp );
-  test.identical( _.mapKeys( got ), [ 'dst1', 'dst2', 'src1', 'src2' ] );
+  test.identical( _.props.keys( got ), [ 'dst1', 'dst2', 'src1', 'src2' ] );
   test.identical( got.dst1, _.bufferTypedIs( got.dst1 ) ? new U8x([ 52 ]) : '4' );
   test.identical( got.dst2, _.bufferTypedIs( got.dst2 ) ? new U8x([ 52 ]) : '4' );
   test.identical( got.src1, _.bufferTypedIs( got.src1 ) ? new U8x([ 52 ]) : '4' );
@@ -33387,7 +33386,7 @@ function filesReflectHardlinkingBreakingOptionDstRewritingOnlyPreserving( test )
   // }
   var got = a.fileProvider.filesExtract( a.abs( '.' ) ).filesTree;
   // test.identical( got, exp );
-  test.identical( _.mapKeys( got ), [ 'dst1', 'dst2', 'src1', 'src2' ] );
+  test.identical( _.props.keys( got ), [ 'dst1', 'dst2', 'src1', 'src2' ] );
   test.identical( got.dst1, _.bufferTypedIs( got.dst1 ) ? new U8x([ 50 ]) : '2' );
   test.identical( got.dst2, _.bufferTypedIs( got.dst2 ) ? new U8x([ 50 ]) : '2' );
   test.identical( got.src1, _.bufferTypedIs( got.src1 ) ? new U8x([ 52 ]) : '4' );
@@ -33434,7 +33433,7 @@ files have different content
   // }
   var got = a.fileProvider.filesExtract( a.abs( '.' ) ).filesTree;
   // test.identical( got, exp );
-  test.identical( _.mapKeys( got ), [ 'dst1', 'dst2', 'src1', 'src2' ] );
+  test.identical( _.props.keys( got ), [ 'dst1', 'dst2', 'src1', 'src2' ] );
   test.identical( got.dst1, _.bufferTypedIs( got.dst1 ) ? new U8x([ 50 ]) : '2' );
   test.identical( got.dst2, _.bufferTypedIs( got.dst2 ) ? new U8x([ 50 ]) : '2' );
   test.identical( got.src1, _.bufferTypedIs( got.src1 ) ? new U8x([ 52 ]) : '4' );
@@ -34077,7 +34076,7 @@ function filesDeleteTrivial( test )
   var stat = provider.statResolvedRead( routinePath );
   test.identical( stat, null );
   extract.finit();
-  test.identical( _.mapKeys( system.providersWithProtocolMap ), [ 'current' ] );
+  test.identical( _.props.keys( system.providersWithProtocolMap ), [ 'current' ] );
 
   /* */
 
@@ -34141,7 +34140,7 @@ function filesDeleteTrivial( test )
   var files = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative' });
   test.identical( files, expectedFiles );
   extract.finit();
-  test.identical( _.mapKeys( system.providersWithProtocolMap ), [ 'current' ] );
+  test.identical( _.props.keys( system.providersWithProtocolMap ), [ 'current' ] );
 
   /* */
 
@@ -34203,7 +34202,7 @@ function filesDeleteTrivial( test )
   var files = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative' });
   test.identical( files, expectedFiles );
   extract.finit();
-  test.identical( _.mapKeys( system.providersWithProtocolMap ), [ 'current' ] );
+  test.identical( _.props.keys( system.providersWithProtocolMap ), [ 'current' ] );
 
   /* */
 
@@ -34267,7 +34266,7 @@ function filesDeleteTrivial( test )
   var files = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative' });
   test.identical( files, expectedFiles );
   extract.finit();
-  test.identical( _.mapKeys( system.providersWithProtocolMap ), [ 'current' ] );
+  test.identical( _.props.keys( system.providersWithProtocolMap ), [ 'current' ] );
 
   /* - */
 
@@ -34313,7 +34312,7 @@ function filesDeleteTrivial( test )
   test.true( !!stat );
 
   extract.finit();
-  test.identical( _.mapKeys( system.providersWithProtocolMap ), [ 'current' ] );
+  test.identical( _.props.keys( system.providersWithProtocolMap ), [ 'current' ] );
 
   /* - */
 
@@ -34901,7 +34900,7 @@ function filesDeleteAsync( test )
       var stat = provider.statResolvedRead( routinePath );
       test.identical( stat, null );
       extract.finit();
-      test.identical( _.mapKeys( system.providersWithProtocolMap ), [ 'current' ] );
+      test.identical( _.props.keys( system.providersWithProtocolMap ), [ 'current' ] );
       return true;
     })
   })
@@ -34972,7 +34971,7 @@ function filesDeleteAsync( test )
       var files = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative' });
       test.identical( files, expectedFiles );
       extract.finit();
-      test.identical( _.mapKeys( system.providersWithProtocolMap ), [ 'current' ] );
+      test.identical( _.props.keys( system.providersWithProtocolMap ), [ 'current' ] );
       return true;
     })
 
@@ -35043,7 +35042,7 @@ function filesDeleteAsync( test )
       var files = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative' });
       test.identical( files, expectedFiles );
       extract.finit();
-      test.identical( _.mapKeys( system.providersWithProtocolMap ), [ 'current' ] );
+      test.identical( _.props.keys( system.providersWithProtocolMap ), [ 'current' ] );
       return true;
     })
 
@@ -35097,7 +35096,7 @@ function filesDeleteAsync( test )
       test.true( !!stat );
 
       extract.finit();
-      test.identical( _.mapKeys( system.providersWithProtocolMap ), [ 'current' ] );
+      test.identical( _.props.keys( system.providersWithProtocolMap ), [ 'current' ] );
       return true;
     })
   })
@@ -36791,7 +36790,7 @@ function filesFindDifference( test )
       src : { ends : sample.ends }
     }
 
-    _.mapExtend( o, sample.options || {} );
+    _.props.extend( o, sample.options || {} );
 
     var files = _.FileProvider.HardDrive();
 
@@ -38428,7 +38427,7 @@ function filesCopyWithAdapter( test )
       allowDelete : 0,
     }
 
-    _.mapExtend( copyOptions, sample.options || {} );
+    _.props.extend( copyOptions, sample.options || {} );
 
     var got = _.fileProvider.filesCopyWithAdapter( copyOptions );
 

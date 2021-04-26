@@ -228,8 +228,8 @@ function filesReflectTrivial( test )
     let o = { reflectMap : { [ remotePath ] : clonePathGlobal } };
 
     let ready = new _.Consequence().take( null );
-    ready.then( () => system.filesReflect( _.mapExtend( null, o ) ) )
-    ready.then( () => system.filesReflect( _.mapExtend( null, o ) ) )
+    ready.then( () => system.filesReflect( _.props.extend( null, o ) ) )
+    ready.then( () => system.filesReflect( _.props.extend( null, o ) ) )
 
     return ready;
   })
@@ -277,8 +277,8 @@ function filesReflectTrivial( test )
     };
 
     let ready = new _.Consequence().take( null );
-    ready.then( () => system.filesReflect( _.mapExtend( null, o ) ) )
-    ready.then( () => system.filesReflect( _.mapExtend( null, o ) ) )
+    ready.then( () => system.filesReflect( _.props.extend( null, o ) ) )
+    ready.then( () => system.filesReflect( _.props.extend( null, o ) ) )
 
     return ready;
   })

@@ -1014,7 +1014,7 @@ function filesSimilarity( test )
 //     testCheck.createResource !== undefined
 //     && context.createTestFile( testCheck.path, testCheck.createResource, testCheck.readOptions.encoding );
 //
-//     var o = _.mapExtend( null, testCheck.readOptions, { filePath : path } );
+//     var o = _.props.extend( null, testCheck.readOptions, { filePath : path } );
 //     // let got = provider.fileReadSync( path, testCheck.readOptions );
 //     let got = provider.fileReadSync( o );
 //
@@ -3392,7 +3392,7 @@ function filesAreOnSameDevice( test )
   }
 
   let provider = new _.FileProvider.Extract({ filesTree });
-  _.mapSupplement( provider.extraStats, extraStats );
+  _.props.supplement( provider.extraStats, extraStats );
 
   test.case = 'same path, does not exist'
   var testPath = '/a/b';

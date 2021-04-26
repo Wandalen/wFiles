@@ -149,7 +149,7 @@ function pathResolveSoftLinkAct( o )
   function resolveIntermediateDirectories()
   {
     let splits = self.path.split( o.filePath );
-    let o2 = _.mapExtend( null, o );
+    let o2 = _.props.extend( null, o );
 
     o2.resolvingIntermediateDirectories = 0;
     o2.filePath = '/';
@@ -177,7 +177,7 @@ function pathResolveSoftLinkAct( o )
     let descriptor = self._descriptorRead( result );
     if( !self._DescriptorIsSoftLink( descriptor ) )
     return result;
-    let o2 = _.mapExtend( null, o );
+    let o2 = _.props.extend( null, o );
     o2.filePath = result;
     return self.pathResolveSoftLinkAct( o2 );
   }
@@ -246,7 +246,7 @@ function pathResolveTextLinkAct( o )
   function resolveIntermediateDirectories()
   {
     let splits = self.path.split( o.filePath );
-    let o2 = _.mapExtend( null, o );
+    let o2 = _.props.extend( null, o );
 
     o2.resolvingIntermediateDirectories = 0;
     o2.filePath = '/';
@@ -274,7 +274,7 @@ function pathResolveTextLinkAct( o )
     let descriptor = self._descriptorRead( result );
     if( !self._DescriptorIsTextLink( descriptor ) )
     return result;
-    let o2 = _.mapExtend( null, o );
+    let o2 = _.props.extend( null, o );
     o2.filePath = result;
     return self.pathResolveTextLinkAct( o2 );
   }
@@ -309,7 +309,7 @@ function fileReadAct( o )
   let result = null;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assertRoutineOptions( fileReadAct, o );
+  _.routine.assertOptions( fileReadAct, o );
   _.assert( _.strIs( o.encoding ) );
 
   let encoder = fileReadAct.encoders[ o.encoding ];
@@ -326,7 +326,7 @@ function fileReadAct( o )
   ({
     filePath : o.filePath,
     resolvingSoftLink : o.resolvingSoftLink,
-    resolvingTextLink : o.resolvingTextLink,
+    // resolvingTextLink : o.resolvingTextLink, 
   }).absolutePath;
 
   if( self.system && _.path.isGlobal( o.filePath ) )
@@ -440,7 +440,7 @@ function dirReadAct( o )
   let self = this;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assertRoutineOptions( dirReadAct, o );
+  _.routine.assertOptions( dirReadAct, o );
 
   let result;
 
@@ -497,7 +497,7 @@ function statReadAct( o )
   let self = this;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assertRoutineOptions( statReadAct, o );
+  _.routine.assertOptions( statReadAct, o );
 
   /* */
 
@@ -678,7 +678,7 @@ function fileWriteAct( o )
   let self = this;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assertRoutineOptions( fileWriteAct, o );
+  _.routine.assertOptions( fileWriteAct, o );
   _.assert( self.path.isNormalized( o.filePath ) );
   _.assert( self.WriteMode.indexOf( o.writeMode ) !== -1 );
 
@@ -942,7 +942,7 @@ function fileDeleteAct( o )
 {
   let self = this;
 
-  _.assertRoutineOptions( fileDeleteAct, o );
+  _.routine.assertOptions( fileDeleteAct, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( self.path.isNormalized( o.filePath ) );
 
@@ -1011,7 +1011,7 @@ function dirMakeAct( o )
   let self = this;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assertRoutineOptions( dirMakeAct, o );
+  _.routine.assertOptions( dirMakeAct, o );
 
   /* */
 
@@ -1061,7 +1061,7 @@ function fileLockAct( o )
   _.assert( !o.sharing || o.sharing === 'process', 'not implemented' );
   _.assert( self.path.isNormalized( o.filePath ) );
   _.assert( !o.waiting || o.timeOut >= 1000 );
-  _.assertRoutineOptions( fileLockAct, arguments );
+  _.routine.assertOptions( fileLockAct, arguments );
 
   let con = _.Consequence.Try( () =>
   {
@@ -1171,7 +1171,7 @@ function fileUnlockAct( o )
   let self = this;
 
   _.assert( self.path.isNormalized( o.filePath ) );
-  _.assertRoutineOptions( fileUnlockAct, arguments );
+  _.routine.assertOptions( fileUnlockAct, arguments );
 
   let con = _.Consequence.Try( () =>
   {
@@ -1232,7 +1232,7 @@ function fileIsLockedAct( o )
 {
   let self = this;
 
-  _.assertRoutineOptions( fileIsLockedAct, arguments );
+  _.routine.assertOptions( fileIsLockedAct, arguments );
   _.assert( self.path.isNormalized( o.filePath ) );
 
   let con = _.Consequence.Try( () =>
@@ -1263,7 +1263,7 @@ function fileRenameAct( o )
   let self = this;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assertRoutineOptions( fileRenameAct, arguments );
+  _.routine.assertOptions( fileRenameAct, arguments );
   _.assert( self.path.isNormalized( o.srcPath ) );
   _.assert( self.path.isNormalized( o.dstPath ) );
 
@@ -1328,7 +1328,7 @@ function fileCopyAct( o )
   let srcFile;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assertRoutineOptions( fileCopyAct, arguments );
+  _.routine.assertOptions( fileCopyAct, arguments );
   _.assert( self.path.isNormalized( o.srcPath ) );
   _.assert( self.path.isNormalized( o.dstPath ) );
 
@@ -1522,7 +1522,7 @@ function softLinkAct( o )
   let self = this;
 
   // debugger
-  _.assertRoutineOptions( softLinkAct, arguments );
+  _.routine.assertOptions( softLinkAct, arguments );
 
   _.assert( self.path.is( o.srcPath ) );
   _.assert( self.path.isAbsolute( o.dstPath ) );
@@ -1596,7 +1596,7 @@ function hardLinkAct( o )
 {
   let self = this;
 
-  _.assertRoutineOptions( hardLinkAct, arguments );
+  _.routine.assertOptions( hardLinkAct, arguments );
   _.assert( self.path.isNormalized( o.srcPath ) );
   _.assert( self.path.isNormalized( o.dstPath ) );
 
@@ -1839,7 +1839,7 @@ function areHardLinkedAct( o )
 {
   let self = this;
 
-  _.assertRoutineOptions( areHardLinkedAct, arguments );
+  _.routine.assertOptions( areHardLinkedAct, arguments );
   _.assert( o.filePath.length === 2, 'Expects exactly two arguments' );
 
   if( o.filePath[ 0 ] === o.filePath[ 1 ] )
@@ -1882,7 +1882,7 @@ _.routineExtend( areHardLinkedAct, Parent.prototype.areHardLinkedAct );
 function isInoAct( o )
 {
   let self = this;
-  _.assertRoutineOptions( isInoAct, arguments );
+  _.routine.assertOptions( isInoAct, arguments );
 
   if( self.usingExtraStat )
   {
@@ -1915,7 +1915,7 @@ function filesTreeSet( src )
 
   self[ filesTreeSymbol ] = src;
 
-  if( src && _.mapKeys( src ).length && self.usingExtraStat )
+  if( src && _.props.keys( src ).length && self.usingExtraStat )
   self.statsAdopt();
 
   return src;
@@ -1944,7 +1944,7 @@ function statsAdopt()
 // {
 //   let self = this;
 //
-//   _.routineOptions( linksRebase, o );
+//   _.routine.options_( linksRebase, o );
 //   _.assert( arguments.length === 1, 'Expects single argument' );
 //   _.assert( 0, 'not tested' );
 //
@@ -2024,7 +2024,7 @@ function _descriptorRead( o )
   if( _.strIs( arguments[ 0 ] ) )
   o = { filePath : arguments[ 0 ] };
 
-  _.routineOptions( _descriptorRead, o );
+  _.routine.options_( _descriptorRead, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( !path.isGlobal( o.filePath ), 'Expects local path, but got', o.filePath );
 
@@ -2102,7 +2102,7 @@ function _descriptorResolve( o )
 
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( o.descriptor );
-  _.routineOptions( _descriptorResolve, o );
+  _.routine.options_( _descriptorResolve, o );
   self._providerDefaultsApply( o );
   _.assert( !o.resolvingTextLink );
 
@@ -2148,7 +2148,7 @@ _descriptorResolve.defaults =
 
 //   _.assert( arguments.length === 1, 'Expects single argument' );
 //   _.assert( o.descriptor );
-//   _.routineOptions( _descriptorResolve, o );
+//   _.routine.options_( _descriptorResolve, o );
 //   self._providerDefaultsApply( o );
 //   _.assert( !o.resolvingTextLink );
 
@@ -2391,9 +2391,9 @@ function _descriptorWrite( o )
   let self = this;
 
   if( _.strIs( arguments[ 0 ] ) )
-  o = { filePath : arguments[ 0 ], data : arguments[ 1 ] };
+  o = { filePath : arguments[ 0 ], data : ( arguments.length > 1 ? arguments[ 1 ] : null ) };
 
-  _.routineOptions( _descriptorWrite, o );
+  _.routine.options_( _descriptorWrite, o );
   _.assert( arguments.length === 1 || arguments.length === 2 );
 
   if( o.upToken === null )

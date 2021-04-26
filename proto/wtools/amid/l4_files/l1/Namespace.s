@@ -331,7 +331,7 @@ function filterSafer( filter )
 
 function _fileOptionsGet( filePath, o ) /* xxx : check */
 {
-  o = o || {};
+  o = o || Object.create( null );
 
   if( _.objectIs( filePath ) )
   {
@@ -409,7 +409,7 @@ function filesNewer( dst, src )
   let timeDst = _.entityMax( [ dst.stat.mtime/* , dst.stat.birthtime */ ] ).value;
 
   // When mtime of the file is changed by timeWrite( fs.utime ), there is difference between passed and setted value.
-  // if( _.numbersAreEquivalent.call( { accuracy : 500 }, timeSrc.getTime(), timeDst.getTime() ) )
+  // if( _.number.equivalent.call( { accuracy : 500 }, timeSrc.getTime(), timeDst.getTime() ) )
   // return null;
 
   if( timeSrc > timeDst )
@@ -551,7 +551,7 @@ function filesSimilarity( o )
 {
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.routineOptions( filesSimilarity, o );
+  _.routine.options_( filesSimilarity, o );
 
   o.src1 = _.fileProvider.recordFactory().record( o.src1 );
   o.src2 = _.fileProvider.recordFactory().record( o.src2 );
@@ -637,7 +637,7 @@ function hashFrom( o )
 
   if( !_.mapIs( arguments[ 0 ] ) )
   o = { src : arguments[ 0 ] }
-  _.routineOptions( hashFrom, o );
+  _.routine.options_( hashFrom, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
 
   return _.files.hashMd5From( o );
@@ -655,7 +655,7 @@ function hashSzFrom( o )
 
   if( !_.mapIs( arguments[ 0 ] ) )
   o = { src : arguments[ 0 ] }
-  _.routineOptions( hashSzFrom, o );
+  _.routine.options_( hashSzFrom, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( !_.streamIs( o.src ), 'not implemented' ); /* qqq : implement */
 
@@ -683,7 +683,7 @@ function hashMd5From( o )
 
   if( !_.mapIs( arguments[ 0 ] ) )
   o = { src : arguments[ 0 ] }
-  _.routineOptions( hashMd5From, o );
+  _.routine.options_( hashMd5From, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
 
   if( Crypto === undefined )
@@ -785,7 +785,7 @@ let Restricts =
 
 }
 
-_.mapSupplement( _.files._, Restricts );
+_.props.supplement( _.files._, Restricts );
 
 let Files =
 {
@@ -823,7 +823,7 @@ let Files =
 
 }
 
-_.mapSupplement( _.files, Files );
+_.props.supplement( _.files, Files );
 
 // --
 // export

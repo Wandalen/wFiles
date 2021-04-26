@@ -95,7 +95,7 @@ function statReadAct( o )
   let con;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assertRoutineOptions( statReadAct, arguments );
+  _.routine.assertOptions( statReadAct, arguments );
 
   /* */
 
@@ -206,7 +206,7 @@ function fileReadAct( o )
   let con = _.Consequence();
   let Reqeust, request, total, result;
 
-  _.assertRoutineOptions( fileReadAct, arguments );
+  _.routine.assertOptions( fileReadAct, arguments );
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.strIs( o.filePath ), 'fileReadAct :', 'Expects {-o.filePath-}' );
   _.assert( _.strIs( o.encoding ), 'fileReadAct :', 'Expects {-o.encoding-}' );
@@ -217,7 +217,7 @@ function fileReadAct( o )
   /* advanced */
 
   // debugger;
-  o.advanced = _.routineOptions( fileReadAct, o.advanced || {}, fileReadAct.advanced );
+  o.advanced = _.routine.options_( fileReadAct, o.advanced || {}, fileReadAct.advanced );
   o.advanced.method = o.advanced.method.toUpperCase();
 
   /* http request */

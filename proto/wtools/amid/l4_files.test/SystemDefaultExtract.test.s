@@ -65,7 +65,7 @@ function onRoutineEnd( test )
 {
   let context = this;
   let provider = context.provider;
-  _.sure( _.arraySetIdentical( _.mapKeys( provider.providersWithProtocolMap ), [ 'second', 'current' ] ), test.name, 'has not restored system!' );
+  _.sure( _.arraySetIdentical( _.props.keys( provider.providersWithProtocolMap ), [ 'second', 'current' ] ), test.name, 'has not restored system!' );
 }
 
 //

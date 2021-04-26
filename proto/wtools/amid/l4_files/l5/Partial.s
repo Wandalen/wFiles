@@ -314,7 +314,7 @@ function _preFilePathScalarWithoutProviderDefaults( routine, args )
   if( path.like( o ) )
   o = { filePath : path.from( o ) };
 
-  _.routineOptions( routine, o );
+  _.routine.optionsWithoutUndefined( routine, o ); /* xxx : qqq : repalce by _.routine.options */
 
   o.filePath = path.normalize( o.filePath );
 
@@ -369,7 +369,7 @@ function _preFilePathVectorWithoutProviderDefaults( routine, args )
   else
   o.filePath = path.from( o.filePath );
 
-  _.routineOptions( routine, o );
+  _.routine.options_( routine, o );
   _.assert( path.s.allAreAbsolute( o.filePath ), () => `Expects absolute path {-o.filePath-}, but got "${ o.filePath }"` );
 
   o.filePath = path.s.normalize( o.filePath );
@@ -401,7 +401,7 @@ function _preFileFilterWithoutProviderDefaults( routine, args )
 
   let o = args[ 0 ];
 
-  _.routineOptions( routine, o );
+  _.routine.options_( routine, o );
 
   o.src = self.recordFilter( o.src );
 
@@ -452,9 +452,9 @@ function _preSrcDstPathWithoutProviderDefaults( routine, args )
   let o = args[ 0 ];
 
   if( path.like( args[ 0 ] ) || path.like( args[ 1 ] ) )
-  o = { dstPath : args[ 0 ], srcPath : args[ 1 ] }
+  o = { dstPath : args[ 0 ], srcPath : ( args.length > 1 ? args[ 1 ] : null ) }
 
-  _.routineOptions( routine, o );
+  _.routine.options_( routine, o );
 
   if( o.dstPath !== null )
   {
@@ -669,7 +669,7 @@ function pathForCopy_head( routine, args )
   if( !_.mapIs( o ) )
   o = { path : o };
 
-  _.routineOptions( routine, o );
+  _.routine.options_( routine, o );
   _.assert( self instanceof _.FileProvider.Abstract );
   _.assert( _.strIs( o.path ) );
   _.assert( arguments.length === 2, 'Expects exactly two arguments' );
@@ -861,7 +861,7 @@ function pathResolveSoftLink_body( o )
   function resolvingIntermediateDirectories()
   {
     let splits = self.path.split( o.filePath );
-    let o2 = _.mapExtend( null, o );
+    let o2 = _.props.extend( null, o );
 
     o2.resolvingIntermediateDirectories = 0;
     o2.filePath = '/';
@@ -899,7 +899,7 @@ having.aspect = 'body';
 
 //
 
-let pathResolveSoftLink = _.routine.uniteCloning_( _preFilePathScalarWithProviderDefaults, pathResolveSoftLink_body );
+let pathResolveSoftLink = _.routine.uniteCloning_replaceByUnite( _preFilePathScalarWithProviderDefaults, pathResolveSoftLink_body );
 
 var having = pathResolveSoftLink.having;
 having.aspect = 'entry';
@@ -934,7 +934,7 @@ function pathResolveTextLink_head( routine, args )
 
   _.assert( arguments.length === 2, 'Expects exactly two arguments' );
   _.assert( args.length === 1, 'Expects single argument for', routine.name );
-  _.routineOptions( routine, o );
+  _.routine.options_( routine, o );
   _.assert( _.strIs( o.filePath ), 'Expects string' );
 
   return o;
@@ -1055,7 +1055,7 @@ function pathResolveTextLink_body( o )
   function resolvingIntermediateDirectories()
   {
     let splits = self.path.split( o.filePath );
-    let o2 = _.mapExtend( null, o );
+    let o2 = _.props.extend( null, o );
 
     o2.resolvingIntermediateDirectories = 0;
     o2.filePath = '/';
@@ -1094,7 +1094,7 @@ var having = pathResolveTextLink_body.having;
 having.driving = 0;
 having.aspect = 'body';
 
-let pathResolveTextLink = _.routine.uniteCloning_( pathResolveTextLink_head, pathResolveTextLink_body );
+let pathResolveTextLink = _.routine.uniteCloning_replaceByUnite( pathResolveTextLink_head, pathResolveTextLink_body );
 
 //
 
@@ -1156,7 +1156,7 @@ function pathResolveLinkStep_body( o )
 
   function o2From( o )
   {
-    let o2 = _.mapExtend( null, o );
+    let o2 = _.props.extend( null, o );
     delete o2.resolvingTextLink;
     delete o2.resolvingSoftLink;
     delete o2.relativeOriginalFile;
@@ -1201,7 +1201,7 @@ var defaults = pathResolveLinkStep_body.defaults;
 defaults.relativeOriginalFile = 0;
 defaults.preservingRelative = 0;
 
-let pathResolveLinkStep = _.routine.uniteCloning_( pathResolveLinkStep_head, pathResolveLinkStep_body );
+let pathResolveLinkStep = _.routine.uniteCloning_replaceByUnite( pathResolveLinkStep_head, pathResolveLinkStep_body );
 pathResolveLinkStep.having.aspect = 'entry';
 
 //
@@ -1226,8 +1226,9 @@ function pathResolveLinkFull_body( o )
   _.assert( path.isAbsolute( o.filePath ) );
   _.assert( !!o.resolvingHeadDirect );
   _.assert( !!o.resolvingHeadReverse );
+  _.assert( _.boolLike( o.throwing ) );
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assertRoutineOptions( pathResolveLinkFull_body, arguments );
+  _.routine.assertOptions( pathResolveLinkFull_body, arguments );
 
   let system = o.system || self.system;
   if( system && system !== self && path.isGlobal( o.filePath ) )
@@ -1371,6 +1372,8 @@ function pathResolveLinkFull_body( o )
         }
       }
 
+      if( result.relativePath !== null && !path.isRelative( result.relativePath ) )
+      result.relativePath = path.relative( o.filePath, result.relativePath );
       return result;
     }
     catch( err )
@@ -1452,7 +1455,7 @@ defaults.stat = null;
 defaults.sync = null;
 defaults.resolvingHeadDirect = 1;
 defaults.resolvingHeadReverse = 1;
-defaults.preservingRelative = 0;
+defaults.preservingRelative = 0; /* xxx : qqq : set to 1 */
 defaults.relativeOriginalFile = 0;
 defaults.recursive = 3; /* 0, 1, 2, 3 */
 
@@ -1468,7 +1471,7 @@ qqq : even if preservingRelative:1 result.relativePath should be relative ( if l
 
 //
 
-let pathResolveLinkFull = _.routine.uniteCloning_( pathResolveLinkFull_head, pathResolveLinkFull_body );
+let pathResolveLinkFull = _.routine.uniteCloning_replaceByUnite( pathResolveLinkFull_head, pathResolveLinkFull_body );
 pathResolveLinkFull.having.aspect = 'entry';
 
 //
@@ -1489,12 +1492,12 @@ function pathResolveLinkTail_body( o )
 
   _.assert( _.routineIs( self.pathResolveLinkTailChain.body ) );
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assertRoutineOptions( pathResolveLinkTail_body, arguments );
+  _.routine.assertOptions( pathResolveLinkTail_body, arguments );
 
   // if( _.strHas( o.filePath, 'Link' ) )
   // debugger;
 
-  let o2 = _.mapExtend( null, o );
+  let o2 = _.props.extend( null, o );
   o2.found = [];
   o2.result = [ o.filePath ];
   let r = self.pathResolveLinkTailChain.body.call( self, o2 );
@@ -1542,7 +1545,7 @@ defaults.recursive = 3;
 
 //
 
-let pathResolveLinkTail = _.routine.uniteCloning_( pathResolveLinkTail_head, pathResolveLinkTail_body );
+let pathResolveLinkTail = _.routine.uniteCloning_replaceByUnite( pathResolveLinkTail_head, pathResolveLinkTail_body );
 pathResolveLinkTail.having.aspect = 'entry';
 
 //
@@ -1586,7 +1589,7 @@ function pathResolveLinkTailChain_body( o )
   _.assert( _.arrayIs( o.found ) );
   _.assert( _.arrayIs( o.result ) );
   _.assert( path.isAbsolute( o.filePath ) );
-  _.assertRoutineOptions( pathResolveLinkTailChain_body, arguments );
+  _.routine.assertOptions( pathResolveLinkTailChain_body, arguments );
 
   let system = o.system || self.system;
   if( system && system !== self && path.isGlobal( o.filePath ) )
@@ -1731,7 +1734,7 @@ defaults.found = null;
 
 //
 
-let pathResolveLinkTailChain = _.routine.uniteCloning_( pathResolveLinkTailChain_head, pathResolveLinkTailChain_body );
+let pathResolveLinkTailChain = _.routine.uniteCloning_replaceByUnite( pathResolveLinkTailChain_head, pathResolveLinkTailChain_body );
 pathResolveLinkTailChain.having.aspect = 'entry';
 
 //
@@ -1757,7 +1760,7 @@ function pathResolveLinkHeadDirect_body( o )
   _.assert( _.boolLike( o.allowingCycled ) );
   _.assert( _.boolLike( o.throwing ) );
   _.assert( path.isAbsolute( o.filePath ) );
-  _.assertRoutineOptions( pathResolveLinkHeadDirect_body, arguments );
+  _.routine.assertOptions( pathResolveLinkHeadDirect_body, arguments );
 
   let system = o.system || self.system;
   if( system && system !== self && path.isGlobal( o.filePath ) )
@@ -1768,7 +1771,7 @@ function pathResolveLinkHeadDirect_body( o )
 
   let splits = path.split( o.filePath );
   let filePath = '/';
-  let o2 = _.mapExtend( null, o );
+  let o2 = _.props.extend( null, o );
 
   for( let i = 1 ; i < splits.length ; i++ )
   {
@@ -1829,7 +1832,7 @@ defaults.recursive = 3;
 
 //
 
-let pathResolveLinkHeadDirect = _.routine.uniteCloning_( pathResolveLinkHeadDirect_head, pathResolveLinkHeadDirect_body );
+let pathResolveLinkHeadDirect = _.routine.uniteCloning_replaceByUnite( pathResolveLinkHeadDirect_head, pathResolveLinkHeadDirect_body );
 pathResolveLinkHeadDirect.having.aspect = 'entry';
 
 //
@@ -1855,7 +1858,7 @@ function pathResolveLinkHeadReverse_body( o )
   _.assert( _.boolLike( o.allowingCycled ) );
   _.assert( _.boolLike( o.throwing ) );
   _.assert( path.isAbsolute( o.filePath ) );
-  _.assertRoutineOptions( pathResolveLinkHeadReverse_body, arguments );
+  _.routine.assertOptions( pathResolveLinkHeadReverse_body, arguments );
 
   let system = o.system || self.system;
   if( system && system !== self && path.isGlobal( o.filePath ) )
@@ -1871,7 +1874,7 @@ function pathResolveLinkHeadReverse_body( o )
 
   while( !path.isRoot( prefixPath ) )
   {
-    let o2 = _.mapExtend( null, o );
+    let o2 = _.props.extend( null, o );
     o2.filePath = prefixPath;
     o2.preservingRelative = 0;
     prefixPath = self.pathResolveLinkTail( o2 ).absolutePath;
@@ -1903,7 +1906,7 @@ defaults.recursive = 3;
 
 //
 
-let pathResolveLinkHeadReverse = _.routine.uniteCloning_( pathResolveLinkHeadReverse_head, pathResolveLinkHeadReverse_body );
+let pathResolveLinkHeadReverse = _.routine.uniteCloning_replaceByUnite( pathResolveLinkHeadReverse_head, pathResolveLinkHeadReverse_body );
 pathResolveLinkHeadReverse.having.aspect = 'entry';
 
 // --
@@ -2010,7 +2013,7 @@ function _recordsSort( o )
     o.sorter = _.strSorterParse( parseOptions );
   }
 
-  _.routineOptions( _recordsSort, o );
+  _.routine.options_( _recordsSort, o );
 
   _.assert( _.longIs( o.src ) );
   _.assert( _.longIs( o.sorter ) );
@@ -2315,7 +2318,7 @@ statRead_body.having.aspect = 'body';
  * @module Tools/mid/Files
  */
 
-let statRead = _.routine.uniteCloning_( _preFilePathScalarWithProviderDefaults, statRead_body );
+let statRead = _.routine.uniteCloning_replaceByUnite( _preFilePathScalarWithProviderDefaults, statRead_body );
 
 statRead.having.aspect = 'entry';
 statRead.having.hubRedirecting = 0;
@@ -2331,7 +2334,7 @@ _.assert( statRead.body.having === statRead.having );
 
 //
 
-let statResolvedRead = _.routine.uniteCloning_( _preFilePathScalarWithProviderDefaults, statRead_body );
+let statResolvedRead = _.routine.uniteCloning_replaceByUnite( _preFilePathScalarWithProviderDefaults, statRead_body );
 
 statResolvedRead.having.aspect = 'entry';
 statResolvedRead.having.hubRedirecting = 0;
@@ -2387,7 +2390,7 @@ function filesSize_head( routine, args )
   if( _.strIs( o ) || _.arrayIs( o ) )
   o = { filePath : o };
 
-  _.routineOptions( routine, o );
+  _.routine.options_( routine, o );
 
   return o;
 }
@@ -2404,7 +2407,7 @@ function filesSize_body( o )
 
   o.filePath = _.arrayAs( o.filePath );
 
-  let optionsForSize = _.mapExtend( null, o );
+  let optionsForSize = _.props.extend( null, o );
   optionsForSize.filePath = o.filePath[ 0 ];
 
   let result = self.fileSize( optionsForSize );
@@ -2432,7 +2435,7 @@ having.driving = 0;
 
 var operates = filesSize_body.operates = Object.create( null );
 
-let filesSize = _.routine.uniteCloning_( filesSize_head, filesSize_body );
+let filesSize = _.routine.uniteCloning_replaceByUnite( filesSize_head, filesSize_body );
 
 //
 
@@ -2482,7 +2485,7 @@ let filesSize = _.routine.uniteCloning_( filesSize_head, filesSize_body );
 qqq : extend test, check cases when does not exist, check throwing option
 Dmytro : extended test routine. Throwing option is checked. Async mode is used.
          Description of routine has callback onEnd, but now it is not used because
-         _.routine.uniteCloning_ check srcMap and screenMap in assert.
+         _.routine.uniteCloning_replaceByUnite check srcMap and screenMap in assert.
 */
 
 function fileSize_body( o )
@@ -2511,7 +2514,7 @@ having.driving = 0;
 having.aspect = 'body';
 having.hubRedirecting = 0;
 
-let fileSize = _.routine.uniteCloning_( _preFilePathScalarWithProviderDefaults, fileSize_body );
+let fileSize = _.routine.uniteCloning_replaceByUnite( _preFilePathScalarWithProviderDefaults, fileSize_body );
 
 fileSize.having.aspect = 'entry';
 
@@ -2522,7 +2525,7 @@ _.assert( fileSize.having.hubRedirecting === 0 );
 function isInoAct( o )
 {
   let self = this;
-  _.assertRoutineOptions( isInoAct, arguments );
+  _.routine.assertOptions( isInoAct, arguments );
   if( _.numberIs( o.ino ) || _.bigIntIs( o.ino ) )
   return true;
   return false;
@@ -2541,7 +2544,7 @@ function isIno( o )
   if( !_.mapIs( arguments[ 0 ] ) )
   o = { ino : arguments[ 0 ] }
   _.assert( arguments.length === 1 );
-  o = _.routineOptions( isIno, o );
+  o = _.routine.options_( isIno, o );
   return self.isInoAct( o );
 }
 
@@ -2572,7 +2575,7 @@ operates.filePath = { pathToRead : 1 }
 function fileExistsAct( o )
 {
   let self = this;
-  let o2 = _.mapExtend( null, o );
+  let o2 = _.props.extend( null, o );
   _.assert( fileExistsAct, arguments );
   o2.throwing = 0;
   o2.resolvingSoftLink = 0;
@@ -2671,7 +2674,7 @@ having.aspect = 'body';
 
 //
 
-let fileExists = _.routine.uniteCloning_( _preFilePathScalarWithProviderDefaults, fileExists_body );
+let fileExists = _.routine.uniteCloning_replaceByUnite( _preFilePathScalarWithProviderDefaults, fileExists_body );
 
 var having = fileExists.having;
 fileExists.having.aspect = 'entry';
@@ -2683,7 +2686,7 @@ function isTerminal_body( o )
   let self = this;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( _.assertRoutineOptions( isTerminal_body, arguments ) );
+  _.assert( _.routine.assertOptions( isTerminal_body, arguments ) );
   _.assert( _.boolLike( o.resolvingSoftLink ) || _.numberIs( o.resolvingSoftLink ) );
   _.assert( _.boolLike( o.resolvingTextLink ) || _.numberIs( o.resolvingTextLink ) );
 
@@ -2733,7 +2736,7 @@ operates.filePath = { pathToRead : 1 }
  * @module Tools/mid/Files
  */
 
-let isTerminal = _.routine.uniteCloning_( _preFilePathScalarWithProviderDefaults, isTerminal_body );
+let isTerminal = _.routine.uniteCloning_replaceByUnite( _preFilePathScalarWithProviderDefaults, isTerminal_body );
 
 isTerminal.having.aspect = 'entry';
 
@@ -2751,7 +2754,7 @@ isTerminal.having.aspect = 'entry';
  * @module Tools/mid/Files
  */
 
-let resolvedIsTerminal = _.routine.uniteCloning_( _preFilePathScalarWithProviderDefaults, isTerminal_body );
+let resolvedIsTerminal = _.routine.uniteCloning_replaceByUnite( _preFilePathScalarWithProviderDefaults, isTerminal_body );
 
 resolvedIsTerminal.defaults.resolvingSoftLink = null;
 resolvedIsTerminal.defaults.resolvingTextLink = null;
@@ -2765,7 +2768,7 @@ function isDir_body( o )
   let self = this;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( _.assertRoutineOptions( isDir_body, arguments ) );
+  _.assert( _.routine.assertOptions( isDir_body, arguments ) );
   _.assert( _.boolLike( o.resolvingSoftLink ) || _.numberIs( o.resolvingSoftLink ) );
   _.assert( _.boolLike( o.resolvingTextLink ) || _.numberIs( o.resolvingTextLink ) );
 
@@ -2777,7 +2780,9 @@ function isDir_body( o )
     throwing : 0
   }
 
+  // debugger;
   o.filePath = self.pathResolveLinkFull( o2 ).absolutePath;
+  // debugger;
 
   _.assert( o2.stat !== undefined );
 
@@ -2815,7 +2820,7 @@ operates.filePath = { pathToRead : 1 }
  * @module Tools/mid/Files
  */
 
-let isDir = _.routine.uniteCloning_( _preFilePathScalarWithProviderDefaults, isDir_body );
+let isDir = _.routine.uniteCloning_replaceByUnite( _preFilePathScalarWithProviderDefaults, isDir_body );
 
 isDir.having.aspect = 'entry';
 
@@ -2834,7 +2839,7 @@ isDir.having.aspect = 'entry';
  * @module Tools/mid/Files
  */
 
-let resolvedIsDir = _.routine.uniteCloning_( _preFilePathScalarWithProviderDefaults, isDir_body );
+let resolvedIsDir = _.routine.uniteCloning_replaceByUnite( _preFilePathScalarWithProviderDefaults, isDir_body );
 
 resolvedIsDir.defaults.resolvingSoftLink = null;
 resolvedIsDir.defaults.resolvingTextLink = null;
@@ -2858,7 +2863,7 @@ function isHardLink_body( o )
   let self = this;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( _.assertRoutineOptions( isHardLink_body, arguments ) );
+  _.assert( _.routine.assertOptions( isHardLink_body, arguments ) );
   _.assert( _.boolLike( o.resolvingSoftLink ) || _.numberIs( o.resolvingSoftLink ) );
   _.assert( _.boolLike( o.resolvingTextLink ) || _.numberIs( o.resolvingTextLink ) );
 
@@ -2896,7 +2901,7 @@ operates.filePath = { pathToRead : 1 }
 
 //
 
-let isHardLink = _.routine.uniteCloning_( _preFilePathScalarWithProviderDefaults, isHardLink_body );
+let isHardLink = _.routine.uniteCloning_replaceByUnite( _preFilePathScalarWithProviderDefaults, isHardLink_body );
 
 isHardLink.defaults.resolvingSoftLink = 0;
 isHardLink.defaults.resolvingTextLink = 0;
@@ -2905,7 +2910,7 @@ isHardLink.having.aspect = 'entry';
 
 //
 
-let resolvedIsHardLink = _.routine.uniteCloning_( _preFilePathScalarWithProviderDefaults, isHardLink_body );
+let resolvedIsHardLink = _.routine.uniteCloning_replaceByUnite( _preFilePathScalarWithProviderDefaults, isHardLink_body );
 
 resolvedIsHardLink.defaults.resolvingSoftLink = null;
 resolvedIsHardLink.defaults.resolvingTextLink = null;
@@ -2929,7 +2934,7 @@ function isSoftLink_body( o )
   let self = this;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( _.assertRoutineOptions( isSoftLink_body, arguments ) );
+  _.assert( _.routine.assertOptions( isSoftLink_body, arguments ) );
   _.assert( _.boolLike( o.resolvingTextLink ) || _.numberIs( o.resolvingTextLink ) );
 
 
@@ -2966,13 +2971,13 @@ operates.filePath = { pathToRead : 1 }
 
 //
 
-let isSoftLink = _.routine.uniteCloning_( _preFilePathScalarWithProviderDefaults, isSoftLink_body );
+let isSoftLink = _.routine.uniteCloning_replaceByUnite( _preFilePathScalarWithProviderDefaults, isSoftLink_body );
 isSoftLink.defaults.resolvingTextLink = 0;
 isSoftLink.having.aspect = 'entry';
 
 //
 
-let resolvedIsSoftLink = _.routine.uniteCloning_( _preFilePathScalarWithProviderDefaults, isSoftLink_body );
+let resolvedIsSoftLink = _.routine.uniteCloning_replaceByUnite( _preFilePathScalarWithProviderDefaults, isSoftLink_body );
 resolvedIsSoftLink.defaults.resolvingTextLink = null;
 resolvedIsSoftLink.having.aspect = 'entry';
 
@@ -2983,7 +2988,7 @@ function isTextLink_body( o )
   let self = this;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( _.assertRoutineOptions( isTextLink_body, arguments ) );
+  _.assert( _.routine.assertOptions( isTextLink_body, arguments ) );
   _.assert( _.boolLike( o.resolvingSoftLink ) || _.numberIs( o.resolvingSoftLink ) );
 
   let o2 =
@@ -3019,13 +3024,13 @@ operates.filePath = { pathToRead : 1 }
 
 //
 
-let isTextLink = _.routine.uniteCloning_( _preFilePathScalarWithProviderDefaults, isTextLink_body );
+let isTextLink = _.routine.uniteCloning_replaceByUnite( _preFilePathScalarWithProviderDefaults, isTextLink_body );
 isTextLink.defaults.resolvingSoftLink = 0;
 isTextLink.having.aspect = 'entry';
 
 //
 
-let resolvedIsTextLink = _.routine.uniteCloning_( _preFilePathScalarWithProviderDefaults, isTextLink_body );
+let resolvedIsTextLink = _.routine.uniteCloning_replaceByUnite( _preFilePathScalarWithProviderDefaults, isTextLink_body );
 resolvedIsTextLink.defaults.resolvingSoftLink = null;
 resolvedIsTextLink.having.aspect = 'entry';
 
@@ -3079,13 +3084,13 @@ operates.filePath = { pathToRead : 1 };
 
 //
 
-let isLink = _.routine.uniteCloning_( _preFilePathScalarWithProviderDefaults, isLink_body );
+let isLink = _.routine.uniteCloning_replaceByUnite( _preFilePathScalarWithProviderDefaults, isLink_body );
 
 isLink.having.aspect = 'entry';
 
 //
 
-let resolvedIsLink = _.routine.uniteCloning_( _preFilePathScalarWithProviderDefaults, isLink_body );
+let resolvedIsLink = _.routine.uniteCloning_replaceByUnite( _preFilePathScalarWithProviderDefaults, isLink_body );
 
 resolvedIsLink.defaults.resolvingSoftLink = null;
 resolvedIsLink.defaults.resolvingTextLink = null;
@@ -3175,7 +3180,7 @@ function streamRead_body( o )
   let result;
   let encoder = _.files.ReadEncoders[ o.encoding ];
 
-  let optionsRead = _.mapExtend( null, o );
+  let optionsRead = _.props.extend( null, o );
   delete optionsRead.throwing;
 
   handleBegin();
@@ -3277,7 +3282,7 @@ var having = streamRead_body.having;
 having.driving = 0;
 having.aspect = 'body';
 
-let streamRead = _.routine.uniteCloning_( _preFilePathScalarWithProviderDefaults, streamRead_body );
+let streamRead = _.routine.uniteCloning_replaceByUnite( _preFilePathScalarWithProviderDefaults, streamRead_body );
 streamRead.having.aspect = 'entry';
 
 //
@@ -3586,7 +3591,7 @@ having.aspect = 'body';
  * @param {Error} error
  */
 
-const fileRead = _.routine.uniteCloning_( fileRead_head, fileRead_body );
+const fileRead = _.routine.uniteCloning_replaceByUnite( fileRead_head, fileRead_body );
 
 fileRead.having.aspect = 'entry';
 fileRead.having.hubResolving = 1;
@@ -3692,7 +3697,7 @@ having.aspect = 'body';
  * @module Tools/mid/Files
  */
 
-let fileReadJson = _.routine.uniteCloning_( fileRead.head, fileReadJson_body );
+let fileReadJson = _.routine.uniteCloning_replaceByUnite( fileRead.head, fileReadJson_body );
 
 fileReadJson.having.aspect = 'entry';
 
@@ -3719,7 +3724,7 @@ having.aspect = 'body';
 
 //
 
-let fileReadJs = _.routine.uniteCloning_( fileRead.head, fileReadJs_body );
+let fileReadJs = _.routine.uniteCloning_replaceByUnite( fileRead.head, fileReadJs_body );
 var having = fileReadJs.having;
 fileReadJs.having.aspect = 'entry';
 
@@ -3736,7 +3741,7 @@ function _fileInterpret_head( routine, args )
   if( self.path.like( o ) )
   o = { filePath : self.path.from( o ) };
 
-  _.routineOptions( routine, o );
+  _.routine.options_( routine, o );
   let encoding = o.encoding;
   self._providerDefaultsApply( o );
   o.encoding = encoding;
@@ -3793,7 +3798,7 @@ _.routineExtend( _fileInterpret_body, fileRead.body );
 
 _fileInterpret_body.defaults.encoding = null;
 
-let fileInterpret = _.routine.uniteCloning_( _fileInterpret_head, _fileInterpret_body );
+let fileInterpret = _.routine.uniteCloning_replaceByUnite( _fileInterpret_head, _fileInterpret_body );
 
 fileInterpret.having.aspect = 'entry';
 
@@ -4019,7 +4024,7 @@ var having = hashRead_body.having;
 having.driving = 0;
 having.aspect = 'body';
 
-let hashRead = _.routine.uniteCloning_( _preFilePathScalarWithProviderDefaults, hashRead_body );
+let hashRead = _.routine.uniteCloning_replaceByUnite( _preFilePathScalarWithProviderDefaults, hashRead_body );
 hashRead.having.aspect = 'entry';
 
 //
@@ -4082,7 +4087,7 @@ function hashSzRead_body( o )
 _.routineExtend( hashSzRead_body, hashRead.body );
 
 var defaults = hashSzRead_body.defaults;
-let hashSzRead = _.routine.uniteCloning_( _preFilePathScalarWithProviderDefaults, hashSzRead_body );
+let hashSzRead = _.routine.uniteCloning_replaceByUnite( _preFilePathScalarWithProviderDefaults, hashSzRead_body );
 hashSzRead.having.aspect = 'entry';
 
 //
@@ -4158,7 +4163,7 @@ _.routineExtend( hashSzIsUpToDate_body, hashRead.body );
 var defaults = hashSzIsUpToDate_body.defaults;
 defaults.hash = null;
 defaults.data = null;
-let hashSzIsUpToDate = _.routine.uniteCloning_( hashSzIsUpToDate_head, hashSzIsUpToDate_body );
+let hashSzIsUpToDate = _.routine.uniteCloning_replaceByUnite( hashSzIsUpToDate_head, hashSzIsUpToDate_body );
 hashSzIsUpToDate.having.aspect = 'entry';
 
 //
@@ -4196,10 +4201,10 @@ function dirRead_body( o )
 
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.longHas( [ 'record', 'absolute', 'relative' ], o.outputFormat ) )
-  _.assertRoutineOptions( dirRead_body, arguments );
+  _.routine.assertOptions( dirRead_body, arguments );
 
   let filePath = o.filePath;
-  let o2 = _.mapExtend( null, o );
+  let o2 = _.props.extend( null, o );
   delete o2.outputFormat;
   delete o2.basePath;
   delete o2.throwing;
@@ -4356,7 +4361,7 @@ having.aspect = 'body';
  * @module Tools/mid/Files
  */
 
-let dirRead = _.routine.uniteCloning_( dirRead_head, dirRead_body );
+let dirRead = _.routine.uniteCloning_replaceByUnite( dirRead_head, dirRead_body );
 
 dirRead.having.aspect = 'entry';
 
@@ -4388,7 +4393,7 @@ having.aspect = 'body';
 
 //
 
-let dirReadDirs = _.routine.uniteCloning_( dirRead.head, dirReadDirs_body );
+let dirReadDirs = _.routine.uniteCloning_replaceByUnite( dirRead.head, dirReadDirs_body );
 dirReadDirs.having.aspect = 'entry';
 
 //
@@ -4420,7 +4425,7 @@ having.aspect = 'body';
 
 //
 
-let dirReadTerminals = _.routine.uniteCloning_( dirRead.head, dirReadTerminals_body );
+let dirReadTerminals = _.routine.uniteCloning_replaceByUnite( dirRead.head, dirReadTerminals_body );
 dirReadTerminals.having.aspect = 'entry';
 
 //
@@ -4459,7 +4464,7 @@ function rightsRead_head( routine, args )
   _.assert( args.length === 1 );
 
   _.assert( arguments.length === 2, 'Expects exactly two arguments' );
-  _.routineOptions( routine, o );
+  _.routine.options_( routine, o );
 
   if( o.sync === null )
   o.sync = self.sync;
@@ -4484,7 +4489,7 @@ having.aspect = 'body';
 
 //
 
-let rightsRead = _.routine.uniteCloning_( rightsRead_head, rightsRead_body );
+let rightsRead = _.routine.uniteCloning_replaceByUnite( rightsRead_head, rightsRead_body );
 var having = rightsRead.having;
 having.aspect = 'entry';
 
@@ -4559,13 +4564,21 @@ function filesAreSame_head( routine, args )
   let self = this;
   let o;
 
-  if( args.length === 2 || args.length === 3 )
+  if( args.length === 3 )
   {
     o =
     {
       ins1 : args[ 0 ],
       ins2 : args[ 1 ],
       default : args[ 2 ],
+    }
+  }
+  else if( args.length === 2 )
+  {
+    o =
+    {
+      ins1 : args[ 0 ],
+      ins2 : args[ 1 ],
     }
   }
   else
@@ -4575,7 +4588,7 @@ function filesAreSame_head( routine, args )
   }
 
   _.assert( arguments.length === 2, 'Expects exactly two arguments' );
-  _.routineOptions( routine, o );
+  _.routine.options_( routine, o );
 
   return o;
 }
@@ -4722,7 +4735,7 @@ function filesCanBeSame_body( o )
 
 _.routineExtend( filesCanBeSame_body, filesAreSameCommon_body );
 
-let filesCanBeSame = _.routine.uniteCloning_( filesAreSame_head, filesCanBeSame_body );
+let filesCanBeSame = _.routine.uniteCloning_replaceByUnite( filesAreSame_head, filesCanBeSame_body );
 filesCanBeSame.having.aspect = 'entry';
 
 //
@@ -4749,7 +4762,7 @@ _.routineExtend( filesAreSameForSure_body, filesAreSameCommon_body );
 
 //
 
-let filesAreSameForSure = _.routine.uniteCloning_( filesAreSame_head, filesAreSameForSure_body );
+let filesAreSameForSure = _.routine.uniteCloning_replaceByUnite( filesAreSame_head, filesAreSameForSure_body );
 filesAreSameForSure.having.aspect = 'entry';
 
 // --
@@ -4778,7 +4791,7 @@ function streamWrite_body( o )
 
   _.assert( arguments.length === 1, 'Expects single argument' );
 
-  let o2 = _.mapExtend( null, o );
+  let o2 = _.props.extend( null, o );
 
   return self.streamWriteAct( o2 );
 }
@@ -4791,7 +4804,7 @@ having.aspect = 'body';
 
 //
 
-let streamWrite = _.routine.uniteCloning_( _preFilePathScalarWithProviderDefaults, streamWrite_body );
+let streamWrite = _.routine.uniteCloning_replaceByUnite( _preFilePathScalarWithProviderDefaults, streamWrite_body );
 streamWrite.having.aspect = 'entry';
 
 //
@@ -4835,7 +4848,7 @@ function fileWrite_head( routine, args )
   }
 
   _.assert( o.data !== undefined, 'Expects defined {-o.data-}' );
-  _.routineOptions( routine, o );
+  _.routine.options_( routine, o );
   self._providerDefaultsApply( o );
   _.assert( _.strIs( o.filePath ), 'Expects string {-o.filePath-}' );
   _.assert( arguments.length === 2, 'Expects exactly two arguments' );
@@ -5002,7 +5015,7 @@ having.aspect = 'body';
  * @module Tools/mid/Files
  */
 
-let fileWrite = _.routine.uniteCloning_( fileWrite_head, fileWrite_body );
+let fileWrite = _.routine.uniteCloning_replaceByUnite( fileWrite_head, fileWrite_body );
 
 fileWrite.having.aspect = 'entry';
 
@@ -5159,12 +5172,12 @@ _.assert( _.boolLike( _.entity.exportJson.defaults.cloning ) );
  * @module Tools/mid/Files
 */
 
-let fileWriteJson = _.routine.uniteCloning_( fileWrite_head, fileWriteJson_body );
+let fileWriteJson = _.routine.uniteCloning_replaceByUnite( fileWrite_head, fileWriteJson_body );
 fileWriteJson.having.aspect = 'entry';
 
 //
 
-let fileWriteJs = _.routine.uniteCloning_( fileWrite_head, fileWriteJson_body );
+let fileWriteJs = _.routine.uniteCloning_replaceByUnite( fileWrite_head, fileWriteJson_body );
 
 var defaults = fileWriteJs.defaults;
 defaults.jsLike = 1;
@@ -5198,7 +5211,7 @@ function fileTouch_head( routine, args )
     o = { filePath : self.path.from( o ) };
   }
 
-  _.routineOptions( routine, o );
+  _.routine.options_( routine, o );
   self._providerDefaultsApply( o );
   _.assert( _.strIs( o.filePath ), 'Expects string {-o.filePath-}, but got', _.entity.strType( o.filePath ) );
 
@@ -5245,7 +5258,7 @@ having.aspect = 'body';
 
 //
 
-let fileTouch = _.routine.uniteCloning_( fileTouch_head, fileTouch_body );
+let fileTouch = _.routine.uniteCloning_replaceByUnite( fileTouch_head, fileTouch_body );
 fileTouch.having.aspect = 'entry';
 
 //
@@ -5300,7 +5313,7 @@ function timeWrite_head( routine, args )
   }
 
   _.assert( arguments.length === 2, 'Expects exactly two arguments' );
-  _.routineOptions( routine, o );
+  _.routine.options_( routine, o );
 
   return o;
 }
@@ -5322,7 +5335,7 @@ having.aspect = 'body';
 
 //
 
-let timeWrite = _.routine.uniteCloning_( timeWrite_head, timeWrite_body );
+let timeWrite = _.routine.uniteCloning_replaceByUnite( timeWrite_head, timeWrite_body );
 timeWrite.having.aspect = 'entry';
 
 //
@@ -5373,7 +5386,7 @@ function rightsWrite_pre_functor( defaultKey )
     }
 
     _.assert( arguments.length === 2, 'Expects exactly two arguments' );
-    _.routineOptions( routine, o );
+    _.routine.options_( routine, o );
 
     if( o.sync === null )
     o.sync = self.sync;
@@ -5400,15 +5413,15 @@ having.aspect = 'body';
 
 //
 
-let rightsWrite = _.routine.uniteCloning_( rightsWrite_pre_functor( 'setRights' ), rightsWrite_body );
+let rightsWrite = _.routine.uniteCloning_replaceByUnite( rightsWrite_pre_functor( 'setRights' ), rightsWrite_body );
 var having = rightsWrite.having;
 having.aspect = 'entry';
 
-let rightsAdd = _.routine.uniteCloning_( rightsWrite_pre_functor( 'addRights' ), rightsWrite_body );
+let rightsAdd = _.routine.uniteCloning_replaceByUnite( rightsWrite_pre_functor( 'addRights' ), rightsWrite_body );
 var having = rightsAdd.having;
 having.aspect = 'entry';
 
-let rightsDel = _.routine.uniteCloning_( rightsWrite_pre_functor( 'delRights' ), rightsWrite_body );
+let rightsDel = _.routine.uniteCloning_replaceByUnite( rightsWrite_pre_functor( 'delRights' ), rightsWrite_body );
 var having = rightsDel.having;
 having.aspect = 'entry';
 
@@ -5446,7 +5459,7 @@ function fileDelete_body( o )
     {
       for( let f = 0 ; f < o.filePath.length ; f++ )
       {
-        let o2 = _.mapExtend( null, o );
+        let o2 = _.props.extend( null, o );
         o2.filePath = o.filePath[ f ];
         fileDelete_body.call( self, o2 );
       }
@@ -5458,7 +5471,7 @@ function fileDelete_body( o )
       let cons = [];
       for( let f = 0 ; f < o.filePath.length ; f++ )
       {
-        let o2 = _.mapExtend( null, o );
+        let o2 = _.props.extend( null, o );
         o2.filePath = o.filePath[ f ];
         cons[ f ] = fileDelete_body.call( self, o2 );
       }
@@ -5494,7 +5507,7 @@ function fileDelete_body( o )
   function act( filePath )
   {
 
-    let o2 = _.mapExtend( null, o );
+    let o2 = _.props.extend( null, o );
 
     o2.filePath = filePath;
 
@@ -5609,12 +5622,12 @@ having.aspect = 'body';
  * @module Tools/mid/Files
  */
 
-let fileDelete = _.routine.uniteCloning_( _preFilePathScalarWithProviderDefaults, fileDelete_body );
+let fileDelete = _.routine.uniteCloning_replaceByUnite( _preFilePathScalarWithProviderDefaults, fileDelete_body );
 fileDelete.having.aspect = 'entry';
 
 //
 
-let fileResolvedDelete = _.routine.uniteCloning_({ head : _preFilePathScalarWithProviderDefaults, body : fileDelete_body, name : 'fileResolvedDelete' });
+let fileResolvedDelete = _.routine.uniteCloning_replaceByUnite({ head : _preFilePathScalarWithProviderDefaults, body : fileDelete_body, name : 'fileResolvedDelete' });
 fileResolvedDelete.defaults.resolvingSoftLink = null;
 fileResolvedDelete.defaults.resolvingTextLink = null;
 fileResolvedDelete.having.aspect = 'entry';
@@ -5750,7 +5763,7 @@ having.aspect = 'body';
 
 //
 
-let dirMake = _.routine.uniteCloning_( _preFilePathScalarWithProviderDefaults, dirMake_body );
+let dirMake = _.routine.uniteCloning_replaceByUnite( _preFilePathScalarWithProviderDefaults, dirMake_body );
 dirMake.having.aspect = 'entry';
 
 //
@@ -5777,7 +5790,7 @@ having.aspect = 'body';
 
 //
 
-let dirMakeForFile = _.routine.uniteCloning_( _preFilePathScalarWithProviderDefaults, dirMakeForFile_body );
+let dirMakeForFile = _.routine.uniteCloning_replaceByUnite( _preFilePathScalarWithProviderDefaults, dirMakeForFile_body );
 dirMakeForFile.having.aspect = 'entry';
 
 // --
@@ -5845,7 +5858,7 @@ having.aspect = 'body';
 
 //
 
-let fileLock = _.routine.uniteCloning_( _preFilePathScalarWithProviderDefaults, fileLock_body );
+let fileLock = _.routine.uniteCloning_replaceByUnite( _preFilePathScalarWithProviderDefaults, fileLock_body );
 dirMakeForFile.having.aspect = 'entry';
 
 //
@@ -5899,7 +5912,7 @@ having.aspect = 'body';
 
 //
 
-let fileUnlock = _.routine.uniteCloning_( _preFilePathScalarWithProviderDefaults, fileUnlock_body );
+let fileUnlock = _.routine.uniteCloning_replaceByUnite( _preFilePathScalarWithProviderDefaults, fileUnlock_body );
 dirMakeForFile.having.aspect = 'entry';
 
 //
@@ -5952,7 +5965,7 @@ having.aspect = 'body';
 
 //
 
-let fileIsLocked = _.routine.uniteCloning_( _preFilePathScalarWithProviderDefaults, fileIsLocked_body );
+let fileIsLocked = _.routine.uniteCloning_replaceByUnite( _preFilePathScalarWithProviderDefaults, fileIsLocked_body );
 dirMakeForFile.having.aspect = 'entry';
 
 // --
@@ -6269,7 +6282,7 @@ function _fileRenameDo( c )
     })
     .then( () =>
     {
-      let o2 = _.mapExtend( null, c.options2 );
+      let o2 = _.props.extend( null, c.options2 );
       let result = self.fileCopyAct( o2 );
       return o.sync ? true : result;
     })
@@ -6314,7 +6327,7 @@ defaults.resolvingDstTextLink = 0;
 
 defaults.breakingDstHardLink = 1;
 
-_.mapExtend( fileRename.defaults, fileRename.body.defaults );
+_.props.extend( fileRename.defaults, fileRename.body.defaults );
 
 //
 
@@ -6581,7 +6594,7 @@ defaults.breakingDstHardLink = 0;
 defaults.resolvingDstSoftLink = 0;
 defaults.resolvingDstTextLink = 0;
 
-_.mapExtend( fileCopy.defaults, fileCopy.body.defaults );
+_.props.extend( fileCopy.defaults, fileCopy.body.defaults );
 
 //
 
@@ -6882,7 +6895,7 @@ defaults.breakingDstHardLink = 1;
 defaults.resolvingDstSoftLink = 0;
 defaults.resolvingDstTextLink = 0;
 
-_.mapExtend( hardLink.defaults, hardLink.body.defaults );
+_.props.extend( hardLink.defaults, hardLink.body.defaults );
 
 /* xxx qqq2 : add test routine to check linking methods fails if context is passed */
 
@@ -6994,7 +7007,7 @@ defaults.resolvingSrcTextLink = 0;
 defaults.resolvingDstSoftLink = 0;
 defaults.resolvingDstTextLink = 0;
 
-_.mapExtend( softLink.defaults, softLink.body.defaults );
+_.props.extend( softLink.defaults, softLink.body.defaults );
 
 //
 
@@ -7003,7 +7016,7 @@ function textLinkAct( o )
   let self = this;
   let path = self.system ? self.system.path : self.path;;
 
-  _.assertRoutineOptions( textLinkAct, arguments );
+  _.routine.assertOptions( textLinkAct, arguments );
   _.assert( path.is( o.srcPath ) );
   _.assert( path.isAbsolute( o.dstPath ) );
 
@@ -7131,7 +7144,7 @@ defaults.resolvingSrcTextLink = 0;
 defaults.resolvingDstSoftLink = 0;
 defaults.resolvingDstTextLink = 0;
 
-_.mapExtend( textLink.defaults, textLink.body.defaults );
+_.props.extend( textLink.defaults, textLink.body.defaults );
 
 //
 
@@ -7157,7 +7170,7 @@ function fileExchange_head( routine, args )
     _.assert( args.length === 1 );
   }
 
-  _.routineOptions( routine, o );
+  _.routine.options_( routine, o );
   self._providerDefaultsApply( o );
   _.assert( _.strIs( o.srcPath ) && _.strIs( o.dstPath ) );
 
@@ -7209,7 +7222,7 @@ function fileExchange_body( o )
       if( !src.stat && !dst.stat )
       return returnNull();
 
-      return self.fileRename( _.mapExtend( null, o, optionsForRename ) );
+      return self.fileRename( _.props.extend( null, o, optionsForRename ) );
     }
     else if( o.throwing )
     {
@@ -7236,7 +7249,7 @@ function fileExchange_body( o )
 
   let tempPath = src.filePath + '-' + _.idWithGuid() + '.tmp';
 
-  var o2 = _.mapExtend( null, o, optionsForRename );
+  var o2 = _.props.extend( null, o, optionsForRename );
 
   o2.srcPath = src.filePath;
   o2.dstPath = tempPath;
@@ -7245,30 +7258,30 @@ function fileExchange_body( o )
 
   if( o.sync )
   {
-    self.fileRename( _.mapExtend( null, o2 ) );
+    self.fileRename( _.props.extend( null, o2 ) );
     o2.dstPath = src.filePath;
     o2.srcPath = dst.filePath;
-    self.fileRename( _.mapExtend( null, o2 ) );
+    self.fileRename( _.props.extend( null, o2 ) );
     o2.dstPath = dst.filePath;
     o2.srcPath = tempPath;
-    return self.fileRename( _.mapExtend( null, o2 ) );
+    return self.fileRename( _.props.extend( null, o2 ) );
   }
   else
   {
-    let con = self.fileRename( _.mapExtend( null, o2 ) );
+    let con = self.fileRename( _.props.extend( null, o2 ) );
 
     con.then( () =>
     {
       o2.dstPath = src.filePath;
       o2.srcPath = dst.filePath;
-      return self.fileRename( _.mapExtend( null, o2 ) );
+      return self.fileRename( _.props.extend( null, o2 ) );
     });
 
     con.then( () =>
     {
       o2.dstPath = dst.filePath;
       o2.srcPath = tempPath;
-      return self.fileRename( _.mapExtend( null, o2 ) );
+      return self.fileRename( _.props.extend( null, o2 ) );
     });
 
     con.catch( ( err ) =>
@@ -7384,7 +7397,7 @@ having.aspect = 'body';
  * @module Tools/mid/Files
  */
 
-let fileExchange = _.routine.uniteCloning_( fileExchange_head, fileExchange_body );
+let fileExchange = _.routine.uniteCloning_replaceByUnite( fileExchange_head, fileExchange_body );
 fileExchange.having.aspect = 'entry';
 
 // --
@@ -7439,7 +7452,7 @@ having.aspect = 'body';
 
 //
 
-let hardLinkBreak = _.routine.uniteCloning_( _preFilePathScalarWithProviderDefaults, hardLinkBreak_body );
+let hardLinkBreak = _.routine.uniteCloning_replaceByUnite( _preFilePathScalarWithProviderDefaults, hardLinkBreak_body );
 hardLinkBreak.having.aspect = 'entry';
 
 //
@@ -7492,7 +7505,7 @@ having.aspect = 'body';
 
 //
 
-let softLinkBreak = _.routine.uniteCloning_( _preFilePathScalarWithProviderDefaults, softLinkBreak_body );
+let softLinkBreak = _.routine.uniteCloning_replaceByUnite( _preFilePathScalarWithProviderDefaults, softLinkBreak_body );
 softLinkBreak.having.aspect = 'entry';
 
 //
@@ -7549,7 +7562,7 @@ function filesAreLinked_head( routine, args )
   {
     o = { filePath : [ args[ 0 ], args[ 1 ] ] }
   }
-  else if( _.arrayLike( args[ 0 ] ) )
+  else if( _.argumentsArray.like( args[ 0 ] ) )
   {
     _.assert( args.length === 1 );
     o = { filePath : args[ 0 ] }
@@ -7577,7 +7590,7 @@ function areHardLinked_body( o ) /* qqq : refactor. probably move some code to a
   let self = this;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assertRoutineOptions( areHardLinked_body, arguments );
+  _.routine.assertOptions( areHardLinked_body, arguments );
 
   if( !o.filePath.length )
   return true;
@@ -7602,7 +7615,7 @@ having.aspect = 'body';
 
 //
 
-let areHardLinked = _.routine.uniteCloning_( filesAreLinked_head, areHardLinked_body );
+let areHardLinked = _.routine.uniteCloning_replaceByUnite( filesAreLinked_head, areHardLinked_body );
 
 var having = areHardLinked.having;
 having.driving = 0;
@@ -7616,7 +7629,7 @@ function areSoftLinked_body( o )
   let path = self.system ? self.system.path : self.path;;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assertRoutineOptions( areSoftLinked_body, arguments );
+  _.routine.assertOptions( areSoftLinked_body, arguments );
   _.assert( o.filePath.length >= 2 );
 
   o.filePath = path.s.normalize( o.filePath );
@@ -7667,7 +7680,7 @@ having.aspect = 'body';
 
 //
 
-let areSoftLinked = _.routine.uniteCloning_( filesAreLinked_head, areSoftLinked_body );
+let areSoftLinked = _.routine.uniteCloning_replaceByUnite( filesAreLinked_head, areSoftLinked_body );
 
 areSoftLinked.having.driving = 0;
 areSoftLinked.having.aspect = 'entry';
@@ -7680,7 +7693,7 @@ function areTextLinked_body( o )
   let path = self.system ? self.system.path : self.path;;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assertRoutineOptions( areTextLinked_body, arguments );
+  _.routine.assertOptions( areTextLinked_body, arguments );
   _.assert( o.filePath.length >= 2 );
 
   o.filePath = path.s.normalize( o.filePath );
@@ -7727,7 +7740,7 @@ having.aspect = 'body';
 
 //
 
-let areTextLinked = _.routine.uniteCloning_( filesAreLinked_head, areTextLinked_body );
+let areTextLinked = _.routine.uniteCloning_replaceByUnite( filesAreLinked_head, areTextLinked_body );
 
 areTextLinked.having.driving = 0;
 areTextLinked.having.aspect = 'entry';

@@ -526,7 +526,7 @@ function recordFiltering( test )
 
   function makeFilter( o )
   {
-    _.mapSupplement( o, { system : _.fileProvider } );
+    _.props.supplement( o, { system : _.fileProvider } );
     var f = _.FileRecordFilter( o );
     f.form();
     return f;

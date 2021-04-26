@@ -11,7 +11,7 @@ const Partial = _.FileProvider.Partial;
 const Find = _.FileProvider.FindMixin;
 const fileRead = Partial.prototype.fileRead;
 
-_.assert( _.lengthOf( _.files.ReadEncoders ) > 0 );
+_.assert( _.entity.lengthOf( _.files.ReadEncoders ) > 0 );
 _.assert( _.routineIs( _.FileRecord ) );
 _.assert( _.routineIs( Abstract ) );
 _.assert( _.routineIs( Partial ) );
@@ -55,7 +55,7 @@ Self.shortName = 'SecondaryMixin';
 //     _.mapSupplementAppending( o, filesReadOld.presets[ o.preset ] );
 //   }
 //
-//   _.routineOptions( filesReadOld, o );
+//   _.routine.options_( filesReadOld, o );
 //   _.assert( arguments.length === 1, 'Expects single argument' );
 //   _.assert( _.arrayIs( o.paths ) || _.objectIs( o.paths ) || _.strIs( o.paths ) );
 //
@@ -128,7 +128,7 @@ Self.shortName = 'SecondaryMixin';
 //       if( _.FileRecord && src instanceof _.FileRecord )
 //       readOptions.filePath = src.absolute;
 //       else
-//       _.mapExtend( readOptions, _.mapOnly_( null, src, self.fileRead.defaults ) );
+//       _.props.extend( readOptions, _.mapOnly_( null, src, self.fileRead.defaults ) );
 //     }
 //     else
 //     readOptions.filePath = src;
@@ -475,7 +475,7 @@ function filesAreUpToDate2_head( routine, args )
   _.assert( arguments.length === 2 );
   _.assert( !o.newer || _.dateIs( o.newer ) );
 
-  _.routineOptions( routine, o );
+  _.routine.options_( routine, o );
 
   return o;
 }
@@ -574,7 +574,7 @@ having.writing = 0;
 having.reading = 1;
 having.driving = 0;
 
-var filesAreUpToDate2 = _.routine.uniteCloning_( filesAreUpToDate2_head, filesAreUpToDate2_body );
+var filesAreUpToDate2 = _.routine.uniteCloning_replaceByUnite( filesAreUpToDate2_head, filesAreUpToDate2_body );
 
 //
 
@@ -590,7 +590,7 @@ function filesAreOnSameDevice_head( routine, args )
     o = { src : args[ 0 ], dst : args[ 1 ] }
   }
 
-  _.routineOptions( routine, o );
+  _.routine.options_( routine, o );
 
   _.assert( _.strDefined( o.src ) );
   _.assert( _.strDefined( o.dst ) );
@@ -650,7 +650,7 @@ having.writing = 0;
 having.reading = 1;
 having.driving = 0;
 
-var filesAreOnSameDevice = _.routine.uniteCloning_( filesAreOnSameDevice_head, filesAreOnSameDevice_body );
+var filesAreOnSameDevice = _.routine.uniteCloning_replaceByUnite( filesAreOnSameDevice_head, filesAreOnSameDevice_body );
 
 //
 
@@ -721,7 +721,7 @@ function filesSearchText( o )
   let self = this;
   let result = [];
 
-  _.routineOptions( filesSearchText, o );
+  _.routine.options_( filesSearchText, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
 
   o.ins = _.arrayAs( o.ins );
@@ -769,7 +769,7 @@ _.routineExtend( filesSearchText, Find.prototype.filesFind );
 
 var defaults = filesSearchText.defaults;
 
-_.mapSupplement( defaults, _.mapBut_( null, _.strSearch.defaults, { src : null } ) );
+_.props.supplement( defaults, _.mapBut_( null, _.strSearch.defaults, { src : null } ) );
 
 defaults.determiningLineNumber = 1;
 
@@ -827,7 +827,7 @@ function fileCodeRead_body( o )
   return result;
 }
 
-var defaults = fileCodeRead_body.defaults = _.mapExtend( null, fileRead.defaults );
+var defaults = fileCodeRead_body.defaults = _.props.extend( null, fileRead.defaults );
 
 defaults.encoding = 'utf8';
 defaults.wrapping = 1;
@@ -838,7 +838,7 @@ defaults.postfix = '\n})();\n';
 
 _.routineExtend( fileCodeRead_body, fileRead.body );
 
-var fileCodeRead = _.routine.uniteCloning_( fileRead.head, fileCodeRead_body );
+var fileCodeRead = _.routine.uniteCloning_replaceByUnite( fileRead.head, fileCodeRead_body );
 
 fileCodeRead.having.aspect = 'entry';
 

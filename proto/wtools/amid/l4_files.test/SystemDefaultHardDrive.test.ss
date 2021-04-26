@@ -59,7 +59,7 @@ function onRoutineEnd( test )
   let context = this;
   let system = context.system || context.provider;
   _.sure( system instanceof _.FileProvider.System );
-  _.sure( _.entityIdentical( _.mapKeys( system.providersWithProtocolMap ), [ 'hd', 'file' ] ), test.name, 'has not restored system!' );
+  _.sure( _.entityIdentical( _.props.keys( system.providersWithProtocolMap ), [ 'hd', 'file' ] ), test.name, 'has not restored system!' );
 }
 
 //

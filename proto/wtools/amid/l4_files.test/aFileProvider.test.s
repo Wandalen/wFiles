@@ -42,7 +42,7 @@ function onRoutineEnd( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  _.sure( _.arraySetIdentical( _.mapKeys( system.providersWithProtocolMap ), [ 'second', 'current' ] ), test.name, 'has not restored system!' );
+  _.sure( _.arraySetIdentical( _.props.keys( system.providersWithProtocolMap ), [ 'second', 'current' ] ), test.name, 'has not restored system!' );
 }
 
 //
@@ -56,7 +56,7 @@ function assetFor( test, a )
     if( _.boolIs( arguments[ 1 ] ) )
     a = { originalAssetPath : arguments[ 1 ] }
     else
-    a = { assetName : arguments[ 1 ] }
+    a = { assetName : ( arguments.length > 1 ? arguments[ 1 ] : null ) }
   }
 
   if( !a.fileProvider )
@@ -1557,7 +1557,7 @@ function fileWriteActSync( test )
 
   test.case = 'normalized path, call fileWrite'
   var filePath = a.abs( 'write_test/file' );
-  var o = _.mapExtend( null, provider.fileWriteAct.defaults );
+  var o = _.props.extend( null, provider.fileWriteAct.defaults );
   o.filePath = filePath;
   o.sync = 1;
   o.data = data;
@@ -1575,7 +1575,7 @@ function fileWriteActSync( test )
     test.case = 'native path, call fileWrite_body'
     var filePath2 = a.abs( 'write_test/file' );
     provider.filesDelete( filePath2 )
-    var o2 = _.mapExtend( null, provider.fileWriteAct.defaults );
+    var o2 = _.props.extend( null, provider.fileWriteAct.defaults );
     o2.filePath = a.path.nativize( filePath2 );
     o2.sync = 1;
     o2.data = data;
@@ -1612,7 +1612,7 @@ function fileWriteActAsync( test )
   {
     test.case = 'normalized path, call fileWrite'
     var filePath = a.abs( 'write_test/file' );
-    var o = _.mapExtend( null, provider.fileWriteAct.defaults );
+    var o = _.props.extend( null, provider.fileWriteAct.defaults );
     o.filePath = filePath;
     o.sync = 0;
     o.data = data;
@@ -1636,7 +1636,7 @@ function fileWriteActAsync( test )
     test.case = 'native path, call fileWrite_body'
     var filePath = a.abs( 'write_test/file' );
     provider.filesDelete( filePath )
-    var o = _.mapExtend( null, provider.fileWriteAct.defaults );
+    var o = _.props.extend( null, provider.fileWriteAct.defaults );
     o.filePath = a.path.nativize( filePath );
     o.sync = 0;
     o.data = data;
@@ -4870,13 +4870,13 @@ function fileCopyActSync( test )
     sync : 1,
     context : provider,
   }
-  var expected = _.mapOnlyOwnKeys( o );
+  var expected = _.props.onlyOwnKeys( o );
   provider.fileCopyAct( o );
   var files = provider.dirRead( routinePath );
   test.identical( files, [ 'dst', 'src' ] );
   var dstFile = provider.fileRead( dstPath );
   test.identical( srcPath, dstFile );
-  var got = _.mapOnlyOwnKeys( o );
+  var got = _.props.onlyOwnKeys( o );
   test.identical( got, expected );
   provider.filesDelete( routinePath );
 
@@ -4897,7 +4897,7 @@ function fileCopyActSync( test )
     context : provider,
   }
 
-  var expected = _.mapExtend( null, o );
+  var expected = _.props.extend( null, o );
 
   provider.fileCopyAct( o );
   var files = provider.dirRead( routinePath );
@@ -5005,7 +5005,7 @@ function fileCopyActSync( test )
     sync : 1,
     context : provider,
   }
-  var expected = _.mapExtend( null, o );
+  var expected = _.props.extend( null, o );
   test.shouldThrowErrorOfAnyKind( () =>
   {
     provider.fileCopyAct( o );
@@ -7375,7 +7375,7 @@ function fileCopySoftLinkResolving( test )
       sync : 1,
       rewriting : 1
     }
-    _.mapSupplement( o, o2 )
+    _.props.supplement( o, o2 )
     return provider.fileCopy( o );
   }
 
@@ -8122,7 +8122,7 @@ function fileCopyLinks( test )
       sync : 1,
       rewriting : 1
     }
-    _.mapSupplement( o, o2 )
+    _.props.supplement( o, o2 )
     return provider.fileCopy( o );
   }
 
@@ -12910,13 +12910,13 @@ function fileRenameActSync( test )
     sync : 1,
     context : provider,
   }
-  var expected = _.mapOnlyOwnKeys( o );
+  var expected = _.props.onlyOwnKeys( o );
   provider.fileRenameAct( o );
   var files = provider.dirRead( routinePath );
   test.identical( files, [ 'dst' ] );
   var dstFile = provider.fileRead( dstPath );
   test.identical( srcPath, dstFile );
-  var got = _.mapOnlyOwnKeys( o );
+  var got = _.props.onlyOwnKeys( o );
   test.identical( got, expected );
   provider.filesDelete( routinePath );
 
@@ -12936,7 +12936,7 @@ function fileRenameActSync( test )
     context : provider,
   }
 
-  var expected = _.mapExtend( null, o );
+  var expected = _.props.extend( null, o );
 
   provider.fileRenameAct( o );
   var files = provider.dirRead( routinePath );
@@ -13061,7 +13061,7 @@ function fileRenameActSync( test )
     sync : 1,
     context : provider,
   }
-  var expected = _.mapExtend( null, o );
+  var expected = _.props.extend( null, o );
   test.shouldThrowErrorOfAnyKind( () =>
   {
     provider.fileRenameAct( o );
@@ -13100,7 +13100,7 @@ function fileRenameSoftLinkResolving( test )
       sync : 1,
       rewriting : 1
     }
-    _.mapSupplement( o, o2 )
+    _.props.supplement( o, o2 )
     return provider.fileRename( o );
   }
 
@@ -15095,7 +15095,7 @@ function fileDeleteActSync( test )
     filePath : srcPath,
     sync : 1
   }
-  var expected = _.mapExtend( null, o );
+  var expected = _.props.extend( null, o );
   provider.fileDeleteAct( o );
   test.identical( o, expected );
   var stat = provider.statResolvedRead( srcPath );
@@ -15163,7 +15163,7 @@ function fileDeleteActSync( test )
     filePath : srcPath,
     sync : 1
   }
-  var expected = _.mapExtend( null, o );
+  var expected = _.props.extend( null, o );
   provider.fileDeleteAct( o );
   test.identical( o, expected );
   var stat = provider.statResolvedRead( srcPath );
@@ -15180,9 +15180,9 @@ function fileDeleteActSync( test )
     filePath : srcPath,
     sync : 1
   }
-  var expected = _.mapOnlyOwnKeys( o );
+  var expected = _.props.onlyOwnKeys( o );
   provider.fileDeleteAct( o );
-  var got = _.mapOnlyOwnKeys( o );
+  var got = _.props.onlyOwnKeys( o );
   test.identical( got, expected );
   var stat = provider.statResolvedRead( srcPath );
   test.true( !stat );
@@ -15274,7 +15274,7 @@ function fileDeleteActSync( test )
     filePath : [ srcPath ],
     sync : 1
   }
-  var expected = _.mapExtend( null, o );
+  var expected = _.props.extend( null, o );
   test.shouldThrowErrorOfAnyKind( () =>
   {
     provider.fileDeleteAct( o );
@@ -17713,7 +17713,7 @@ function statReadActSync( test )
     throwing : 0,
     resolvingSoftLink : 0,
   }
-  var o2 = _.mapExtend( null, o );
+  var o2 = _.props.extend( null, o );
   var stat = provider.statReadAct( o );
   test.identical( o, o2 );
   test.true( !!stat );
@@ -17744,7 +17744,7 @@ function statReadActSync( test )
     throwing : 0,
     resolvingSoftLink : 0,
   }
-  var o2 = _.mapExtend( null, o );
+  var o2 = _.props.extend( null, o );
   var stat = provider.statReadAct( o );
   test.identical( o, o2 );
   test.true( !!stat );
@@ -17785,7 +17785,7 @@ function statReadActSync( test )
     throwing : 0,
     resolvingSoftLink : 0,
   }
-  var o2 = _.mapExtend( null, o );
+  var o2 = _.props.extend( null, o );
   var stat = provider.statReadAct( o );
   test.identical( o, o2 );
   test.true( !!stat );
@@ -17816,7 +17816,7 @@ function statReadActSync( test )
     throwing : 0,
     resolvingSoftLink : 0,
   }
-  var o2 = _.mapExtend( null, o );
+  var o2 = _.props.extend( null, o );
   var stat = provider.statReadAct( o );
   test.identical( o, o2 );
   test.true( !!stat );
@@ -17857,7 +17857,7 @@ function statReadActSync( test )
     throwing : 0,
     resolvingSoftLink : 0,
   }
-  var o2 = _.mapExtend( null, o );
+  var o2 = _.props.extend( null, o );
   var stat = provider.statReadAct( o );
   test.identical( o, o2 );
   test.true( !!stat );
@@ -17888,7 +17888,7 @@ function statReadActSync( test )
     throwing : 0,
     resolvingSoftLink : 0,
   }
-  var o2 = _.mapExtend( null, o );
+  var o2 = _.props.extend( null, o );
   var stat = provider.statReadAct( o );
   test.identical( o, o2 );
   test.true( !!stat );
@@ -17916,7 +17916,7 @@ function statReadActSync( test )
     throwing : 0,
     resolvingSoftLink : 1,
   }
-  var o2 = _.mapExtend( null, o );
+  var o2 = _.props.extend( null, o );
   var stat = provider.statReadAct( o );
   test.identical( o, o2 );
   test.true( !!stat );
@@ -17953,7 +17953,7 @@ function statReadActSync( test )
     throwing : 0,
     resolvingSoftLink : 0,
   }
-  var o2 = _.mapExtend( null, o );
+  var o2 = _.props.extend( null, o );
   var stat = provider.statReadAct( o );
   test.identical( o, o2 );
   test.true( !!stat );
@@ -17984,7 +17984,7 @@ function statReadActSync( test )
     throwing : 0,
     resolvingSoftLink : 0,
   }
-  var o2 = _.mapExtend( null, o );
+  var o2 = _.props.extend( null, o );
   var stat = provider.statReadAct( o );
   test.identical( o, o2 );
   test.true( !!stat );
@@ -18020,7 +18020,7 @@ function statReadActSync( test )
     throwing : 0,
     resolvingSoftLink : 0,
   }
-  var o2 = _.mapExtend( null, o );
+  var o2 = _.props.extend( null, o );
   var stat = provider.statReadAct( o );
   test.identical( o, o2 );
   test.true( !!stat );
@@ -18052,7 +18052,7 @@ function statReadActSync( test )
     throwing : 0,
     resolvingSoftLink : 1,
   }
-  var o2 = _.mapExtend( null, o );
+  var o2 = _.props.extend( null, o );
   var stat = provider.statReadAct( o );
   test.identical( o, o2 );
   test.true( !!stat );
@@ -18088,7 +18088,7 @@ function statReadActSync( test )
     throwing : 0,
     resolvingSoftLink : 1,
   }
-  var o2 = _.mapExtend( null, o );
+  var o2 = _.props.extend( null, o );
   var stat = provider.statReadAct( o );
   test.identical( o, o2 );
   test.true( !!stat );
@@ -18130,7 +18130,7 @@ function statReadActSync( test )
     throwing : 0,
     resolvingSoftLink : 0,
   }
-  var o2 = _.mapExtend( null, o );
+  var o2 = _.props.extend( null, o );
   var stat = provider.statReadAct( o );
   test.identical( o, o2 );
   test.true( !!stat );
@@ -18161,7 +18161,7 @@ function statReadActSync( test )
     throwing : 0,
     resolvingSoftLink : 0,
   }
-  var o2 = _.mapExtend( null, o );
+  var o2 = _.props.extend( null, o );
   var stat = provider.statReadAct( o );
   test.identical( o, o2 );
   test.true( !!stat );
@@ -18196,7 +18196,7 @@ function statReadActSync( test )
     throwing : 0,
     resolvingSoftLink : 1,
   }
-  var expected = _.mapExtend( null, o );
+  var expected = _.props.extend( null, o );
   // expected.filePath = provider.path.nativize( o.filePath );
   var stat = provider.statReadAct( o );
   test.identical( o, expected );
@@ -18214,7 +18214,7 @@ function statReadActSync( test )
     throwing : 0,
     resolvingSoftLink : 1
   }
-  var expected = _.mapExtend( null, o );
+  var expected = _.props.extend( null, o );
   var stat = provider.statReadAct( o );
   test.identical( o, expected );
   test.true( !stat );
@@ -18231,7 +18231,7 @@ function statReadActSync( test )
     throwing : 1,
     resolvingSoftLink : 1
   }
-  var expected = _.mapExtend( null, o );
+  var expected = _.props.extend( null, o );
   test.shouldThrowErrorOfAnyKind( () => provider.statReadAct( o ) );
   test.identical( o, expected );
   provider.filesDelete( routinePath );
@@ -18248,10 +18248,10 @@ function statReadActSync( test )
     throwing : 0,
     resolvingSoftLink : 1
   }
-  var expected = _.mapOnlyOwnKeys( o );
+  var expected = _.props.onlyOwnKeys( o );
   // expected.filePath = provider.path.nativize( o.filePath );
   var stat = provider.statReadAct( o );
-  var got = _.mapOnlyOwnKeys( o );
+  var got = _.props.onlyOwnKeys( o );
   test.identical( got, expected );
   test.true( !!stat );
   provider.filesDelete( routinePath );
@@ -18456,7 +18456,7 @@ function statReadActSync( test )
     throwing : 0,
     resolvingSoftLink : 1,
   }
-  var expected = _.mapExtend( null, o );
+  var expected = _.props.extend( null, o );
   test.shouldThrowErrorOfAnyKind( () =>
   {
     provider.statReadAct( o );
@@ -18472,7 +18472,7 @@ function statReadActSync( test )
     throwing : 1,
     resolvingSoftLink : 1,
   }
-  var expected = _.mapExtend( null, o );
+  var expected = _.props.extend( null, o );
   test.shouldThrowErrorOfAnyKind( () =>
   {
     provider.statReadAct( o );
@@ -20914,7 +20914,7 @@ function fileWriteSync( test )
       data,
       sync : 1
     }
-    var o2 =_.mapExtend( null, provider.fileWrite.body.defaults )
+    var o2 =_.props.extend( null, provider.fileWrite.body.defaults )
     o2.filePath2 = provider.path.nativize( filePath2 )
     o2.data = data;
     o2.sync = 1;
@@ -21676,7 +21676,7 @@ function fileWriteAsync( test )
     test.case = 'native path, call fileWrite_body'
     var filePath = test.context.pathFor( 'write_test/file' );
     provider.filesDelete( filePath )
-    var o =_.mapExtend( null, provider.fileWrite.body.defaults )
+    var o =_.props.extend( null, provider.fileWrite.body.defaults )
     o.filePath = provider.path.nativize( filePath )
     o.data = data;
     o.sync = 0;
@@ -24879,12 +24879,12 @@ function softLinkActSync( test )
     sync : 1,
     context : provider,
   }
-  var expected = _.mapOnlyOwnKeys( o );
+  var expected = _.props.onlyOwnKeys( o );
   provider.softLinkAct( o );
   test.true( provider.isSoftLink( dstPath ) );
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
   test.identical( got, srcPath );
-  var got = _.mapOnlyOwnKeys( o );
+  var got = _.props.onlyOwnKeys( o );
   test.identical( got, expected );
   provider.filesDelete( routinePath );
 
@@ -24904,12 +24904,12 @@ function softLinkActSync( test )
     sync : 1,
     context : provider,
   }
-  var expected = _.mapOnlyOwnKeys( o );
+  var expected = _.props.onlyOwnKeys( o );
   provider.softLinkAct( o );
   test.true( provider.isSoftLink( dstPath ) );
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
   test.identical( got, srcPath );
-  var got = _.mapOnlyOwnKeys( o );
+  var got = _.props.onlyOwnKeys( o );
   test.identical( got, expected );
   provider.filesDelete( routinePath );
 
@@ -24930,12 +24930,12 @@ function softLinkActSync( test )
     sync : 1,
     context : provider,
   }
-  var expected = _.mapOnlyOwnKeys( o );
+  var expected = _.props.onlyOwnKeys( o );
   provider.softLinkAct( o );
   test.true( provider.isSoftLink( dstPath ) );
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
   test.identical( got, srcPath );
-  var got = _.mapOnlyOwnKeys( o );
+  var got = _.props.onlyOwnKeys( o );
   test.identical( got, expected );
   provider.filesDelete( routinePath );
 
@@ -25123,7 +25123,7 @@ function softLinkActSync( test )
     context : provider,
   }
 
-  var expected = _.mapExtend( null, o );
+  var expected = _.props.extend( null, o );
 
   if( !( provider instanceof _.FileProvider.System ) )
   if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
@@ -25153,14 +25153,14 @@ function softLinkActSync( test )
     sync : 1,
     context : provider,
   }
-  var expected = _.mapOnlyOwnKeys( o );
+  var expected = _.props.onlyOwnKeys( o );
   if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
   expected.type = 'file'
   provider.softLinkAct( o );
   test.true( provider.isSoftLink( dstPath ) );
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
   test.identical( got, srcPath );
-  var got = _.mapOnlyOwnKeys( o );
+  var got = _.props.onlyOwnKeys( o );
   test.identical( got, expected );
   provider.filesDelete( routinePath );
 
@@ -25322,7 +25322,7 @@ function softLinkActSync( test )
     sync : 1,
     context : provider,
   }
-  var expected = _.mapExtend( null, o );
+  var expected = _.props.extend( null, o );
   test.shouldThrowErrorOfAnyKind( () =>
   {
     provider.softLinkAct( o );
@@ -25452,7 +25452,7 @@ function softLinkSoftLinkResolving( test )
       sync : 1,
       rewriting : 1
     }
-    _.mapSupplement( o, o2 )
+    _.props.supplement( o, o2 )
     return provider.softLink( o );
   }
 
@@ -25976,7 +25976,7 @@ function softLinkRelativeLinkResolving( test )
       sync : 1,
       rewriting : 1
     }
-    _.mapSupplement( o, o2 )
+    _.props.supplement( o, o2 )
     return provider.softLink( o );
   }
 
@@ -27611,9 +27611,9 @@ function softLinkToParentDirectorySync( test )
   test.identical( provider.pathResolveLinkFull( dst2Path ).filePath, srcPath );
 
   test.case = 'dir -> link -> link, relative paths';
-  srcPath  = test.context.pathFor( 'written/softLinkToParentDirectorySync/dir' );
-  dstPath  = test.context.pathFor( 'written/softLinkToParentDirectorySync/dir/link' );
-  dst2Path  = test.context.pathFor( 'written/softLinkToParentDirectorySync/dir/link/link2' );
+  srcPath = test.context.pathFor( 'written/softLinkToParentDirectorySync/dir' );
+  dstPath = test.context.pathFor( 'written/softLinkToParentDirectorySync/dir/link' );
+  dst2Path = test.context.pathFor( 'written/softLinkToParentDirectorySync/dir/link/link2' );
   provider.dirMake( srcPath );
   provider.softLink
   ({
@@ -30853,13 +30853,13 @@ function hardLinkActSync( test )
     sync : 1,
     context : null
   }
-  var expected = _.mapOnlyOwnKeys( o );
+  var expected = _.props.onlyOwnKeys( o );
   provider.hardLinkAct( o );
   if( context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
   test.identical( provider.areHardLinked( [ srcPath, dstPath ] ), hardLinked );
   else
   test.identical( provider.areHardLinked( [ srcPath, dstPath ] ), true );
-  var got = _.mapOnlyOwnKeys( o );
+  var got = _.props.onlyOwnKeys( o );
   test.identical( got, expected );
   provider.filesDelete( routinePath );
 
@@ -30955,13 +30955,13 @@ function hardLinkActSync( test )
     sync : 1,
     context : null
   }
-  var expected = _.mapOnlyOwnKeys( o );
+  var expected = _.props.onlyOwnKeys( o );
   provider.hardLinkAct( o );
   if( context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
   test.identical( provider.areHardLinked( [ srcPath, dstPath ] ), hardLinked );
   else
   test.identical( provider.areHardLinked( [ srcPath, dstPath ] ), true );
-  var got = _.mapOnlyOwnKeys( o );
+  var got = _.props.onlyOwnKeys( o );
   test.identical( got, expected );
   provider.filesDelete( routinePath );
 
@@ -31200,7 +31200,7 @@ function hardLinkActSync( test )
     context : null
   }
 
-  var expected = _.mapExtend( null, o );
+  var expected = _.props.extend( null, o );
 
   provider.hardLinkAct( o );
   if( context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
@@ -31227,13 +31227,13 @@ function hardLinkActSync( test )
     sync : 1,
     context : null
   }
-  var expected = _.mapOnlyOwnKeys( o );
+  var expected = _.props.onlyOwnKeys( o );
   provider.hardLinkAct( o );
   if( context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
   test.identical( provider.areHardLinked( [ srcPath, dstPath ] ), hardLinked );
   else
   test.identical( provider.areHardLinked( [ srcPath, dstPath ] ), true );
-  var got = _.mapOnlyOwnKeys( o );
+  var got = _.props.onlyOwnKeys( o );
   test.identical( got, expected );
   provider.filesDelete( routinePath );
 
@@ -31385,7 +31385,7 @@ function hardLinkActSync( test )
     sync : 1,
     context : null
   }
-  var expected = _.mapExtend( null, o );
+  var expected = _.props.extend( null, o );
   test.shouldThrowErrorOfAnyKind( () =>
   {
     provider.hardLinkAct( o );
@@ -32269,7 +32269,7 @@ function hardLinkActAsync( test )
       sync : 0,
       context : null
     }
-    var expected = _.mapOnlyOwnKeys( o );
+    var expected = _.props.onlyOwnKeys( o );
     return test.mustNotThrowError( provider.hardLinkAct( o ) )
     .then( ( got ) =>
     {
@@ -32278,7 +32278,7 @@ function hardLinkActAsync( test )
       test.identical( provider.areHardLinked( [ srcPath, dstPath ] ), hardLinked );
       else
       test.identical( provider.areHardLinked( [ srcPath, dstPath ] ), true );
-      got = _.mapOnlyOwnKeys( o );
+      got = _.props.onlyOwnKeys( o );
       test.identical( got, expected );
       provider.filesDelete( routinePath );
       return null;
@@ -32303,13 +32303,13 @@ function hardLinkActAsync( test )
       sync : 0,
       context : null
     }
-    var expected = _.mapOnlyOwnKeys( o );
+    var expected = _.props.onlyOwnKeys( o );
     return test.shouldThrowErrorOfAnyKind( provider.hardLinkAct( o ) )
     .then( ( got ) =>
     {
       test.true( _.errIs( got ) );
       test.true( !provider.areHardLinked( [ srcPath, dstPath ] ) );
-      got = _.mapOnlyOwnKeys( o );
+      got = _.props.onlyOwnKeys( o );
       test.identical( got, expected );
       provider.filesDelete( routinePath );
       return null;
@@ -32335,13 +32335,13 @@ function hardLinkActAsync( test )
       sync : 0,
       context : null
     }
-    var expected = _.mapOnlyOwnKeys( o );
+    var expected = _.props.onlyOwnKeys( o );
     return test.shouldThrowErrorOfAnyKind( provider.hardLinkAct( o ) )
     .then( ( got ) =>
     {
       test.true( _.errIs( got ) );
       test.true( !provider.areHardLinked( [ srcPath, dstPath ] ) );
-      got = _.mapOnlyOwnKeys( o );
+      got = _.props.onlyOwnKeys( o );
       test.identical( got, expected );
       provider.filesDelete( routinePath );
       return null;
@@ -32369,13 +32369,13 @@ function hardLinkActAsync( test )
       sync : 0,
       context : null
     }
-    var expected = _.mapOnlyOwnKeys( o );
+    var expected = _.props.onlyOwnKeys( o );
     return test.shouldThrowErrorOfAnyKind( provider.hardLinkAct( o ) )
     .then( ( got ) =>
     {
       test.true( _.errIs( got ) );
       test.true( !provider.areHardLinked( [ srcPath, dstPath ] ) );
-      got = _.mapOnlyOwnKeys( o );
+      got = _.props.onlyOwnKeys( o );
       test.identical( got, expected );
       provider.filesDelete( routinePath );
       return null;
@@ -32402,13 +32402,13 @@ function hardLinkActAsync( test )
       sync : 0,
       context : null
     }
-    var expected = _.mapOnlyOwnKeys( o );
+    var expected = _.props.onlyOwnKeys( o );
     return test.shouldThrowErrorOfAnyKind( provider.hardLinkAct( o ) )
     .then( ( got ) =>
     {
       test.true( _.errIs( got ) );
       test.true( !provider.areHardLinked( [ srcPath, dstPath ] ) );
-      got = _.mapOnlyOwnKeys( o );
+      got = _.props.onlyOwnKeys( o );
       test.identical( got, expected );
       provider.filesDelete( routinePath );
       return null;
@@ -32433,13 +32433,13 @@ function hardLinkActAsync( test )
       sync : 0,
       context : null
     }
-    var expected = _.mapOnlyOwnKeys( o );
+    var expected = _.props.onlyOwnKeys( o );
     return test.mustNotThrowError( provider.hardLinkAct( o ) )
     .then( ( got ) =>
     {
       test.identical( got, true );
       test.true( !provider.isHardLink( dstPath ) );
-      got = _.mapOnlyOwnKeys( o );
+      got = _.props.onlyOwnKeys( o );
       test.identical( got, expected );
       return null;
     })
@@ -32466,7 +32466,7 @@ function hardLinkActAsync( test )
       sync : 0,
       context : null
     }
-    var expected = _.mapOnlyOwnKeys( o );
+    var expected = _.props.onlyOwnKeys( o );
     return test.mustNotThrowError( provider.hardLinkAct( o ) )
     .then( ( got ) =>
     {
@@ -32475,7 +32475,7 @@ function hardLinkActAsync( test )
       test.identical( provider.areHardLinked( [ srcPath, dstPath ] ), hardLinked );
       else
       test.identical( provider.areHardLinked( [ srcPath, dstPath ] ), true );
-      got = _.mapOnlyOwnKeys( o );
+      got = _.props.onlyOwnKeys( o );
       test.identical( got, expected );
       provider.filesDelete( routinePath );
       return null;
@@ -33870,7 +33870,7 @@ function hardLinkSoftLinkResolving( test )
       sync : 1,
       rewriting : 1
     }
-    _.mapSupplement( o, o2 );
+    _.props.supplement( o, o2 );
     return provider.hardLink( o );
   }
 
@@ -34362,7 +34362,7 @@ function hardLinkHardLinkBreaking( test )
       rewriting : 1,
       throwing : 1
     }
-    _.mapSupplement( o, o2 )
+    _.props.supplement( o, o2 )
     return provider.hardLink( o );
   }
 
@@ -35931,7 +35931,7 @@ function hardLinkBreaking( test )
   // }
   var got = a.fileProvider.filesExtract( a.abs( '.' ) ).filesTree;
   // test.identical( got, exp );
-  test.identical( _.mapKeys( got ), [ 'file1', 'file2', 'file3' ] );
+  test.identical( _.props.keys( got ), [ 'file1', 'file2', 'file3' ] );
   test.identical( got.file1, _.bufferTypedIs( got.file1 ) ? new U8x([ 49 ]) : '1' );
   test.identical( got.file2, _.bufferTypedIs( got.file2 ) ? new U8x([ 49 ]) : '1' );
   test.identical( got.file3, _.bufferTypedIs( got.file2 ) ? new U8x([ 51 ]) : '3' );
@@ -35957,7 +35957,7 @@ function hardLinkBreaking( test )
   // }
   var got = a.fileProvider.filesExtract( a.abs( '.' ) ).filesTree;
   // test.identical( got, exp );
-  test.identical( _.mapKeys( got ), [ 'dst1', 'dst2', 'src1', 'src2' ] );
+  test.identical( _.props.keys( got ), [ 'dst1', 'dst2', 'src1', 'src2' ] );
   test.identical( got.dst1, _.bufferTypedIs( got.dst1 ) ? new U8x([ 49 ]) : '1' );
   test.identical( got.dst2, _.bufferTypedIs( got.dst2 ) ? new U8x([ 50 ]) : '2' );
   test.identical( got.src1, _.bufferTypedIs( got.src1 ) ? new U8x([ 51 ]) : '3' );
@@ -35974,7 +35974,7 @@ function hardLinkBreaking( test )
   // }
   var got = a.fileProvider.filesExtract( a.abs( '.' ) ).filesTree;
   // test.identical( got, exp );
-  test.identical( _.mapKeys( got ), [ 'dst1', 'dst2', 'src1', 'src2' ] );
+  test.identical( _.props.keys( got ), [ 'dst1', 'dst2', 'src1', 'src2' ] );
   test.identical( got.dst1, _.bufferTypedIs( got.dst1 ) ? new U8x([ 50 ]) : '2' );
   test.identical( got.dst2, _.bufferTypedIs( got.dst2 ) ? new U8x([ 50 ]) : '2' );
   test.identical( got.src1, _.bufferTypedIs( got.src1 ) ? new U8x([ 52 ]) : '4' );
@@ -36009,7 +36009,7 @@ function hardLinkBreaking( test )
   // }
   var got = a.fileProvider.filesExtract( a.abs( '.' ) ).filesTree;
   // test.identical( got, exp );
-  test.identical( _.mapKeys( got ), [ 'dst1', 'dst2', 'src1', 'src2' ] );
+  test.identical( _.props.keys( got ), [ 'dst1', 'dst2', 'src1', 'src2' ] );
   test.identical( got.dst1, _.bufferTypedIs( got.dst1 ) ? new U8x([ 52 ]) : '4' );
   test.identical( got.dst2, _.bufferTypedIs( got.dst2 ) ? new U8x([ 50 ]) : '2' );
   test.identical( got.src1, _.bufferTypedIs( got.src1 ) ? new U8x([ 52 ]) : '4' );
@@ -36044,7 +36044,7 @@ function hardLinkBreaking( test )
   // }
   var got = a.fileProvider.filesExtract( a.abs( '.' ) ).filesTree;
   // test.identical( got, exp );
-  test.identical( _.mapKeys( got ), [ 'dst1', 'dst2', 'src1', 'src2' ] );
+  test.identical( _.props.keys( got ), [ 'dst1', 'dst2', 'src1', 'src2' ] );
   test.identical( got.dst1, _.bufferTypedIs( got.dst1 ) ? new U8x([ 52 ]) : '4' );
   test.identical( got.dst2, _.bufferTypedIs( got.dst2 ) ? new U8x([ 50 ]) : '2' );
   test.identical( got.src1, _.bufferTypedIs( got.src1 ) ? new U8x([ 52 ]) : '4' );
@@ -36077,7 +36077,7 @@ function hardLinkBreaking( test )
   // }
   var got = a.fileProvider.filesExtract( a.abs( '.' ) ).filesTree;
   // test.identical( got, exp );
-  test.identical( _.mapKeys( got ), [ 'dst1', 'dst2', 'src1', 'src2' ] );
+  test.identical( _.props.keys( got ), [ 'dst1', 'dst2', 'src1', 'src2' ] );
   test.identical( got.dst1, _.bufferTypedIs( got.dst1 ) ? new U8x([ 52 ]) : '4' );
   test.identical( got.dst2, _.bufferTypedIs( got.dst2 ) ? new U8x([ 50 ]) : '2' );
   test.identical( got.src1, _.bufferTypedIs( got.src1 ) ? new U8x([ 52 ]) : '4' );
@@ -36112,7 +36112,7 @@ function hardLinkBreaking( test )
   // }
   var got = a.fileProvider.filesExtract( a.abs( '.' ) ).filesTree;
   // test.identical( got, exp );
-  test.identical( _.mapKeys( got ), [ 'dst1', 'dst2', 'src1', 'src2' ] );
+  test.identical( _.props.keys( got ), [ 'dst1', 'dst2', 'src1', 'src2' ] );
   test.identical( got.dst1, _.bufferTypedIs( got.dst1 ) ? new U8x([ 52 ]) : '4' );
   test.identical( got.dst2, _.bufferTypedIs( got.dst2 ) ? new U8x([ 52 ]) : '4' );
   test.identical( got.src1, _.bufferTypedIs( got.src1 ) ? new U8x([ 52 ]) : '4' );
@@ -36147,7 +36147,7 @@ function hardLinkBreaking( test )
   // }
   var got = a.fileProvider.filesExtract( a.abs( '.' ) ).filesTree;
   // test.identical( got, exp );
-  test.identical( _.mapKeys( got ), [ 'dst1', 'dst2', 'src1', 'src2' ] );
+  test.identical( _.props.keys( got ), [ 'dst1', 'dst2', 'src1', 'src2' ] );
   test.identical( got.dst1, _.bufferTypedIs( got.dst1 ) ? new U8x([ 49 ]) : '1' );
   test.identical( got.dst2, _.bufferTypedIs( got.dst2 ) ? new U8x([ 49 ]) : '1' );
   test.identical( got.src1, _.bufferTypedIs( got.src1 ) ? new U8x([ 49 ]) : '1' );
@@ -37759,18 +37759,18 @@ function isTerminal( test )
   provider.filesDelete( dirPath );
   provider.softLink({ dstPath : linkPath, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
-  var got = provider.isTerminal( _.mapExtend( null, o ) );
+  var got = provider.isTerminal( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got, null );
 
   test.case = 'soft to missing'
   provider.filesDelete( dirPath );
   provider.softLink({ dstPath : linkPath, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  var got = provider.isTerminal( _.mapExtend( null, o ) );
+  var got = provider.isTerminal( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got, null );
 
   test.case = 'soft to terminal'
@@ -37778,9 +37778,9 @@ function isTerminal( test )
   provider.fileWrite( filePath, filePath );
   provider.softLink({ dstPath : linkPath, srcPath : filePath });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  var got = provider.isTerminal( _.mapExtend( null, o ) );
+  var got = provider.isTerminal( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isSoftLink(), true );
 
@@ -37789,9 +37789,9 @@ function isTerminal( test )
   provider.fileWrite( filePath, filePath );
   provider.softLink({ dstPath : linkPath, srcPath : filePath });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
-  var got = provider.isTerminal( _.mapExtend( null, o ) );
+  var got = provider.isTerminal( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isSoftLink(), false );
 
@@ -37801,9 +37801,9 @@ function isTerminal( test )
   provider.fileWrite( filePath, filePath );
   provider.softLink({ dstPath : linkPath, srcPath : filePath });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  var got = provider.isTerminal( _.mapExtend( null, o ) );
+  var got = provider.isTerminal( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isSoftLink(), false );
 
@@ -37812,9 +37812,9 @@ function isTerminal( test )
   provider.dirMake( filePath );
   provider.softLink({ dstPath : linkPath, srcPath : filePath });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  var got = provider.isTerminal( _.mapExtend( null, o ) );
+  var got = provider.isTerminal( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isSoftLink(), true );
 
@@ -37823,9 +37823,9 @@ function isTerminal( test )
   provider.dirMake( filePath );
   provider.softLink({ dstPath : linkPath, srcPath : filePath });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
-  var got = provider.isTerminal( _.mapExtend( null, o ) );
+  var got = provider.isTerminal( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isSoftLink(), false );
   test.identical( got.isDirectory(), true );
@@ -37835,9 +37835,9 @@ function isTerminal( test )
   provider.dirMake( filePath );
   provider.softLink({ dstPath : linkPath, srcPath : filePath });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  var got = provider.isTerminal( _.mapExtend( null, o ) );
+  var got = provider.isTerminal( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isSoftLink(), false );
   test.identical( got.isDirectory(), true );
@@ -37847,9 +37847,9 @@ function isTerminal( test )
   provider.softLink({ dstPath : linkPath2, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  var got = provider.isTerminal( _.mapExtend( null, o ) );
+  var got = provider.isTerminal( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isSoftLink(), true );
 
@@ -37858,9 +37858,9 @@ function isTerminal( test )
   provider.softLink({ dstPath : linkPath2, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
-  var got = provider.isTerminal( _.mapExtend( null, o ) );
+  var got = provider.isTerminal( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got, null );
 
   test.case = 'soft to soft to missing'
@@ -37868,9 +37868,9 @@ function isTerminal( test )
   provider.softLink({ dstPath : linkPath2, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  var got = provider.isTerminal( _.mapExtend( null, o ) );
+  var got = provider.isTerminal( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got, null );
 
   test.case = 'soft to soft to terminal'
@@ -37879,9 +37879,9 @@ function isTerminal( test )
   provider.softLink({ dstPath : linkPath2, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  var got = provider.isTerminal( _.mapExtend( null, o ) );
+  var got = provider.isTerminal( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isSoftLink(), true );
 
@@ -37891,9 +37891,9 @@ function isTerminal( test )
   provider.softLink({ dstPath : linkPath2, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
-  var got = provider.isTerminal( _.mapExtend( null, o ) );
+  var got = provider.isTerminal( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isSoftLink(), false );
 
@@ -37903,9 +37903,9 @@ function isTerminal( test )
   provider.softLink({ dstPath : linkPath2, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  var got = provider.isTerminal( _.mapExtend( null, o ) );
+  var got = provider.isTerminal( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isSoftLink(), false );
 
@@ -37915,9 +37915,9 @@ function isTerminal( test )
   provider.softLink({ dstPath : linkPath2, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  var got = provider.isTerminal( _.mapExtend( null, o ) );
+  var got = provider.isTerminal( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isSoftLink(), true );
 
@@ -37927,9 +37927,9 @@ function isTerminal( test )
   provider.softLink({ dstPath : linkPath2, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
-  var got = provider.isTerminal( _.mapExtend( null, o ) );
+  var got = provider.isTerminal( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isSoftLink(), false );
   test.identical( got.isDirectory(), true );
@@ -37940,9 +37940,9 @@ function isTerminal( test )
   provider.softLink({ dstPath : linkPath2, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  var got = provider.isTerminal( _.mapExtend( null, o ) );
+  var got = provider.isTerminal( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isSoftLink(), false );
   test.identical( got.isDirectory(), true );
@@ -37952,9 +37952,9 @@ function isTerminal( test )
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  var got = provider.isTerminal( _.mapExtend( null, o ) );
+  var got = provider.isTerminal( _.props.extend( null, o ) );
   test.identical( got, false );
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isSoftLink(), true );
 
@@ -37963,9 +37963,9 @@ function isTerminal( test )
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
-  var got = provider.isTerminal( _.mapExtend( null, o ) );
+  var got = provider.isTerminal( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isSoftLink(), false );
   test.identical( got.isTextLink(), true );
@@ -37975,9 +37975,9 @@ function isTerminal( test )
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  var got = provider.isTerminal( _.mapExtend( null, o ) );
+  var got = provider.isTerminal( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got, null);
 
   test.case = 'soft to text to terminal'
@@ -37986,9 +37986,9 @@ function isTerminal( test )
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  var got = provider.isTerminal( _.mapExtend( null, o ) );
+  var got = provider.isTerminal( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isSoftLink(), true );
 
@@ -37998,9 +37998,9 @@ function isTerminal( test )
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
-  var got = provider.isTerminal( _.mapExtend( null, o ) );
+  var got = provider.isTerminal( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isSoftLink(), false );
   test.identical( got.isTextLink(), true );
@@ -38011,9 +38011,9 @@ function isTerminal( test )
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  var got = provider.isTerminal( _.mapExtend( null, o ) );
+  var got = provider.isTerminal( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isSoftLink(), false );
   test.identical( got.isTextLink(), false );
@@ -38024,9 +38024,9 @@ function isTerminal( test )
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  var got = provider.isTerminal( _.mapExtend( null, o ) );
+  var got = provider.isTerminal( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isSoftLink(), true );
 
@@ -38036,9 +38036,9 @@ function isTerminal( test )
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
-  var got = provider.isTerminal( _.mapExtend( null, o ) );
+  var got = provider.isTerminal( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isSoftLink(), false );
   test.identical( got.isTextLink(), true );
@@ -38049,9 +38049,9 @@ function isTerminal( test )
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  var got = provider.isTerminal( _.mapExtend( null, o ) );
+  var got = provider.isTerminal( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isSoftLink(), false );
   test.identical( got.isTextLink(), false );
@@ -38061,7 +38061,7 @@ function isTerminal( test )
   provider.filesDelete( dirPath );
   provider.softLink({ dstPath : linkPath, srcPath : '../link', allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  var got = provider.isTerminal( _.mapExtend( null, o ) );
+  var got = provider.isTerminal( _.props.extend( null, o ) );
   test.identical( got, false )
   var got = provider.statRead( o );
   test.identical( got.isTerminal(), false );
@@ -38071,18 +38071,18 @@ function isTerminal( test )
   provider.filesDelete( dirPath );
   provider.softLink({ dstPath : linkPath, srcPath : '../link', allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
-  var got = provider.isTerminal( _.mapExtend( null, o ) );
+  var got = provider.isTerminal( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got, null );
 
   test.case = 'soft context cycled'
   provider.filesDelete( dirPath );
   provider.softLink({ dstPath : linkPath, srcPath : '../link', allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  var got = provider.isTerminal( _.mapExtend( null, o ) );
+  var got = provider.isTerminal( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got, null );
 
   test.case = 'soft cycled'
@@ -38090,9 +38090,9 @@ function isTerminal( test )
   provider.softLink({ dstPath : linkPath2, srcPath : linkPath, allowingMissed : 1, makingDirectory : 1 });
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  var got = provider.isTerminal( _.mapExtend( null, o ) );
+  var got = provider.isTerminal( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isSoftLink(), true );
 
@@ -38101,9 +38101,9 @@ function isTerminal( test )
   provider.softLink({ dstPath : linkPath2, srcPath : linkPath, allowingMissed : 1, makingDirectory : 1 });
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
-  var got = provider.isTerminal( _.mapExtend( null, o ) );
+  var got = provider.isTerminal( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got, null );
 
   test.case = 'soft cycled'
@@ -38111,9 +38111,9 @@ function isTerminal( test )
   provider.softLink({ dstPath : linkPath2, srcPath : linkPath, allowingMissed : 1, makingDirectory : 1 });
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  var got = provider.isTerminal( _.mapExtend( null, o ) );
+  var got = provider.isTerminal( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got, null );
 
   test.case = 'hardLink'
@@ -38121,9 +38121,9 @@ function isTerminal( test )
   provider.fileWrite( filePath, filePath);
   provider.hardLink({ dstPath : linkPath, srcPath : filePath });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  var got = provider.isTerminal( _.mapExtend( null, o ) );
+  var got = provider.isTerminal( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isHardLink(), true );
 
@@ -38132,9 +38132,9 @@ function isTerminal( test )
   provider.fileWrite( filePath, filePath);
   provider.hardLink({ dstPath : linkPath, srcPath : filePath });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
-  var got = provider.isTerminal( _.mapExtend( null, o ) );
+  var got = provider.isTerminal( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isHardLink(), true );
 
@@ -38143,9 +38143,9 @@ function isTerminal( test )
   provider.fileWrite( filePath, filePath);
   provider.hardLink({ dstPath : linkPath, srcPath : filePath });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  var got = provider.isTerminal( _.mapExtend( null, o ) );
+  var got = provider.isTerminal( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isHardLink(), true );
 
@@ -38156,9 +38156,9 @@ function isTerminal( test )
   // provider.softLink( linkPath2, linkPath3 );
   // provider.hardLink( linkPath, linkPath2 );
   // var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  // var got = provider.isTerminal( _.mapExtend( null, o ) );
+  // var got = provider.isTerminal( _.props.extend( null, o ) );
   // test.identical( got, true )
-  // var got = provider.statRead( _.mapExtend( null, o ) );
+  // var got = provider.statRead( _.props.extend( null, o ) );
   // test.identical( got.isTerminal(), true );
   // test.identical( got.isHardLink(), false );
   // test.identical( got.isSoftLink(), false );
@@ -38171,9 +38171,9 @@ function isTerminal( test )
   // provider.softLink( linkPath2, linkPath3 );
   // provider.hardLink( linkPath, linkPath2 );
   // var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
-  // var got = provider.isTerminal( _.mapExtend( null, o ) );
+  // var got = provider.isTerminal( _.props.extend( null, o ) );
   // test.identical( got, true )
-  // var got = provider.statRead( _.mapExtend( null, o ) );
+  // var got = provider.statRead( _.props.extend( null, o ) );
   // test.identical( got.isTerminal(), true );
   // test.identical( got.isHardLink(), true );
   // test.identical( got.isSoftLink(), false );
@@ -38187,9 +38187,9 @@ function isTerminal( test )
   // provider.softLink( linkPath2, linkPath3 );
   // provider.hardLink( linkPath, linkPath2 );
   // var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  // var got = provider.isTerminal( _.mapExtend( null, o ) );
+  // var got = provider.isTerminal( _.props.extend( null, o ) );
   // test.identical( got, true )
-  // var got = provider.statRead( _.mapExtend( null, o ) );
+  // var got = provider.statRead( _.props.extend( null, o ) );
   // test.identical( got.isTerminal(), true );
   // test.identical( got.isHardLink(), false );
   // test.identical( got.isSoftLink(), false );
@@ -38202,9 +38202,9 @@ function isTerminal( test )
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( linkPath3 ) );
   provider.hardLink( linkPath, linkPath2 );
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  var got = provider.isTerminal( _.mapExtend( null, o ) );
+  var got = provider.isTerminal( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), true );
@@ -38217,9 +38217,9 @@ function isTerminal( test )
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( linkPath3 ) );
   provider.hardLink( linkPath, linkPath2 );
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
-  var got = provider.isTerminal( _.mapExtend( null, o ) );
+  var got = provider.isTerminal( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), false );
@@ -38232,9 +38232,9 @@ function isTerminal( test )
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( linkPath3 ) );
   provider.hardLink( linkPath, linkPath2 );
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  var got = provider.isTerminal( _.mapExtend( null, o ) );
+  var got = provider.isTerminal( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), false );
@@ -38246,9 +38246,9 @@ function isTerminal( test )
   provider.hardLink({ dstPath : linkPath2, srcPath : filePath });
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  var got = provider.isTerminal( _.mapExtend( null, o ) );
+  var got = provider.isTerminal( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isSoftLink(), true );
   test.identical( got.isHardLink(), false );
@@ -38260,9 +38260,9 @@ function isTerminal( test )
   provider.hardLink({ dstPath : linkPath2, srcPath : filePath });
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
-  var got = provider.isTerminal( _.mapExtend( null, o ) );
+  var got = provider.isTerminal( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isSoftLink(), false );
   test.identical( got.isHardLink(), true );
@@ -38274,9 +38274,9 @@ function isTerminal( test )
   provider.hardLink({ dstPath : linkPath2, srcPath : filePath });
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  var got = provider.isTerminal( _.mapExtend( null, o ) );
+  var got = provider.isTerminal( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isSoftLink(), false );
   test.identical( got.isHardLink(), true );
@@ -38289,9 +38289,9 @@ function isTerminal( test )
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( linkPath3 ) )
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  var got = provider.isTerminal( _.mapExtend( null, o ) );
+  var got = provider.isTerminal( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isSoftLink(), true );
   test.identical( got.isHardLink(), false );
@@ -38303,9 +38303,9 @@ function isTerminal( test )
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( linkPath3 ) )
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
-  var got = provider.isTerminal( _.mapExtend( null, o ) );
+  var got = provider.isTerminal( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isSoftLink(), false );
   test.identical( got.isHardLink(), false );
@@ -38318,9 +38318,9 @@ function isTerminal( test )
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( linkPath3 ) )
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  var got = provider.isTerminal( _.mapExtend( null, o ) );
+  var got = provider.isTerminal( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isSoftLink(), false );
   test.identical( got.isHardLink(), true );
@@ -38330,18 +38330,18 @@ function isTerminal( test )
   provider.filesDelete( dirPath );
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  var got = provider.isTerminal( _.mapExtend( null, o ) );
+  var got = provider.isTerminal( _.props.extend( null, o ) );
   test.identical( got, false );
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got, null );
 
   test.case = 'text to missing'
   provider.filesDelete( dirPath );
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
-  var got = provider.isTerminal( _.mapExtend( null, o ) );
+  var got = provider.isTerminal( _.props.extend( null, o ) );
   test.identical( got, true );
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isSoftLink(), false );
   test.identical( got.isTextLink(), true );
@@ -38350,9 +38350,9 @@ function isTerminal( test )
   provider.filesDelete( dirPath );
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  var got = provider.isTerminal( _.mapExtend( null, o ) );
+  var got = provider.isTerminal( _.props.extend( null, o ) );
   test.identical( got, false );
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got, null );
 
   test.case = 'text to terminal'
@@ -38360,9 +38360,9 @@ function isTerminal( test )
   provider.fileWrite( filePath, filePath )
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  var got = provider.isTerminal( _.mapExtend( null, o ) );
+  var got = provider.isTerminal( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isSoftLink(), false );
   test.identical( got.isHardLink(), false );
@@ -38373,9 +38373,9 @@ function isTerminal( test )
   provider.fileWrite( filePath, filePath )
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
-  var got = provider.isTerminal( _.mapExtend( null, o ) );
+  var got = provider.isTerminal( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isSoftLink(), false );
   test.identical( got.isHardLink(), false );
@@ -38386,9 +38386,9 @@ function isTerminal( test )
   provider.fileWrite( filePath, filePath )
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  var got = provider.isTerminal( _.mapExtend( null, o ) );
+  var got = provider.isTerminal( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isSoftLink(), false );
   test.identical( got.isHardLink(), false );
@@ -38399,9 +38399,9 @@ function isTerminal( test )
   provider.dirMake( filePath )
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  var got = provider.isTerminal( _.mapExtend( null, o ) );
+  var got = provider.isTerminal( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isSoftLink(), false );
   test.identical( got.isHardLink(), false );
@@ -38413,9 +38413,9 @@ function isTerminal( test )
   provider.dirMake( filePath )
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
-  var got = provider.isTerminal( _.mapExtend( null, o ) );
+  var got = provider.isTerminal( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isSoftLink(), false );
   test.identical( got.isHardLink(), false );
@@ -38427,9 +38427,9 @@ function isTerminal( test )
   provider.dirMake( filePath )
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  var got = provider.isTerminal( _.mapExtend( null, o ) );
+  var got = provider.isTerminal( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isSoftLink(), false );
   test.identical( got.isHardLink(), false );
@@ -38442,9 +38442,9 @@ function isTerminal( test )
   provider.softLink( linkPath2, filePath );
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( linkPath2 ) );
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  var got = provider.isTerminal( _.mapExtend( null, o ) );
+  var got = provider.isTerminal( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isSoftLink(), true );
   test.identical( got.isHardLink(), false );
@@ -38456,9 +38456,9 @@ function isTerminal( test )
   provider.softLink( linkPath2, filePath );
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( linkPath2 ) );
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
-  var got = provider.isTerminal( _.mapExtend( null, o ) );
+  var got = provider.isTerminal( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isSoftLink(), false );
   test.identical( got.isHardLink(), false );
@@ -38470,9 +38470,9 @@ function isTerminal( test )
   provider.softLink( linkPath2, filePath );
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( linkPath2 ) );
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  var got = provider.isTerminal( _.mapExtend( null, o ) );
+  var got = provider.isTerminal( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isSoftLink(), false );
   test.identical( got.isHardLink(), false );
@@ -38482,18 +38482,18 @@ function isTerminal( test )
   provider.filesDelete( dirPath );
   provider.fileWrite( linkPath, 'link ../link' );
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  var got = provider.isTerminal( _.mapExtend( null, o ) );
+  var got = provider.isTerminal( _.props.extend( null, o ) );
   test.identical( got, true );
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got, null );
 
   test.case = 'text context cycled'
   provider.filesDelete( dirPath );
   provider.fileWrite( linkPath, 'link ../link' );
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
-  var got = provider.isTerminal( _.mapExtend( null, o ) );
+  var got = provider.isTerminal( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isSoftLink(), false );
   test.identical( got.isHardLink(), false );
@@ -38503,9 +38503,9 @@ function isTerminal( test )
   provider.filesDelete( dirPath );
   provider.fileWrite( linkPath, 'link ../link' );
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  var got = provider.isTerminal( _.mapExtend( null, o ) );
+  var got = provider.isTerminal( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got, null );
 
   test.case = 'text cycled'
@@ -38513,9 +38513,9 @@ function isTerminal( test )
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( linkPath ) );
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( linkPath2 ) );
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  var got = provider.isTerminal( _.mapExtend( null, o ) );
+  var got = provider.isTerminal( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got, null );
 
   test.case = 'text cycled'
@@ -38523,9 +38523,9 @@ function isTerminal( test )
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( linkPath ) );
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( linkPath2 ) );
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
-  var got = provider.isTerminal( _.mapExtend( null, o ) );
+  var got = provider.isTerminal( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isSoftLink(), false );
   test.identical( got.isHardLink(), false );
@@ -38536,9 +38536,9 @@ function isTerminal( test )
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( linkPath ) );
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( linkPath2 ) );
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  var got = provider.isTerminal( _.mapExtend( null, o ) );
+  var got = provider.isTerminal( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got, null );
 
   provider.fieldPop( 'usingTextLink', 1 );
@@ -38935,9 +38935,9 @@ function isSoftLink( test )
   provider.fileWrite( filePath, filePath );
   provider.softLink({ dstPath : linkPath, srcPath : filePath });
   var o = { filePath : linkPath, resolvingTextLink : 1 };
-  var got = provider.isSoftLink( _.mapExtend( null, o ) );
+  var got = provider.isSoftLink( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isSoftLink(), true );
 
@@ -38946,9 +38946,9 @@ function isSoftLink( test )
   provider.dirMake( filePath );
   provider.softLink({ dstPath : linkPath, srcPath : filePath });
   var o = { filePath : linkPath, resolvingTextLink : 1 };
-  var got = provider.isSoftLink( _.mapExtend( null, o ) );
+  var got = provider.isSoftLink( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isSoftLink(), true );
 
@@ -38957,9 +38957,9 @@ function isSoftLink( test )
   provider.softLink({ dstPath : linkPath2, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1 };
-  var got = provider.isSoftLink( _.mapExtend( null, o ) );
+  var got = provider.isSoftLink( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isSoftLink(), true );
 
@@ -38969,9 +38969,9 @@ function isSoftLink( test )
   provider.softLink({ dstPath : linkPath2, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1 };
-  var got = provider.isSoftLink( _.mapExtend( null, o ) );
+  var got = provider.isSoftLink( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isSoftLink(), true );
 
@@ -38981,9 +38981,9 @@ function isSoftLink( test )
   provider.softLink({ dstPath : linkPath2, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1 };
-  var got = provider.isSoftLink( _.mapExtend( null, o ) );
+  var got = provider.isSoftLink( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isSoftLink(), true );
 
@@ -38992,9 +38992,9 @@ function isSoftLink( test )
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1 };
-  var got = provider.isSoftLink( _.mapExtend( null, o ) );
+  var got = provider.isSoftLink( _.props.extend( null, o ) );
   test.identical( got, true );
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isSoftLink(), true );
 
@@ -39004,9 +39004,9 @@ function isSoftLink( test )
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1 };
-  var got = provider.isSoftLink( _.mapExtend( null, o ) );
+  var got = provider.isSoftLink( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isSoftLink(), true );
 
@@ -39016,9 +39016,9 @@ function isSoftLink( test )
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1 };
-  var got = provider.isSoftLink( _.mapExtend( null, o ) );
+  var got = provider.isSoftLink( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isSoftLink(), true );
 
@@ -39026,7 +39026,7 @@ function isSoftLink( test )
   provider.filesDelete( dirPath );
   provider.softLink({ dstPath : linkPath, srcPath : '../link', allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1 };
-  var got = provider.isSoftLink( _.mapExtend( null, o ) );
+  var got = provider.isSoftLink( _.props.extend( null, o ) );
   test.identical( got, true )
   var got = provider.statRead( o );
   test.identical( got.isTerminal(), false );
@@ -39037,9 +39037,9 @@ function isSoftLink( test )
   provider.fileWrite( filePath, filePath);
   provider.hardLink({ dstPath : linkPath, srcPath : filePath });
   var o = { filePath : linkPath, resolvingTextLink : 1 };
-  var got = provider.isSoftLink( _.mapExtend( null, o ) );
+  var got = provider.isSoftLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isHardLink(), true );
   test.identical( got.isSoftLink(), false );
@@ -39051,9 +39051,9 @@ function isSoftLink( test )
   // provider.softLink( linkPath2, linkPath3 );
   // provider.hardLink( linkPath, linkPath2 );
   // var o = { filePath : linkPath, resolvingTextLink : 1 };
-  // var got = provider.isSoftLink( _.mapExtend( null, o ) );
+  // var got = provider.isSoftLink( _.props.extend( null, o ) );
   // test.identical( got, false )
-  // var got = provider.statRead( _.mapExtend( null, o ) );
+  // var got = provider.statRead( _.props.extend( null, o ) );
   // test.identical( got.isTerminal(), true );
   // test.identical( got.isHardLink(), false );
   // test.identical( got.isSoftLink(), false );
@@ -39065,9 +39065,9 @@ function isSoftLink( test )
   provider.hardLink({ dstPath : linkPath2, srcPath : filePath });
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2 });
   var o = { filePath : linkPath, resolvingTextLink : 1 };
-  var got = provider.isSoftLink( _.mapExtend( null, o ) );
+  var got = provider.isSoftLink( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isSoftLink(), true );
   test.identical( got.isHardLink(), false );
@@ -39076,9 +39076,9 @@ function isSoftLink( test )
   provider.filesDelete( dirPath );
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 1 };
-  var got = provider.isSoftLink( _.mapExtend( null, o ) );
+  var got = provider.isSoftLink( _.props.extend( null, o ) );
   test.identical( got, false );
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got, null );
 
   test.case = 'text to terminal'
@@ -39086,9 +39086,9 @@ function isSoftLink( test )
   provider.fileWrite( filePath, filePath )
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 1 };
-  var got = provider.isSoftLink( _.mapExtend( null, o ) );
+  var got = provider.isSoftLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isSoftLink(), false );
   test.identical( got.isHardLink(), false );
@@ -39099,9 +39099,9 @@ function isSoftLink( test )
   provider.dirMake( filePath )
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 1 };
-  var got = provider.isSoftLink( _.mapExtend( null, o ) );
+  var got = provider.isSoftLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isSoftLink(), false );
   test.identical( got.isHardLink(), false );
@@ -39114,9 +39114,9 @@ function isSoftLink( test )
   provider.softLink( linkPath2, filePath );
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( linkPath2 ) );
   var o = { filePath : linkPath, resolvingTextLink : 1 };
-  var got = provider.isSoftLink( _.mapExtend( null, o ) );
+  var got = provider.isSoftLink( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isSoftLink(), true );
   test.identical( got.isHardLink(), false );
@@ -39126,9 +39126,9 @@ function isSoftLink( test )
   provider.filesDelete( dirPath );
   provider.fileWrite( linkPath, 'link ../link' );
   var o = { filePath : linkPath, resolvingTextLink : 1 };
-  var got = provider.isSoftLink( _.mapExtend( null, o ) );
+  var got = provider.isSoftLink( _.props.extend( null, o ) );
   test.identical( got, false );
-  var got = provider.statRead( _.mapExtend( null, o ) )
+  var got = provider.statRead( _.props.extend( null, o ) )
   test.identical( got, null );
 
   test.case = 'text cycled'
@@ -39136,9 +39136,9 @@ function isSoftLink( test )
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( linkPath ) );
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( linkPath2 ) );
   var o = { filePath : linkPath, resolvingTextLink : 1 };
-  var got = provider.isSoftLink( _.mapExtend( null, o ) );
+  var got = provider.isSoftLink( _.props.extend( null, o ) );
   test.identical( got, false );
-  var got = provider.statRead( _.mapExtend( null, o ) )
+  var got = provider.statRead( _.props.extend( null, o ) )
   test.identical( got, null );
 
   provider.fieldPop( 'usingTextLink', 1 );
@@ -39933,18 +39933,18 @@ function isHardLink( test )
   provider.filesDelete( dirPath );
   provider.softLink({ dstPath : linkPath, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
-  var got = provider.isHardLink( _.mapExtend( null, o ) );
+  var got = provider.isHardLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got, null );
 
   test.case = 'soft to missing'
   provider.filesDelete( dirPath );
   provider.softLink({ dstPath : linkPath, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  var got = provider.isHardLink( _.mapExtend( null, o ) );
+  var got = provider.isHardLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got, null );
 
   test.case = 'soft to terminal'
@@ -39952,9 +39952,9 @@ function isHardLink( test )
   provider.fileWrite( filePath, filePath );
   provider.softLink({ dstPath : linkPath, srcPath : filePath });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  var got = provider.isHardLink( _.mapExtend( null, o ) );
+  var got = provider.isHardLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), true );
 
@@ -39963,9 +39963,9 @@ function isHardLink( test )
   provider.fileWrite( filePath, filePath );
   provider.softLink({ dstPath : linkPath, srcPath : filePath });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
-  var got = provider.isHardLink( _.mapExtend( null, o ) );
+  var got = provider.isHardLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), false );
@@ -39976,9 +39976,9 @@ function isHardLink( test )
   provider.fileWrite( filePath, filePath );
   provider.softLink({ dstPath : linkPath, srcPath : filePath });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  var got = provider.isHardLink( _.mapExtend( null, o ) );
+  var got = provider.isHardLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), false );
@@ -39988,9 +39988,9 @@ function isHardLink( test )
   provider.dirMake( filePath );
   provider.softLink({ dstPath : linkPath, srcPath : filePath });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  var got = provider.isHardLink( _.mapExtend( null, o ) );
+  var got = provider.isHardLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), true );
 
@@ -39999,9 +39999,9 @@ function isHardLink( test )
   provider.dirMake( filePath );
   provider.softLink({ dstPath : linkPath, srcPath : filePath });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
-  var got = provider.isHardLink( _.mapExtend( null, o ) );
+  var got = provider.isHardLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), false );
   test.identical( got.isDirectory(), true );
@@ -40011,9 +40011,9 @@ function isHardLink( test )
   provider.dirMake( filePath );
   provider.softLink({ dstPath : linkPath, srcPath : filePath });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  var got = provider.isHardLink( _.mapExtend( null, o ) );
+  var got = provider.isHardLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), false );
   test.identical( got.isDirectory(), true );
@@ -40023,9 +40023,9 @@ function isHardLink( test )
   provider.softLink({ dstPath : linkPath2, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  var got = provider.isHardLink( _.mapExtend( null, o ) );
+  var got = provider.isHardLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), true );
 
@@ -40034,9 +40034,9 @@ function isHardLink( test )
   provider.softLink({ dstPath : linkPath2, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
-  var got = provider.isHardLink( _.mapExtend( null, o ) );
+  var got = provider.isHardLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got, null );
 
   test.case = 'soft to soft to missing'
@@ -40044,9 +40044,9 @@ function isHardLink( test )
   provider.softLink({ dstPath : linkPath2, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  var got = provider.isHardLink( _.mapExtend( null, o ) );
+  var got = provider.isHardLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got, null );
 
   test.case = 'soft to soft to terminal'
@@ -40055,9 +40055,9 @@ function isHardLink( test )
   provider.softLink({ dstPath : linkPath2, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  var got = provider.isHardLink( _.mapExtend( null, o ) );
+  var got = provider.isHardLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), true );
 
@@ -40067,9 +40067,9 @@ function isHardLink( test )
   provider.softLink({ dstPath : linkPath2, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
-  var got = provider.isHardLink( _.mapExtend( null, o ) );
+  var got = provider.isHardLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), false );
@@ -40080,9 +40080,9 @@ function isHardLink( test )
   provider.softLink({ dstPath : linkPath2, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  var got = provider.isHardLink( _.mapExtend( null, o ) );
+  var got = provider.isHardLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), false );
@@ -40093,9 +40093,9 @@ function isHardLink( test )
   provider.softLink({ dstPath : linkPath2, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  var got = provider.isHardLink( _.mapExtend( null, o ) );
+  var got = provider.isHardLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), true );
 
@@ -40105,9 +40105,9 @@ function isHardLink( test )
   provider.softLink({ dstPath : linkPath2, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
-  var got = provider.isHardLink( _.mapExtend( null, o ) );
+  var got = provider.isHardLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), false );
   test.identical( got.isDirectory(), true );
@@ -40118,9 +40118,9 @@ function isHardLink( test )
   provider.softLink({ dstPath : linkPath2, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  var got = provider.isHardLink( _.mapExtend( null, o ) );
+  var got = provider.isHardLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), false );
   test.identical( got.isDirectory(), true );
@@ -40130,9 +40130,9 @@ function isHardLink( test )
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  var got = provider.isHardLink( _.mapExtend( null, o ) );
+  var got = provider.isHardLink( _.props.extend( null, o ) );
   test.identical( got, false );
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), true );
 
@@ -40141,9 +40141,9 @@ function isHardLink( test )
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
-  var got = provider.isHardLink( _.mapExtend( null, o ) );
+  var got = provider.isHardLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), false );
@@ -40154,9 +40154,9 @@ function isHardLink( test )
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  var got = provider.isHardLink( _.mapExtend( null, o ) );
+  var got = provider.isHardLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got, null);
 
   test.case = 'soft to text to terminal'
@@ -40165,9 +40165,9 @@ function isHardLink( test )
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  var got = provider.isHardLink( _.mapExtend( null, o ) );
+  var got = provider.isHardLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), true );
 
@@ -40177,9 +40177,9 @@ function isHardLink( test )
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
-  var got = provider.isHardLink( _.mapExtend( null, o ) );
+  var got = provider.isHardLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), false );
@@ -40191,9 +40191,9 @@ function isHardLink( test )
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  var got = provider.isHardLink( _.mapExtend( null, o ) );
+  var got = provider.isHardLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), false );
@@ -40205,9 +40205,9 @@ function isHardLink( test )
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  var got = provider.isHardLink( _.mapExtend( null, o ) );
+  var got = provider.isHardLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), true );
 
@@ -40217,9 +40217,9 @@ function isHardLink( test )
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
-  var got = provider.isHardLink( _.mapExtend( null, o ) );
+  var got = provider.isHardLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), false );
@@ -40231,9 +40231,9 @@ function isHardLink( test )
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  var got = provider.isHardLink( _.mapExtend( null, o ) );
+  var got = provider.isHardLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), false );
@@ -40244,7 +40244,7 @@ function isHardLink( test )
   provider.filesDelete( dirPath );
   provider.softLink({ dstPath : linkPath, srcPath : '../link', allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  var got = provider.isHardLink( _.mapExtend( null, o ) );
+  var got = provider.isHardLink( _.props.extend( null, o ) );
   test.identical( got, false )
   var got = provider.statRead( o );
   test.identical( got.isHardLink(), false );
@@ -40254,18 +40254,18 @@ function isHardLink( test )
   provider.filesDelete( dirPath );
   provider.softLink({ dstPath : linkPath, srcPath : '../link', allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
-  var got = provider.isHardLink( _.mapExtend( null, o ) );
+  var got = provider.isHardLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got, null );
 
   test.case = 'soft context cycled'
   provider.filesDelete( dirPath );
   provider.softLink({ dstPath : linkPath, srcPath : '../link', allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  var got = provider.isHardLink( _.mapExtend( null, o ) );
+  var got = provider.isHardLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got, null );
 
   test.case = 'soft cycled'
@@ -40273,9 +40273,9 @@ function isHardLink( test )
   provider.softLink({ dstPath : linkPath2, srcPath : linkPath, allowingMissed : 1, makingDirectory : 1 });
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  var got = provider.isHardLink( _.mapExtend( null, o ) );
+  var got = provider.isHardLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), true );
 
@@ -40284,9 +40284,9 @@ function isHardLink( test )
   provider.softLink({ dstPath : linkPath2, srcPath : linkPath, allowingMissed : 1, makingDirectory : 1 });
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
-  var got = provider.isHardLink( _.mapExtend( null, o ) );
+  var got = provider.isHardLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got, null );
 
   test.case = 'soft cycled'
@@ -40294,9 +40294,9 @@ function isHardLink( test )
   provider.softLink({ dstPath : linkPath2, srcPath : linkPath, allowingMissed : 1, makingDirectory : 1 });
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  var got = provider.isHardLink( _.mapExtend( null, o ) );
+  var got = provider.isHardLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got, null );
 
   test.case = 'hardLink'
@@ -40304,9 +40304,9 @@ function isHardLink( test )
   provider.fileWrite( filePath, filePath);
   provider.hardLink({ dstPath : linkPath, srcPath : filePath });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  var got = provider.isHardLink( _.mapExtend( null, o ) );
+  var got = provider.isHardLink( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isHardLink(), true );
 
   test.case = 'hardLink'
@@ -40314,9 +40314,9 @@ function isHardLink( test )
   provider.fileWrite( filePath, filePath);
   provider.hardLink({ dstPath : linkPath, srcPath : filePath });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
-  var got = provider.isHardLink( _.mapExtend( null, o ) );
+  var got = provider.isHardLink( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isHardLink(), true );
 
   test.case = 'hardLink'
@@ -40324,9 +40324,9 @@ function isHardLink( test )
   provider.fileWrite( filePath, filePath);
   provider.hardLink({ dstPath : linkPath, srcPath : filePath });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  var got = provider.isHardLink( _.mapExtend( null, o ) );
+  var got = provider.isHardLink( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isHardLink(), true );
 
   // test.case = 'hardLink -> soft -> text -> terminal'
@@ -40336,9 +40336,9 @@ function isHardLink( test )
   // provider.softLink( linkPath2, linkPath3 );
   // provider.hardLink( linkPath, linkPath2 );
   // var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  // var got = provider.isHardLink( _.mapExtend( null, o ) );
+  // var got = provider.isHardLink( _.props.extend( null, o ) );
   // test.identical( got, false )
-  // var got = provider.statRead( _.mapExtend( null, o ) );
+  // var got = provider.statRead( _.props.extend( null, o ) );
   // test.identical( got.isTerminal(), true );
   // test.identical( got.isHardLink(), false );
   // test.identical( got.isSoftLink(), false );
@@ -40351,9 +40351,9 @@ function isHardLink( test )
   // provider.softLink( linkPath2, linkPath3 );
   // provider.hardLink( linkPath, linkPath2 );
   // var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
-  // var got = provider.isHardLink( _.mapExtend( null, o ) );
+  // var got = provider.isHardLink( _.props.extend( null, o ) );
   // test.identical( got, true )
-  // var got = provider.statRead( _.mapExtend( null, o ) );
+  // var got = provider.statRead( _.props.extend( null, o ) );
   // test.identical( got.isTerminal(), true );
   // test.identical( got.isHardLink(), true );
   // test.identical( got.isSoftLink(), false );
@@ -40366,9 +40366,9 @@ function isHardLink( test )
   // provider.softLink( linkPath2, linkPath3 );
   // provider.hardLink( linkPath, linkPath2 );
   // var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  // var got = provider.isHardLink( _.mapExtend( null, o ) );
+  // var got = provider.isHardLink( _.props.extend( null, o ) );
   // test.identical( got, false )
-  // var got = provider.statRead( _.mapExtend( null, o ) );
+  // var got = provider.statRead( _.props.extend( null, o ) );
   // test.identical( got.isTerminal(), true );
   // test.identical( got.isHardLink(), false );
   // test.identical( got.isSoftLink(), false );
@@ -40380,9 +40380,9 @@ function isHardLink( test )
   provider.hardLink({ dstPath : linkPath2, srcPath : filePath });
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  var got = provider.isHardLink( _.mapExtend( null, o ) );
+  var got = provider.isHardLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), true );
@@ -40394,9 +40394,9 @@ function isHardLink( test )
   provider.hardLink({ dstPath : linkPath2, srcPath : filePath });
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
-  var got = provider.isHardLink( _.mapExtend( null, o ) );
+  var got = provider.isHardLink( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isSoftLink(), false );
   test.identical( got.isHardLink(), true );
@@ -40407,9 +40407,9 @@ function isHardLink( test )
   provider.hardLink({ dstPath : linkPath2, srcPath : filePath });
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  var got = provider.isHardLink( _.mapExtend( null, o ) );
+  var got = provider.isHardLink( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isSoftLink(), false );
   test.identical( got.isHardLink(), true );
@@ -40421,9 +40421,9 @@ function isHardLink( test )
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( linkPath3 ) )
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  var got = provider.isHardLink( _.mapExtend( null, o ) );
+  var got = provider.isHardLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isSoftLink(), true );
   test.identical( got.isHardLink(), false );
@@ -40435,9 +40435,9 @@ function isHardLink( test )
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( linkPath3 ) )
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
-  var got = provider.isHardLink( _.mapExtend( null, o ) );
+  var got = provider.isHardLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isSoftLink(), false );
   test.identical( got.isHardLink(), false );
@@ -40450,9 +40450,9 @@ function isHardLink( test )
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( linkPath3 ) )
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  var got = provider.isHardLink( _.mapExtend( null, o ) );
+  var got = provider.isHardLink( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isSoftLink(), false );
   test.identical( got.isHardLink(), true );
@@ -40462,18 +40462,18 @@ function isHardLink( test )
   provider.filesDelete( dirPath );
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  var got = provider.isHardLink( _.mapExtend( null, o ) );
+  var got = provider.isHardLink( _.props.extend( null, o ) );
   test.identical( got, false );
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got, null );
 
   test.case = 'text to missing'
   provider.filesDelete( dirPath );
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
-  var got = provider.isHardLink( _.mapExtend( null, o ) );
+  var got = provider.isHardLink( _.props.extend( null, o ) );
   test.identical( got, false );
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), false );
@@ -40483,9 +40483,9 @@ function isHardLink( test )
   provider.filesDelete( dirPath );
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  var got = provider.isHardLink( _.mapExtend( null, o ) );
+  var got = provider.isHardLink( _.props.extend( null, o ) );
   test.identical( got, false );
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got, null );
 
   test.case = 'text to terminal'
@@ -40493,9 +40493,9 @@ function isHardLink( test )
   provider.fileWrite( filePath, filePath )
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  var got = provider.isHardLink( _.mapExtend( null, o ) );
+  var got = provider.isHardLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isSoftLink(), false );
   test.identical( got.isHardLink(), false );
@@ -40506,9 +40506,9 @@ function isHardLink( test )
   provider.fileWrite( filePath, filePath )
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
-  var got = provider.isHardLink( _.mapExtend( null, o ) );
+  var got = provider.isHardLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isSoftLink(), false );
   test.identical( got.isHardLink(), false );
@@ -40519,9 +40519,9 @@ function isHardLink( test )
   provider.fileWrite( filePath, filePath )
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  var got = provider.isHardLink( _.mapExtend( null, o ) );
+  var got = provider.isHardLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isSoftLink(), false );
   test.identical( got.isHardLink(), false );
@@ -40532,9 +40532,9 @@ function isHardLink( test )
   provider.dirMake( filePath )
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  var got = provider.isHardLink( _.mapExtend( null, o ) );
+  var got = provider.isHardLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isSoftLink(), false );
   test.identical( got.isHardLink(), false );
@@ -40546,9 +40546,9 @@ function isHardLink( test )
   provider.dirMake( filePath )
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
-  var got = provider.isHardLink( _.mapExtend( null, o ) );
+  var got = provider.isHardLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isSoftLink(), false );
   test.identical( got.isHardLink(), false );
@@ -40560,9 +40560,9 @@ function isHardLink( test )
   provider.dirMake( filePath )
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  var got = provider.isHardLink( _.mapExtend( null, o ) );
+  var got = provider.isHardLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isSoftLink(), false );
   test.identical( got.isHardLink(), false );
@@ -40575,9 +40575,9 @@ function isHardLink( test )
   provider.softLink( linkPath2, filePath );
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( linkPath2 ) );
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  var got = provider.isHardLink( _.mapExtend( null, o ) );
+  var got = provider.isHardLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isSoftLink(), true );
   test.identical( got.isHardLink(), false );
@@ -40589,9 +40589,9 @@ function isHardLink( test )
   provider.softLink( linkPath2, filePath );
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( linkPath2 ) );
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
-  var got = provider.isHardLink( _.mapExtend( null, o ) );
+  var got = provider.isHardLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isSoftLink(), false );
   test.identical( got.isHardLink(), false );
@@ -40603,9 +40603,9 @@ function isHardLink( test )
   provider.softLink( linkPath2, filePath );
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( linkPath2 ) );
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  var got = provider.isHardLink( _.mapExtend( null, o ) );
+  var got = provider.isHardLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isSoftLink(), false );
   test.identical( got.isHardLink(), false );
@@ -40615,9 +40615,9 @@ function isHardLink( test )
   provider.filesDelete( dirPath );
   provider.fileWrite( linkPath, 'link ../link' );
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  var got = provider.isHardLink( _.mapExtend( null, o ) );
+  var got = provider.isHardLink( _.props.extend( null, o ) );
   test.identical( got, false );
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got, null );
 
 
@@ -40625,9 +40625,9 @@ function isHardLink( test )
   provider.filesDelete( dirPath );
   provider.fileWrite( linkPath, 'link ../link' );
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
-  var got = provider.isHardLink( _.mapExtend( null, o ) );
+  var got = provider.isHardLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isSoftLink(), false );
   test.identical( got.isHardLink(), false );
@@ -40637,9 +40637,9 @@ function isHardLink( test )
   provider.filesDelete( dirPath );
   provider.fileWrite( linkPath, 'link ../link' );
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  var got = provider.isHardLink( _.mapExtend( null, o ) );
+  var got = provider.isHardLink( _.props.extend( null, o ) );
   test.identical( got, false );
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got, null );
 
   test.case = 'text cycled'
@@ -40647,9 +40647,9 @@ function isHardLink( test )
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( linkPath ) );
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( linkPath2 ) );
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  var got = provider.isHardLink( _.mapExtend( null, o ) );
+  var got = provider.isHardLink( _.props.extend( null, o ) );
   test.identical( got, false );
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got, null );
 
   test.case = 'text cycled'
@@ -40657,9 +40657,9 @@ function isHardLink( test )
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( linkPath ) );
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( linkPath2 ) );
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
-  var got = provider.isHardLink( _.mapExtend( null, o ) );
+  var got = provider.isHardLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isSoftLink(), false );
   test.identical( got.isHardLink(), false );
@@ -40670,9 +40670,9 @@ function isHardLink( test )
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( linkPath ) );
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( linkPath2 ) );
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  var got = provider.isHardLink( _.mapExtend( null, o ) );
+  var got = provider.isHardLink( _.props.extend( null, o ) );
   test.identical( got, false );
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got, null );
 
   provider.fieldPop( 'usingTextLink', 1 );
@@ -40701,18 +40701,18 @@ function isLink( test )
   test.case = 'missing'
   provider.filesDelete( filePath );
   var o = { filePath, resolvingTextLink : 0, resolvingSoftLink : 0 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got, null );
 
   test.case = 'terminal'
   provider.filesDelete( filePath );
   provider.fileWrite( filePath, filePath );
   var o = { filePath, resolvingTextLink : 0, resolvingSoftLink : 0 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), false );
@@ -40722,9 +40722,9 @@ function isLink( test )
   provider.filesDelete( filePath );
   provider.dirMake( filePath );
   var o = { filePath, resolvingTextLink : 0, resolvingSoftLink : 0 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), false );
@@ -40736,9 +40736,9 @@ function isLink( test )
   provider.filesDelete( dirPath );
   provider.softLink({ dstPath : linkPath, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), true );
@@ -40750,9 +40750,9 @@ function isLink( test )
   provider.fileWrite( filePath, filePath );
   provider.softLink({ dstPath : linkPath, srcPath : filePath });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), true );
@@ -40764,9 +40764,9 @@ function isLink( test )
   provider.dirMake( filePath );
   provider.softLink({ dstPath : linkPath, srcPath : filePath });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), true );
@@ -40778,9 +40778,9 @@ function isLink( test )
   provider.softLink({ dstPath : linkPath2, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), true );
@@ -40793,9 +40793,9 @@ function isLink( test )
   provider.softLink({ dstPath : linkPath2, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), true );
@@ -40808,9 +40808,9 @@ function isLink( test )
   provider.softLink({ dstPath : linkPath2, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), true );
@@ -40822,9 +40822,9 @@ function isLink( test )
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), true );
@@ -40837,9 +40837,9 @@ function isLink( test )
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), true );
@@ -40852,9 +40852,9 @@ function isLink( test )
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), true );
@@ -40865,9 +40865,9 @@ function isLink( test )
   provider.filesDelete( dirPath );
   provider.softLink({ dstPath : linkPath, srcPath : '../link', allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), true );
@@ -40879,9 +40879,9 @@ function isLink( test )
   provider.softLink({ dstPath : linkPath2, srcPath : linkPath, allowingMissed : 1, makingDirectory : 1 });
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), true );
@@ -40893,9 +40893,9 @@ function isLink( test )
   provider.fileWrite( filePath, filePath);
   provider.hardLink({ dstPath : linkPath, srcPath : filePath });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isHardLink(), true );
   test.identical( got.isSoftLink(), false );
@@ -40909,9 +40909,9 @@ function isLink( test )
   // provider.softLink( linkPath2, linkPath3 );
   // provider.hardLink( linkPath, linkPath2 );
   // var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
-  // var got = provider.isLink( _.mapExtend( null, o ) );
+  // var got = provider.isLink( _.props.extend( null, o ) );
   // test.identical( got, true )
-  // var got = provider.statRead( _.mapExtend( null, o ) );
+  // var got = provider.statRead( _.props.extend( null, o ) );
   // test.identical( got.isTerminal(), true );
   // test.identical( got.isHardLink(), true );
   // test.identical( got.isSoftLink(), false );
@@ -40925,9 +40925,9 @@ function isLink( test )
   // provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( linkPath3 ) );
   // provider.hardLink( linkPath, linkPath2 );
   // var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
-  // var got = provider.isLink( _.mapExtend( null, o ) );
+  // var got = provider.isLink( _.props.extend( null, o ) );
   // test.identical( got, true )
-  // var got = provider.statRead( _.mapExtend( null, o ) );
+  // var got = provider.statRead( _.props.extend( null, o ) );
   // test.identical( got.isTerminal(), true );
   // test.identical( got.isHardLink(), true );
   // test.identical( got.isSoftLink(), false );
@@ -40940,9 +40940,9 @@ function isLink( test )
   provider.hardLink({ dstPath : linkPath2, srcPath : filePath });
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), true );
@@ -40956,9 +40956,9 @@ function isLink( test )
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( linkPath3 ) )
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), true );
@@ -40969,9 +40969,9 @@ function isLink( test )
   provider.filesDelete( dirPath );
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, true );
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), false );
@@ -40983,9 +40983,9 @@ function isLink( test )
   provider.fileWrite( filePath, filePath )
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), false );
@@ -40997,9 +40997,9 @@ function isLink( test )
   provider.dirMake( filePath )
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), false );
@@ -41012,9 +41012,9 @@ function isLink( test )
   provider.softLink( linkPath2, filePath );
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( linkPath2 ) );
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), false );
@@ -41027,9 +41027,9 @@ function isLink( test )
   provider.softLink( linkPath2, filePath );
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( linkPath2 ) );
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), false );
@@ -41040,9 +41040,9 @@ function isLink( test )
   provider.filesDelete( dirPath );
   provider.fileWrite( linkPath, 'link ../link' );
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), false );
@@ -41054,9 +41054,9 @@ function isLink( test )
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( linkPath ) );
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( linkPath2 ) );
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), false );
@@ -41072,34 +41072,34 @@ function isLink( test )
   test.case = 'missing'
   provider.filesDelete( filePath );
   var o = { filePath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got, null );
 
   test.case = 'missing'
   provider.filesDelete( filePath );
   var o = { filePath, resolvingTextLink : 0, resolvingSoftLink : 1 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got, null );
 
   test.case = 'missing'
   provider.filesDelete( filePath );
   var o = { filePath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got, null );
 
   test.case = 'terminal'
   provider.filesDelete( filePath );
   provider.fileWrite( filePath, filePath );
   var o = { filePath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), false );
@@ -41109,9 +41109,9 @@ function isLink( test )
   provider.filesDelete( filePath );
   provider.fileWrite( filePath, filePath );
   var o = { filePath, resolvingTextLink : 0, resolvingSoftLink : 1 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), false );
@@ -41121,9 +41121,9 @@ function isLink( test )
   provider.filesDelete( filePath );
   provider.fileWrite( filePath, filePath );
   var o = { filePath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), false );
@@ -41133,9 +41133,9 @@ function isLink( test )
   provider.filesDelete( filePath );
   provider.dirMake( filePath );
   var o = { filePath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), false );
@@ -41146,9 +41146,9 @@ function isLink( test )
   provider.filesDelete( filePath );
   provider.dirMake( filePath );
   var o = { filePath, resolvingTextLink : 0, resolvingSoftLink : 1 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), false );
@@ -41159,9 +41159,9 @@ function isLink( test )
   provider.filesDelete( filePath );
   provider.dirMake( filePath );
   var o = { filePath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), false );
@@ -41172,9 +41172,9 @@ function isLink( test )
   provider.filesDelete( dirPath );
   provider.softLink({ dstPath : linkPath, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), true );
@@ -41185,18 +41185,18 @@ function isLink( test )
   provider.filesDelete( dirPath );
   provider.softLink({ dstPath : linkPath, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got, null);
 
   test.case = 'soft to missing'
   provider.filesDelete( dirPath );
   provider.softLink({ dstPath : linkPath, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got, null);
 
   test.case = 'soft to terminal'
@@ -41204,9 +41204,9 @@ function isLink( test )
   provider.fileWrite( filePath, filePath );
   provider.softLink({ dstPath : linkPath, srcPath : filePath });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), true );
@@ -41218,9 +41218,9 @@ function isLink( test )
   provider.fileWrite( filePath, filePath );
   provider.softLink({ dstPath : linkPath, srcPath : filePath });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), false );
@@ -41232,9 +41232,9 @@ function isLink( test )
   provider.fileWrite( filePath, filePath );
   provider.softLink({ dstPath : linkPath, srcPath : filePath });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), false );
@@ -41246,9 +41246,9 @@ function isLink( test )
   provider.dirMake( filePath );
   provider.softLink({ dstPath : linkPath, srcPath : filePath });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), true );
@@ -41260,9 +41260,9 @@ function isLink( test )
   provider.dirMake( filePath );
   provider.softLink({ dstPath : linkPath, srcPath : filePath });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), false );
@@ -41274,9 +41274,9 @@ function isLink( test )
   provider.dirMake( filePath );
   provider.softLink({ dstPath : linkPath, srcPath : filePath });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), false );
@@ -41288,9 +41288,9 @@ function isLink( test )
   provider.softLink({ dstPath : linkPath2, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), true );
@@ -41302,9 +41302,9 @@ function isLink( test )
   provider.softLink({ dstPath : linkPath2, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got, null );
 
   test.case = 'soft to soft to missing'
@@ -41312,9 +41312,9 @@ function isLink( test )
   provider.softLink({ dstPath : linkPath2, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got, null );
 
   test.case = 'soft to soft to terminal'
@@ -41323,9 +41323,9 @@ function isLink( test )
   provider.softLink({ dstPath : linkPath2, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), true );
@@ -41338,9 +41338,9 @@ function isLink( test )
   provider.softLink({ dstPath : linkPath2, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), false );
@@ -41353,9 +41353,9 @@ function isLink( test )
   provider.softLink({ dstPath : linkPath2, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), false );
@@ -41368,9 +41368,9 @@ function isLink( test )
   provider.softLink({ dstPath : linkPath2, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), true );
@@ -41383,9 +41383,9 @@ function isLink( test )
   provider.softLink({ dstPath : linkPath2, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), false );
@@ -41398,9 +41398,9 @@ function isLink( test )
   provider.softLink({ dstPath : linkPath2, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), false );
@@ -41412,9 +41412,9 @@ function isLink( test )
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), true );
@@ -41426,9 +41426,9 @@ function isLink( test )
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), false );
@@ -41440,9 +41440,9 @@ function isLink( test )
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got, null );
 
   test.case = 'soft to text to terminal'
@@ -41451,9 +41451,9 @@ function isLink( test )
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), true );
@@ -41466,9 +41466,9 @@ function isLink( test )
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), false );
@@ -41481,9 +41481,9 @@ function isLink( test )
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), false );
@@ -41496,9 +41496,9 @@ function isLink( test )
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), true );
@@ -41511,9 +41511,9 @@ function isLink( test )
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), false );
@@ -41526,9 +41526,9 @@ function isLink( test )
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), false );
@@ -41539,9 +41539,9 @@ function isLink( test )
   provider.filesDelete( dirPath );
   provider.softLink({ dstPath : linkPath, srcPath : '../link', allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), true );
@@ -41552,18 +41552,18 @@ function isLink( test )
   provider.filesDelete( dirPath );
   provider.softLink({ dstPath : linkPath, srcPath : '../link', allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got, null );
 
   test.case = 'soft context cycled'
   provider.filesDelete( dirPath );
   provider.softLink({ dstPath : linkPath, srcPath : '../link', allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got, null );
 
   test.case = 'soft cycled'
@@ -41571,9 +41571,9 @@ function isLink( test )
   provider.softLink({ dstPath : linkPath2, srcPath : linkPath, allowingMissed : 1, makingDirectory : 1 });
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), true );
@@ -41585,9 +41585,9 @@ function isLink( test )
   provider.softLink({ dstPath : linkPath2, srcPath : linkPath, allowingMissed : 1, makingDirectory : 1 });
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got, null );
 
   test.case = 'soft cycled'
@@ -41595,9 +41595,9 @@ function isLink( test )
   provider.softLink({ dstPath : linkPath2, srcPath : linkPath, allowingMissed : 1, makingDirectory : 1 });
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got, null );
 
   test.case = 'hardLink'
@@ -41605,9 +41605,9 @@ function isLink( test )
   provider.fileWrite( filePath, filePath);
   provider.hardLink({ dstPath : linkPath, srcPath : filePath });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isHardLink(), true );
   test.identical( got.isSoftLink(), false );
@@ -41620,9 +41620,9 @@ function isLink( test )
   provider.fileWrite( filePath, filePath);
   provider.hardLink({ dstPath : linkPath, srcPath : filePath });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isHardLink(), true );
   test.identical( got.isSoftLink(), false );
@@ -41635,9 +41635,9 @@ function isLink( test )
   provider.fileWrite( filePath, filePath);
   provider.hardLink({ dstPath : linkPath, srcPath : filePath });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isHardLink(), true );
   test.identical( got.isSoftLink(), false );
@@ -41652,9 +41652,9 @@ function isLink( test )
   // provider.softLink( linkPath2, linkPath3 );
   // provider.hardLink( linkPath, linkPath2 );
   // var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  // var got = provider.isLink( _.mapExtend( null, o ) );
+  // var got = provider.isLink( _.props.extend( null, o ) );
   // test.identical( got, false )
-  // var got = provider.statRead( _.mapExtend( null, o ) );
+  // var got = provider.statRead( _.props.extend( null, o ) );
   // test.identical( got.isTerminal(), true );
   // test.identical( got.isHardLink(), false );
   // test.identical( got.isSoftLink(), false );
@@ -41669,9 +41669,9 @@ function isLink( test )
   // provider.softLink( linkPath2, linkPath3 );
   // provider.hardLink( linkPath, linkPath2 );
   // var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
-  // var got = provider.isLink( _.mapExtend( null, o ) );
+  // var got = provider.isLink( _.props.extend( null, o ) );
   // test.identical( got, true )
-  // var got = provider.statRead( _.mapExtend( null, o ) );
+  // var got = provider.statRead( _.props.extend( null, o ) );
   // test.identical( got.isTerminal(), true );
   // test.identical( got.isHardLink(), true );
   // test.identical( got.isSoftLink(), false );
@@ -41686,9 +41686,9 @@ function isLink( test )
   // provider.softLink( linkPath2, linkPath3 );
   // provider.hardLink( linkPath, linkPath2 );
   // var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  // var got = provider.isLink( _.mapExtend( null, o ) );
+  // var got = provider.isLink( _.props.extend( null, o ) );
   // test.identical( got, false )
-  // var got = provider.statRead( _.mapExtend( null, o ) );
+  // var got = provider.statRead( _.props.extend( null, o ) );
   // test.identical( got.isTerminal(), true );
   // test.identical( got.isHardLink(), false );
   // test.identical( got.isSoftLink(), false );
@@ -41703,9 +41703,9 @@ function isLink( test )
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( linkPath3 ) );
   provider.hardLink( linkPath, linkPath2 );
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), true );
@@ -41720,9 +41720,9 @@ function isLink( test )
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( linkPath3 ) );
   provider.hardLink( linkPath, linkPath2 );
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), false );
@@ -41737,9 +41737,9 @@ function isLink( test )
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( linkPath3 ) );
   provider.hardLink( linkPath, linkPath2 );
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), false );
@@ -41753,9 +41753,9 @@ function isLink( test )
   provider.hardLink({ dstPath : linkPath2, srcPath : filePath });
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), true );
@@ -41769,9 +41769,9 @@ function isLink( test )
   provider.hardLink({ dstPath : linkPath2, srcPath : filePath });
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isHardLink(), true );
   test.identical( got.isSoftLink(), false );
@@ -41785,9 +41785,9 @@ function isLink( test )
   provider.hardLink({ dstPath : linkPath2, srcPath : filePath });
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isHardLink(), true );
   test.identical( got.isSoftLink(), false );
@@ -41802,9 +41802,9 @@ function isLink( test )
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( linkPath3 ) )
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), true );
@@ -41819,9 +41819,9 @@ function isLink( test )
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( linkPath3 ) )
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), false );
@@ -41836,9 +41836,9 @@ function isLink( test )
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( linkPath3 ) )
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isHardLink(), true );
   test.identical( got.isSoftLink(), false );
@@ -41850,18 +41850,18 @@ function isLink( test )
   provider.filesDelete( dirPath );
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, false );
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got, null );
 
   test.case = 'text to missing'
   provider.filesDelete( dirPath );
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, true );
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), false );
@@ -41873,9 +41873,9 @@ function isLink( test )
   provider.filesDelete( dirPath );
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, false );
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got, null );
 
   test.case = 'text to terminal'
@@ -41883,9 +41883,9 @@ function isLink( test )
   provider.fileWrite( filePath, filePath )
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), false );
@@ -41899,9 +41899,9 @@ function isLink( test )
   provider.fileWrite( filePath, filePath )
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), false );
@@ -41914,9 +41914,9 @@ function isLink( test )
   provider.fileWrite( filePath, filePath )
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), false );
@@ -41929,9 +41929,9 @@ function isLink( test )
   provider.dirMake( filePath )
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), false );
@@ -41944,9 +41944,9 @@ function isLink( test )
   provider.dirMake( filePath )
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), false );
@@ -41959,9 +41959,9 @@ function isLink( test )
   provider.dirMake( filePath )
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), false );
@@ -41975,9 +41975,9 @@ function isLink( test )
   provider.softLink( linkPath2, filePath );
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( linkPath2 ) );
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), true );
@@ -41991,9 +41991,9 @@ function isLink( test )
   provider.softLink( linkPath2, filePath );
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( linkPath2 ) );
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), false );
@@ -42007,9 +42007,9 @@ function isLink( test )
   provider.softLink( linkPath2, filePath );
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( linkPath2 ) );
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), false );
@@ -42023,9 +42023,9 @@ function isLink( test )
   provider.softLink( linkPath2, filePath );
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( linkPath2 ) );
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), true );
@@ -42039,9 +42039,9 @@ function isLink( test )
   provider.softLink( linkPath2, filePath );
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( linkPath2 ) );
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), false );
@@ -42055,9 +42055,9 @@ function isLink( test )
   provider.softLink( linkPath2, filePath );
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( linkPath2 ) );
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, false )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), false );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), false );
@@ -42069,18 +42069,18 @@ function isLink( test )
   provider.filesDelete( dirPath );
   provider.fileWrite( linkPath, 'link ../link' );
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, true );
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got, null );
 
   test.case = 'text context cycled'
   provider.filesDelete( dirPath );
   provider.fileWrite( linkPath, 'link ../link' );
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, true );
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), false );
@@ -42092,9 +42092,9 @@ function isLink( test )
   provider.filesDelete( dirPath );
   provider.fileWrite( linkPath, 'link ../link' );
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, false );
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got, null );
 
   test.case = 'text cycled'
@@ -42102,9 +42102,9 @@ function isLink( test )
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( linkPath ) );
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( linkPath2 ) );
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, true );
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got, null );
 
   test.case = 'text cycled'
@@ -42112,9 +42112,9 @@ function isLink( test )
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( linkPath ) );
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( linkPath2 ) );
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, true )
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got.isTerminal(), true );
   test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), false );
@@ -42127,9 +42127,9 @@ function isLink( test )
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( linkPath ) );
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( linkPath2 ) );
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  var got = provider.isLink( _.mapExtend( null, o ) );
+  var got = provider.isLink( _.props.extend( null, o ) );
   test.identical( got, true );
-  var got = provider.statRead( _.mapExtend( null, o ) );
+  var got = provider.statRead( _.props.extend( null, o ) );
   test.identical( got, null );
 
   provider.fieldPop( 'usingTextLink', 1 );
@@ -43455,7 +43455,7 @@ function record( test )
   let providerEffective = context.providerEffective || context.provider;
 
   test.true( providerEffective.system === system );
-  test.true( _.longHas( _.mapKeys( system.providersWithProtocolMap ), providerEffective.protocol ) );
+  test.true( _.longHas( _.props.keys( system.providersWithProtocolMap ), providerEffective.protocol ) );
 
   var filePath = '/record/terminal';
   var expected = filePath;
@@ -43478,7 +43478,7 @@ function recordStat( test )
   let providerEffective = context.providerEffective || context.provider;
 
   test.true( providerEffective.system === system );
-  test.true( _.longHas( _.mapKeys( system.providersWithProtocolMap ), providerEffective.protocol ) );
+  test.true( _.longHas( _.props.keys( system.providersWithProtocolMap ), providerEffective.protocol ) );
 
   let filePath = test.context.pathFor( 'written/recordStat/file' );
   var record = context.provider.recordFactory({ allowingMissed : 1 }).record( filePath );
@@ -44295,7 +44295,7 @@ function pathResolveLinkTailChain( test )
 
   test.case = 'not existing file';
   provider.filesDelete( context.provider.path.dir( filePath ) );
-  var o = _.mapExtend( null, o1, { filePath } );
+  var o = _.props.extend( null, o1, { filePath } );
   provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ filePath, null ] )
   test.identical( o.found, [ filePath, null ] )
@@ -44303,7 +44303,7 @@ function pathResolveLinkTailChain( test )
   test.case = 'existing file';
   provider.filesDelete( context.provider.path.dir( filePath ) );
   provider.fileWrite( filePath, filePath );
-  var o = _.mapExtend( null, o1, { filePath } );
+  var o = _.props.extend( null, o1, { filePath } );
   provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ filePath ] )
   test.identical( o.found, [ filePath ] )
@@ -44312,7 +44312,7 @@ function pathResolveLinkTailChain( test )
   provider.filesDelete( context.provider.path.dir( filePath ) );
   provider.fileWrite( filePath, filePath );
   provider.hardLink( linkPath, filePath );
-  var o = _.mapExtend( null, o1, { filePath : linkPath } );
+  var o = _.props.extend( null, o1, { filePath : linkPath } );
   provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath ] )
   test.identical( o.found, [ linkPath ] )
@@ -44321,7 +44321,7 @@ function pathResolveLinkTailChain( test )
   provider.filesDelete( context.provider.path.dir( filePath ) );
   provider.fileWrite( filePath, filePath );
   provider.softLink( linkPath, filePath );
-  var o = _.mapExtend( null, o1, { filePath : linkPath } );
+  var o = _.props.extend( null, o1, { filePath : linkPath } );
   provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath, filePath ] )
   test.identical( o.found, [ linkPath, filePath ] )
@@ -44330,7 +44330,7 @@ function pathResolveLinkTailChain( test )
   provider.filesDelete( context.provider.path.dir( filePath ) );
   provider.fileWrite( filePath, filePath );
   provider.softLink( linkPath, '../file' );
-  var o = _.mapExtend( null, o1, { filePath : linkPath } );
+  var o = _.props.extend( null, o1, { filePath : linkPath } );
   var got = provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath, filePath ] )
   test.identical( o.found, [ linkPath, filePath ] )
@@ -44339,7 +44339,7 @@ function pathResolveLinkTailChain( test )
   provider.filesDelete( context.provider.path.dir( filePath ) );
   provider.fileWrite( filePath, filePath );
   provider.softLink( linkPath, '../file' );
-  var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
+  var o = _.props.extend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
   provider.pathResolveLinkTailChain( o );
   var expectedFound = [ linkPath, filePath ]
   var expectedResult = [ linkPath, test.context.globalFromPreferred( '../file' ) ]
@@ -44350,7 +44350,7 @@ function pathResolveLinkTailChain( test )
   provider.filesDelete( context.provider.path.dir( filePath ) );
   provider.fileWrite( filePath, filePath );
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( filePath ));
-  var o = _.mapExtend( null, o1, { filePath : linkPath } );
+  var o = _.props.extend( null, o1, { filePath : linkPath } );
   var got = provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath, filePath ] )
   test.identical( o.found, [ linkPath, filePath ] )
@@ -44366,7 +44366,7 @@ function pathResolveLinkTailChain( test )
     makingDirectory : 1,
     allowingMissed : 1
   });
-  var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 0 } );
+  var o = _.props.extend( null, o1, { filePath : linkPath, throwing : 0 } );
   var got = provider.pathResolveLinkTailChain( o );
   var expectedResult =
   [
@@ -44394,7 +44394,7 @@ function pathResolveLinkTailChain( test )
     makingDirectory : 1,
     allowingMissed : 1
   });
-  var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 0, preservingRelative : 1 } );
+  var o = _.props.extend( null, o1, { filePath : linkPath, throwing : 0, preservingRelative : 1 } );
   var got = provider.pathResolveLinkTailChain( o );
   var expectedResult =
   [
@@ -44423,7 +44423,7 @@ function pathResolveLinkTailChain( test )
     makingDirectory : 1,
     allowingMissed : 1
   });
-  var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 0 } );
+  var o = _.props.extend( null, o1, { filePath : linkPath, throwing : 0 } );
   var got = provider.pathResolveLinkTailChain( o );
   var expectedResult =
   [
@@ -44452,7 +44452,7 @@ function pathResolveLinkTailChain( test )
     makingDirectory : 1,
     allowingMissed : 1
   });
-  var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 0, preservingRelative : 1 } );
+  var o = _.props.extend( null, o1, { filePath : linkPath, throwing : 0, preservingRelative : 1 } );
   var got = provider.pathResolveLinkTailChain( o );
   var expectedFound =
   [
@@ -44480,7 +44480,7 @@ function pathResolveLinkTailChain( test )
     makingDirectory : 1,
     allowingMissed : 1
   });
-  var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 1, allowingMissed : 0 } );
+  var o = _.props.extend( null, o1, { filePath : linkPath, throwing : 1, allowingMissed : 0 } );
   test.shouldThrowErrorOfAnyKind( () => provider.pathResolveLinkTailChain( o ) );
 
   /* - */
@@ -44494,7 +44494,7 @@ function pathResolveLinkTailChain( test )
     makingDirectory : 1,
     allowingMissed : 1
   });
-  var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 1, allowingMissed : 1 } );
+  var o = _.props.extend( null, o1, { filePath : linkPath, throwing : 1, allowingMissed : 1 } );
   var got = provider.pathResolveLinkTailChain( o );
   var expectedFound =
   [
@@ -44523,7 +44523,7 @@ function pathResolveLinkTailChain( test )
     makingDirectory : 1,
     allowingMissed : 1
   });
-  var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 1, allowingMissed : 0  } );
+  var o = _.props.extend( null, o1, { filePath : linkPath, throwing : 1, allowingMissed : 0  } );
   test.shouldThrowErrorOfAnyKind( () => provider.pathResolveLinkTailChain( o ) );
 
   /* - */
@@ -44538,7 +44538,7 @@ function pathResolveLinkTailChain( test )
     makingDirectory : 1,
     allowingMissed : 1
   });
-  var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 1, allowingMissed : 1  } );
+  var o = _.props.extend( null, o1, { filePath : linkPath, throwing : 1, allowingMissed : 1  } );
   var got = provider.pathResolveLinkTailChain( o );
   var expectedFound =
   [
@@ -44562,7 +44562,7 @@ function pathResolveLinkTailChain( test )
   provider.fileWrite( filePath, filePath );
   provider.softLink( linkPath2, filePath );
   provider.softLink( linkPath, linkPath2 );
-  var o = _.mapExtend( null, o1, { filePath : linkPath } );
+  var o = _.props.extend( null, o1, { filePath : linkPath } );
   provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath, linkPath2, filePath ] );
   test.identical( o.found, [ linkPath, linkPath2, filePath ] );
@@ -44572,7 +44572,7 @@ function pathResolveLinkTailChain( test )
   provider.fileWrite( filePath, filePath );
   provider.softLink( linkPath2, filePath );
   provider.softLink( linkPath, linkPath2 );
-  var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
+  var o = _.props.extend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
   provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath, linkPath2, filePath ] );
   test.identical( o.found, [ linkPath, linkPath2, filePath ] );
@@ -44582,7 +44582,7 @@ function pathResolveLinkTailChain( test )
   provider.fileWrite( filePath, filePath );
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( filePath ));
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( linkPath2 ) );
-  var o = _.mapExtend( null, o1, { filePath : linkPath } );
+  var o = _.props.extend( null, o1, { filePath : linkPath } );
   provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath, linkPath2, filePath ] );
   test.identical( o.found, [ linkPath, linkPath2, filePath ] );
@@ -44592,7 +44592,7 @@ function pathResolveLinkTailChain( test )
   provider.fileWrite( filePath, filePath );
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( filePath ));
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( linkPath2 ) );
-  var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
+  var o = _.props.extend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
   provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath, linkPath2, filePath ] );
   test.identical( o.found, [ linkPath, linkPath2, filePath ] );
@@ -44603,7 +44603,7 @@ function pathResolveLinkTailChain( test )
   provider.softLink( linkPath3, filePath );
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( linkPath3 ) );
   provider.softLink( linkPath, linkPath2 );
-  var o = _.mapExtend( null, o1, { filePath : linkPath } );
+  var o = _.props.extend( null, o1, { filePath : linkPath } );
   provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath, linkPath2, linkPath3, filePath ] );
   test.identical( o.found, [ linkPath, linkPath2, linkPath3, filePath ] );
@@ -44614,7 +44614,7 @@ function pathResolveLinkTailChain( test )
   provider.softLink( linkPath3, filePath );
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( linkPath3 ) );
   provider.softLink( linkPath, linkPath2 );
-  var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
+  var o = _.props.extend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
   provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath, linkPath2, linkPath3, filePath ] );
   test.identical( o.found, [ linkPath, linkPath2, linkPath3, filePath ] );
@@ -44625,7 +44625,7 @@ function pathResolveLinkTailChain( test )
   provider.fileWrite( linkPath3, 'link ' + provider.path.preferredFromGlobal( filePath ));
   provider.softLink( linkPath2, linkPath3 );
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( linkPath2 ) );
-  var o = _.mapExtend( null, o1, { filePath : linkPath } );
+  var o = _.props.extend( null, o1, { filePath : linkPath } );
   provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath, linkPath2, linkPath3, filePath ] );
   test.identical( o.found, [ linkPath, linkPath2, linkPath3, filePath ] );
@@ -44636,7 +44636,7 @@ function pathResolveLinkTailChain( test )
   provider.fileWrite( linkPath3, 'link ' + provider.path.preferredFromGlobal( filePath ));
   provider.softLink( linkPath2, linkPath3 );
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( linkPath2 ) );
-  var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
+  var o = _.props.extend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
   provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath, linkPath2, linkPath3, filePath ] );
   test.identical( o.found, [ linkPath, linkPath2, linkPath3, filePath ] );
@@ -44647,7 +44647,7 @@ function pathResolveLinkTailChain( test )
   provider.softLink( linkPath3, filePath );
   provider.softLink( linkPath2, '../link3' );
   provider.softLink( linkPath, test.context.globalFromPreferred( '../link2' ) );
-  var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
+  var o = _.props.extend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
   provider.pathResolveLinkTailChain( o );
   var expectedFound =
   [
@@ -44674,7 +44674,7 @@ function pathResolveLinkTailChain( test )
   provider.fileWrite( linkPath3, 'link ' + provider.path.preferredFromGlobal( filePath ));
   provider.hardLink( linkPath2, linkPath3 );
   provider.softLink( linkPath, linkPath2 );
-  var o = _.mapExtend( null, o1, { filePath : linkPath } );
+  var o = _.props.extend( null, o1, { filePath : linkPath } );
   provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath, linkPath2, linkPath3, filePath ] )
   test.identical( o.found, [ linkPath, linkPath2, linkPath3, filePath ] )
@@ -44685,7 +44685,7 @@ function pathResolveLinkTailChain( test )
   provider.fileWrite( linkPath3, 'link ' + provider.path.preferredFromGlobal( filePath ));
   provider.hardLink( linkPath2, linkPath3 );
   provider.softLink( linkPath, provider.path.relative( linkPath, linkPath2 ) );
-  var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 0 } );
+  var o = _.props.extend( null, o1, { filePath : linkPath, preservingRelative : 0 } );
   provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath, linkPath2, linkPath3, filePath ] )
   test.identical( o.found, [ linkPath, linkPath2, linkPath3, filePath ] )
@@ -44696,7 +44696,7 @@ function pathResolveLinkTailChain( test )
   provider.fileWrite( linkPath3, 'link ' + provider.path.preferredFromGlobal( filePath ));
   provider.hardLink( linkPath2, linkPath3 );
   provider.softLink( linkPath, provider.path.relative( linkPath, linkPath2 ) );
-  var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
+  var o = _.props.extend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
   provider.pathResolveLinkTailChain( o );
   test.identical( o.found, [ linkPath, linkPath2, linkPath3, filePath ] )
   test.identical( o.result, [ linkPath, test.context.globalFromPreferred( '../link2' ), linkPath3, filePath ]  )
@@ -44708,7 +44708,7 @@ function pathResolveLinkTailChain( test )
   // provider.fileWrite( filePath, filePath );
   // provider.softLink( linkPath, '..' );
   // provider.softLink( linkPath2, '../file' );
-  // var o = _.mapExtend( null, o1, { filePath : path.join( routinePath, 'link/link2' ), preservingRelative : 1, resolvingHeadDirectories : 0 } );
+  // var o = _.props.extend( null, o1, { filePath : path.join( routinePath, 'link/link2' ), preservingRelative : 1, resolvingHeadDirectories : 0 } );
   // var got = provider.pathResolveLinkTailChain( o );
   // var expectedFound =
   // [
@@ -44731,7 +44731,7 @@ function pathResolveLinkTailChain( test )
   // provider.fileWrite( filePath, filePath );
   // provider.softLink( linkPath, '..' );
   // provider.softLink( linkPath2, '../file' );
-  // var o = _.mapExtend( null, o1, { filePath : path.join( routinePath, 'link/link2' ), preservingRelative : 1, resolvingHeadDirectories : 1 } );
+  // var o = _.props.extend( null, o1, { filePath : path.join( routinePath, 'link/link2' ), preservingRelative : 1, resolvingHeadDirectories : 1 } );
   // var got = provider.pathResolveLinkTailChain( o );
   // var expectedFound =
   // [
@@ -44786,7 +44786,7 @@ function pathResolveLinkTailChain( test )
   // */
 
   // var routinePath = path.join( dirPath, 'linkToDir1/linkToDir2/linkToTerminal' )
-  // var o = _.mapExtend( null, o1, { filePath : routinePath, preservingRelative : 1, resolvingHeadDirectories : 0 } );
+  // var o = _.props.extend( null, o1, { filePath : routinePath, preservingRelative : 1, resolvingHeadDirectories : 0 } );
   // var got = provider.pathResolveLinkTailChain( o );
   // test.identical( o.result, [ routinePath, pathToFile ] )
   // test.identical( o.found, [ routinePath, pathToFile ] )
@@ -44823,7 +44823,7 @@ function pathResolveLinkTailChain( test )
   // */
 
   // var routinePath = path.join( dirPath, 'linkToDir1/linkToDir2/linkToTerminal' )
-  // var o = _.mapExtend( null, o1, { filePath : routinePath, preservingRelative : 1, resolvingHeadDirectories : 1 } );
+  // var o = _.props.extend( null, o1, { filePath : routinePath, preservingRelative : 1, resolvingHeadDirectories : 1 } );
   // var got = provider.pathResolveLinkTailChain( o );
   // test.identical( o.result, [ routinePath, linkToDir1Path, dir1Path, linkToTerminalPath, dirPath2, linkInDir2, pathToFile ] )
   // test.identical( o.found, [ routinePath, linkToDir1Path, dir1Path, linkToTerminalPath, dirPath2, linkInDir2, pathToFile ] )
@@ -44860,7 +44860,7 @@ function pathResolveLinkTailChain( test )
   // */
 
   // var routinePath = path.join( dirPath, 'linkToDir1/linkToDir2/linkToTerminal' )
-  // var o = _.mapExtend( null, o1, { filePath : routinePath, preservingRelative : 1, resolvingHeadDirectories : 0 } );
+  // var o = _.props.extend( null, o1, { filePath : routinePath, preservingRelative : 1, resolvingHeadDirectories : 0 } );
   // var got = provider.pathResolveLinkTailChain( o );
   // test.identical( o.found, [ routinePath, '../../file', path.join( dirPath, 'linkToDir1/file'), null ] )
   // test.identical( o.result, [ routinePath, path.join( dirPath, 'linkToDir1/file'), null ] )
@@ -44897,7 +44897,7 @@ function pathResolveLinkTailChain( test )
   // */
 
   // var routinePath = path.join( dirPath, 'linkToDir1/linkToDir2/linkToTerminal' )
-  // var o = _.mapExtend( null, o1, { filePath : routinePath, preservingRelative : 1, resolvingHeadDirectories : 1 } );
+  // var o = _.props.extend( null, o1, { filePath : routinePath, preservingRelative : 1, resolvingHeadDirectories : 1 } );
   // var got = provider.pathResolveLinkTailChain( o );
   // test.identical( o.found, [ routinePath, linkToDir1Path, '../dir1', dir1Path, linkToTerminalPath, '../../dir2', dirPath2, linkInDir2, '../../file', pathToFile ] )
   // test.identical( o.result, [ routinePath, linkToDir1Path, dir1Path, linkToTerminalPath, dirPath2, linkInDir2, pathToFile ] )
@@ -44934,7 +44934,7 @@ function pathResolveLinkTailChain( test )
   // */
 
   // var routinePath = path.join( dirPath, 'linkToDir1/linkToDir2/linkToTerminal' )
-  // var o = _.mapExtend( null, o1, { filePath : routinePath, preservingRelative : 1, resolvingHeadDirectories : 1 } );
+  // var o = _.props.extend( null, o1, { filePath : routinePath, preservingRelative : 1, resolvingHeadDirectories : 1 } );
   // var got = provider.pathResolveLinkTailChain( o );
   // test.identical( o.result, [ routinePath, linkToDir1Path, dir1Path, linkToTerminalPath, dirPath2, linkInDir2, pathToFile ] )
   // test.identical( o.found, [ routinePath, linkToDir1Path, dir1Path, linkToTerminalPath, dirPath2, linkInDir2, pathToFile ] )
@@ -44971,7 +44971,7 @@ function pathResolveLinkTailChain( test )
   // */
 
   // var routinePath = path.join( dirPath, 'linkToDir1/linkToDir2/linkToTerminal' )
-  // var o = _.mapExtend( null, o1, { filePath : routinePath, preservingRelative : 1, resolvingHeadDirectories : 0 } );
+  // var o = _.props.extend( null, o1, { filePath : routinePath, preservingRelative : 1, resolvingHeadDirectories : 0 } );
   // var got = provider.pathResolveLinkTailChain( o );
   // test.identical( o.result, [ routinePath, null ] )
   // test.identical( o.found, [ routinePath, null ] )
@@ -44981,7 +44981,7 @@ function pathResolveLinkTailChain( test )
   test.case = 'context cycle softLink, throwing on'
   provider.filesDelete( context.provider.path.dir( filePath ) );
   provider.softLink({ dstPath : linkPath, srcPath : '../link', allowingMissed : 1, makingDirectory : 1 });
-  var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 1, allowingMissed : 1 } );
+  var o = _.props.extend( null, o1, { filePath : linkPath, throwing : 1, allowingMissed : 1 } );
   provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath, linkPath, null ] );
   test.identical( o.found, [ linkPath, linkPath, null ] );
@@ -44989,13 +44989,13 @@ function pathResolveLinkTailChain( test )
   test.case = 'context cycle softLink, throwing on'
   provider.filesDelete( context.provider.path.dir( filePath ) );
   provider.softLink({ dstPath : linkPath, srcPath : '../link', allowingMissed : 1, makingDirectory : 1 });
-  var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 1, allowingMissed : 0, allowingCycled : 0 } );
+  var o = _.props.extend( null, o1, { filePath : linkPath, throwing : 1, allowingMissed : 0, allowingCycled : 0 } );
   test.shouldThrowErrorOfAnyKind( () => provider.pathResolveLinkTailChain( o ) );
 
   test.case = 'context cycle softLink, throwing off'
   provider.filesDelete( context.provider.path.dir( filePath ) );
   provider.softLink({ dstPath : linkPath, srcPath : '../link', allowingMissed : 1, makingDirectory : 1 });
-  var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 0, allowingMissed : 1 } );
+  var o = _.props.extend( null, o1, { filePath : linkPath, throwing : 0, allowingMissed : 1 } );
   provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath, linkPath, null ] );
   test.identical( o.found, [ linkPath, linkPath, null ] );
@@ -45003,7 +45003,7 @@ function pathResolveLinkTailChain( test )
   test.case = 'context cycle softLink, throwing off'
   provider.filesDelete( context.provider.path.dir( filePath ) );
   provider.softLink({ dstPath : linkPath, srcPath : '../link', allowingMissed : 1, makingDirectory : 1 });
-  var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 0, allowingMissed : 0 } );
+  var o = _.props.extend( null, o1, { filePath : linkPath, throwing : 0, allowingMissed : 0 } );
   provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath, linkPath, null ] );
   test.identical( o.found, [ linkPath, linkPath, null ] );
@@ -45011,7 +45011,7 @@ function pathResolveLinkTailChain( test )
   test.case = 'context cycle text, throwing on '
   provider.filesDelete( context.provider.path.dir( filePath ) );
   provider.fileWrite( linkPath, 'link ' + '../link' );
-  var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 1, allowingMissed : 1 } );
+  var o = _.props.extend( null, o1, { filePath : linkPath, throwing : 1, allowingMissed : 1 } );
   provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath, linkPath, null ] );
   test.identical( o.found, [ linkPath, linkPath, null ] );
@@ -45019,13 +45019,13 @@ function pathResolveLinkTailChain( test )
   test.case = 'context cycle text, throwing on '
   provider.filesDelete( context.provider.path.dir( filePath ) );
   provider.fileWrite( linkPath, 'link ' + '../link' );
-  var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 1, allowingMissed : 0, allowingCycled : 0 } );
+  var o = _.props.extend( null, o1, { filePath : linkPath, throwing : 1, allowingMissed : 0, allowingCycled : 0 } );
   test.shouldThrowErrorOfAnyKind( () => provider.pathResolveLinkTailChain( o ) );
 
   test.case = 'context cycle text, throwing off'
   provider.filesDelete( context.provider.path.dir( filePath ) );
   provider.fileWrite( linkPath, 'link ' + '../link' );
-  var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 0, allowingMissed : 1 } );
+  var o = _.props.extend( null, o1, { filePath : linkPath, throwing : 0, allowingMissed : 1 } );
   provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath, linkPath, null ] );
   test.identical( o.found, [ linkPath, linkPath, null ] );
@@ -45033,7 +45033,7 @@ function pathResolveLinkTailChain( test )
   test.case = 'context cycle text, throwing off'
   provider.filesDelete( context.provider.path.dir( filePath ) );
   provider.fileWrite( linkPath, 'link ' + '../link' );
-  var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 0, allowingMissed : 0 } );
+  var o = _.props.extend( null, o1, { filePath : linkPath, throwing : 0, allowingMissed : 0 } );
   provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath, linkPath, null ] );
   test.identical( o.found, [ linkPath, linkPath, null ] );
@@ -45042,7 +45042,7 @@ function pathResolveLinkTailChain( test )
   provider.filesDelete( context.provider.path.dir( filePath ) );
   provider.softLink({ dstPath : linkPath2, srcPath : linkPath, allowingMissed : 1, makingDirectory : 1 });
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
-  var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 1, allowingMissed : 1 } );
+  var o = _.props.extend( null, o1, { filePath : linkPath, throwing : 1, allowingMissed : 1 } );
   provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath, linkPath2, linkPath, null ] );
   test.identical( o.found, [ linkPath, linkPath2, linkPath, null ] );
@@ -45051,14 +45051,14 @@ function pathResolveLinkTailChain( test )
   provider.filesDelete( context.provider.path.dir( filePath ) );
   provider.softLink({ dstPath : linkPath2, srcPath : linkPath, allowingMissed : 1, makingDirectory : 1 });
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
-  var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 1, allowingMissed : 0, allowingCycled : 0 } );
+  var o = _.props.extend( null, o1, { filePath : linkPath, throwing : 1, allowingMissed : 0, allowingCycled : 0 } );
   test.shouldThrowErrorOfAnyKind( () => provider.pathResolveLinkTailChain( o ) );
 
   test.case = 'cycle softLink, throwing off'
   provider.filesDelete( context.provider.path.dir( filePath ) );
   provider.softLink({ dstPath : linkPath2, srcPath : linkPath, allowingMissed : 1, makingDirectory : 1 });
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
-  var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 0, allowingMissed : 1 } );
+  var o = _.props.extend( null, o1, { filePath : linkPath, throwing : 0, allowingMissed : 1 } );
   provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath, linkPath2, linkPath, null ] );
   test.identical( o.found, [ linkPath, linkPath2, linkPath, null ] );
@@ -45067,7 +45067,7 @@ function pathResolveLinkTailChain( test )
   provider.filesDelete( context.provider.path.dir( filePath ) );
   provider.softLink({ dstPath : linkPath2, srcPath : linkPath, allowingMissed : 1, makingDirectory : 1 });
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
-  var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 0, allowingMissed : 0 } );
+  var o = _.props.extend( null, o1, { filePath : linkPath, throwing : 0, allowingMissed : 0 } );
   provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath, linkPath2, linkPath, null ] );
   test.identical( o.found, [ linkPath, linkPath2, linkPath, null ] );
@@ -45076,7 +45076,7 @@ function pathResolveLinkTailChain( test )
   provider.filesDelete( context.provider.path.dir( filePath ) );
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( linkPath ) );
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( linkPath2 ) );
-  var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 1, allowingMissed : 1 } );
+  var o = _.props.extend( null, o1, { filePath : linkPath, throwing : 1, allowingMissed : 1 } );
   provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath, linkPath2, linkPath, null ] );
   test.identical( o.found, [ linkPath, linkPath2, linkPath, null ] );
@@ -45085,14 +45085,14 @@ function pathResolveLinkTailChain( test )
   provider.filesDelete( context.provider.path.dir( filePath ) );
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( linkPath ) );
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( linkPath2 ) );
-  var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 1, allowingMissed : 0, allowingCycled : 0 } );
+  var o = _.props.extend( null, o1, { filePath : linkPath, throwing : 1, allowingMissed : 0, allowingCycled : 0 } );
   test.shouldThrowErrorOfAnyKind( () => provider.pathResolveLinkTailChain( o ) );
 
   test.case = 'cycle text link, throwing off'
   provider.filesDelete( context.provider.path.dir( filePath ) );
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( linkPath ) );
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( linkPath2 ) );
-  var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 0, allowingMissed : 1 } );
+  var o = _.props.extend( null, o1, { filePath : linkPath, throwing : 0, allowingMissed : 1 } );
   provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath, linkPath2, linkPath, null ] );
   test.identical( o.found, [ linkPath, linkPath2, linkPath, null ] );
@@ -45101,7 +45101,7 @@ function pathResolveLinkTailChain( test )
   provider.filesDelete( context.provider.path.dir( filePath ) );
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( linkPath ) );
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( linkPath2 ) );
-  var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 0, allowingMissed : 1 } );
+  var o = _.props.extend( null, o1, { filePath : linkPath, throwing : 0, allowingMissed : 1 } );
   provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath, linkPath2, linkPath, null ] );
   test.identical( o.found, [ linkPath, linkPath2, linkPath, null ] );
@@ -45110,7 +45110,7 @@ function pathResolveLinkTailChain( test )
   provider.filesDelete( context.provider.path.dir( filePath ) );
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( linkPath ) );
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
-  var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 1, allowingMissed : 1 } );
+  var o = _.props.extend( null, o1, { filePath : linkPath, throwing : 1, allowingMissed : 1 } );
   provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath, linkPath2, linkPath, null ] );
   test.identical( o.found, [ linkPath, linkPath2, linkPath, null ] );
@@ -45119,14 +45119,14 @@ function pathResolveLinkTailChain( test )
   provider.filesDelete( context.provider.path.dir( filePath ) );
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( linkPath ) );
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
-  var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 1, allowingMissed : 0, allowingCycled : 0 } );
+  var o = _.props.extend( null, o1, { filePath : linkPath, throwing : 1, allowingMissed : 0, allowingCycled : 0 } );
   test.shouldThrowErrorOfAnyKind( () => provider.pathResolveLinkTailChain( o ) );
 
   test.case = 'cycle soft text, throwing off'
   provider.filesDelete( context.provider.path.dir( filePath ) );
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( linkPath ) );
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
-  var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 0, allowingMissed : 1 } );
+  var o = _.props.extend( null, o1, { filePath : linkPath, throwing : 0, allowingMissed : 1 } );
   provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath, linkPath2, linkPath, null ] );
   test.identical( o.found, [ linkPath, linkPath2, linkPath, null ] );
@@ -45135,7 +45135,7 @@ function pathResolveLinkTailChain( test )
   provider.filesDelete( context.provider.path.dir( filePath ) );
   provider.fileWrite( linkPath2, 'link ' + provider.path.preferredFromGlobal( linkPath ) );
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
-  var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 0, allowingMissed : 0 } );
+  var o = _.props.extend( null, o1, { filePath : linkPath, throwing : 0, allowingMissed : 0 } );
   provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath, linkPath2, linkPath, null ] );
   test.identical( o.found, [ linkPath, linkPath2, linkPath, null ] );
@@ -45150,7 +45150,7 @@ function pathResolveLinkTailChain( test )
 
   test.case = 'not existing file';
   provider.filesDelete( context.provider.path.dir( filePath ) );
-  var o = _.mapExtend( null, o1, { filePath } );
+  var o = _.props.extend( null, o1, { filePath } );
   test.shouldThrowErrorOfAnyKind( () => provider.pathResolveLinkTailChain( o ) );
   test.identical( o.result, [ filePath, null ] )
   test.identical( o.found, [ filePath, null ] )
@@ -45158,7 +45158,7 @@ function pathResolveLinkTailChain( test )
   test.case = 'existing file';
   provider.filesDelete( context.provider.path.dir( filePath ) );
   provider.fileWrite( filePath, filePath );
-  var o = _.mapExtend( null, o1, { filePath } );
+  var o = _.props.extend( null, o1, { filePath } );
   provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ filePath ] )
   test.identical( o.found, [ filePath ] )
@@ -45167,7 +45167,7 @@ function pathResolveLinkTailChain( test )
   provider.filesDelete( context.provider.path.dir( filePath ) );
   provider.fileWrite( filePath, filePath );
   provider.hardLink( linkPath, filePath );
-  var o = _.mapExtend( null, o1, { filePath : linkPath } );
+  var o = _.props.extend( null, o1, { filePath : linkPath } );
   provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath ] )
   test.identical( o.found, [ linkPath ] )
@@ -45176,7 +45176,7 @@ function pathResolveLinkTailChain( test )
   provider.filesDelete( context.provider.path.dir( filePath ) );
   provider.fileWrite( filePath, filePath );
   provider.softLink( linkPath, filePath );
-  var o = _.mapExtend( null, o1, { filePath : linkPath } );
+  var o = _.props.extend( null, o1, { filePath : linkPath } );
   provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath, filePath ] )
   test.identical( o.found, [ linkPath, filePath ] )
@@ -45185,7 +45185,7 @@ function pathResolveLinkTailChain( test )
   provider.filesDelete( context.provider.path.dir( filePath ) );
   provider.fileWrite( filePath, filePath );
   provider.softLink( linkPath, '../file' );
-  var o = _.mapExtend( null, o1, { filePath : linkPath } );
+  var o = _.props.extend( null, o1, { filePath : linkPath } );
   var got = provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath, filePath ] )
   test.identical( o.found, [ linkPath, filePath ] )
@@ -45194,7 +45194,7 @@ function pathResolveLinkTailChain( test )
   provider.filesDelete( context.provider.path.dir( filePath ) );
   provider.fileWrite( filePath, filePath );
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( filePath ));
-  var o = _.mapExtend( null, o1, { filePath : linkPath } );
+  var o = _.props.extend( null, o1, { filePath : linkPath } );
   var got = provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath, filePath ] )
   test.identical( o.found, [ linkPath, filePath ] )
@@ -45202,7 +45202,7 @@ function pathResolveLinkTailChain( test )
   test.case = 'softLink to missing';
   provider.filesDelete( context.provider.path.dir( filePath ) );
   provider.softLink({ dstPath : linkPath, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
-  var o = _.mapExtend( null, o1, { filePath : linkPath } );
+  var o = _.props.extend( null, o1, { filePath : linkPath } );
   test.shouldThrowErrorOfAnyKind( () => provider.pathResolveLinkTailChain( o ) );
   test.identical( o.result, [ linkPath, filePath, null ] )
   test.identical( o.found, [ linkPath, filePath, null ] )
@@ -45210,7 +45210,7 @@ function pathResolveLinkTailChain( test )
   test.case = 'relative softLink to missing';
   provider.filesDelete( context.provider.path.dir( filePath ) );
   provider.softLink({ dstPath : linkPath, srcPath : '../file', allowingMissed : 1, makingDirectory : 1 });
-  var o = _.mapExtend( null, o1, { filePath : linkPath } );
+  var o = _.props.extend( null, o1, { filePath : linkPath } );
   test.shouldThrowErrorOfAnyKind( () => provider.pathResolveLinkTailChain( o ) );
   test.identical( o.result, [ linkPath, filePath, null ] )
   test.identical( o.found, [ linkPath, filePath, null ] )
@@ -45218,7 +45218,7 @@ function pathResolveLinkTailChain( test )
   test.case = 'relative softLink to missing';
   provider.filesDelete( context.provider.path.dir( filePath ) );
   provider.softLink({ dstPath : linkPath, srcPath : '../file', allowingMissed : 1, makingDirectory : 1 });
-  var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
+  var o = _.props.extend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
   test.shouldThrowErrorOfAnyKind( () => provider.pathResolveLinkTailChain( o ) );
   test.identical( o.result, [ linkPath, test.context.globalFromPreferred( '../file' ), null ] )
   test.identical( o.found, [ linkPath, filePath, null ] )
@@ -45226,7 +45226,7 @@ function pathResolveLinkTailChain( test )
   test.case = 'textLink to missing';
   provider.filesDelete( context.provider.path.dir( filePath ) );
   provider.textLink({ dstPath : linkPath, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
-  var o = _.mapExtend( null, o1, { filePath : linkPath } );
+  var o = _.props.extend( null, o1, { filePath : linkPath } );
   test.shouldThrowErrorOfAnyKind( () => provider.pathResolveLinkTailChain( o ) );
   test.identical( o.result, [ linkPath, filePath, null ] )
   test.identical( o.found, [ linkPath, filePath, null ] )
@@ -45234,7 +45234,7 @@ function pathResolveLinkTailChain( test )
   test.case = 'textLink to missing';
   provider.filesDelete( context.provider.path.dir( filePath ) );
   provider.textLink({ dstPath : linkPath, srcPath : '../file', allowingMissed : 1, makingDirectory : 1 });
-  var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
+  var o = _.props.extend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
   test.shouldThrowErrorOfAnyKind( () => provider.pathResolveLinkTailChain( o ) );
   test.identical( o.result, [ linkPath, test.context.globalFromPreferred( '../file' ), null ] )
   test.identical( o.found, [ linkPath, filePath, null ] )
@@ -45243,7 +45243,7 @@ function pathResolveLinkTailChain( test )
   provider.filesDelete( context.provider.path.dir( filePath ) );
   provider.textLink({ dstPath : linkPath2, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
   provider.textLink({ dstPath : linkPath, srcPath : linkPath2 });
-  var o = _.mapExtend( null, o1, { filePath : linkPath } );
+  var o = _.props.extend( null, o1, { filePath : linkPath } );
   test.shouldThrowErrorOfAnyKind( () => provider.pathResolveLinkTailChain( o ) );
   test.identical( o.result, [ linkPath, linkPath2, filePath, null ] )
   test.identical( o.found, [ linkPath, linkPath2, filePath, null ] )
@@ -45252,7 +45252,7 @@ function pathResolveLinkTailChain( test )
   provider.filesDelete( context.provider.path.dir( filePath ) );
   provider.softLink({ dstPath : linkPath2, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
-  var o = _.mapExtend( null, o1, { filePath : linkPath } );
+  var o = _.props.extend( null, o1, { filePath : linkPath } );
   test.shouldThrowErrorOfAnyKind( () => provider.pathResolveLinkTailChain( o ) );
   test.identical( o.result, [ linkPath, linkPath2, filePath, null ] )
   test.identical( o.found, [ linkPath, linkPath2, filePath, null ] )
@@ -45261,7 +45261,7 @@ function pathResolveLinkTailChain( test )
   provider.filesDelete( context.provider.path.dir( filePath ) );
   provider.textLink({ dstPath : linkPath2, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2 });
-  var o = _.mapExtend( null, o1, { filePath : linkPath } );
+  var o = _.props.extend( null, o1, { filePath : linkPath } );
   test.shouldThrowErrorOfAnyKind( () => provider.pathResolveLinkTailChain( o ) );
   test.identical( o.result, [ linkPath, linkPath2, filePath, null ] )
   test.identical( o.found, [ linkPath, linkPath2, filePath, null ] )
@@ -45270,7 +45270,7 @@ function pathResolveLinkTailChain( test )
   provider.filesDelete( context.provider.path.dir( filePath ) );
   provider.softLink({ dstPath : linkPath2, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
   provider.textLink({ dstPath : linkPath, srcPath : linkPath2 });
-  var o = _.mapExtend( null, o1, { filePath : linkPath } );
+  var o = _.props.extend( null, o1, { filePath : linkPath } );
   test.shouldThrowErrorOfAnyKind( () => provider.pathResolveLinkTailChain( o ) );
   test.identical( o.result, [ linkPath, linkPath2, filePath, null ] )
   test.identical( o.found, [ linkPath, linkPath2, filePath, null ] )
@@ -45284,7 +45284,7 @@ function pathResolveLinkTailChain( test )
 
   test.case = 'not existing file';
   provider.filesDelete( context.provider.path.dir( filePath ) );
-  var o = _.mapExtend( null, o1, { filePath } );
+  var o = _.props.extend( null, o1, { filePath } );
   provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ filePath, null ] )
   test.identical( o.found, [ filePath, null ] )
@@ -45292,7 +45292,7 @@ function pathResolveLinkTailChain( test )
   test.case = 'existing file';
   provider.filesDelete( context.provider.path.dir( filePath ) );
   provider.fileWrite( filePath, filePath );
-  var o = _.mapExtend( null, o1, { filePath } );
+  var o = _.props.extend( null, o1, { filePath } );
   provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ filePath ] )
   test.identical( o.found, [ filePath ] )
@@ -45301,7 +45301,7 @@ function pathResolveLinkTailChain( test )
   provider.filesDelete( context.provider.path.dir( filePath ) );
   provider.fileWrite( filePath, filePath );
   provider.hardLink( linkPath, filePath );
-  var o = _.mapExtend( null, o1, { filePath : linkPath } );
+  var o = _.props.extend( null, o1, { filePath : linkPath } );
   provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath ] )
   test.identical( o.found, [ linkPath ] )
@@ -45310,7 +45310,7 @@ function pathResolveLinkTailChain( test )
   provider.filesDelete( context.provider.path.dir( filePath ) );
   provider.fileWrite( filePath, filePath );
   provider.softLink( linkPath, filePath );
-  var o = _.mapExtend( null, o1, { filePath : linkPath } );
+  var o = _.props.extend( null, o1, { filePath : linkPath } );
   provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath, filePath ] )
   test.identical( o.found, [ linkPath, filePath ] )
@@ -45319,7 +45319,7 @@ function pathResolveLinkTailChain( test )
   provider.filesDelete( context.provider.path.dir( filePath ) );
   provider.fileWrite( filePath, filePath );
   provider.softLink( linkPath, '../file' );
-  var o = _.mapExtend( null, o1, { filePath : linkPath } );
+  var o = _.props.extend( null, o1, { filePath : linkPath } );
   var got = provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath, filePath ] )
   test.identical( o.found, [ linkPath, filePath ] )
@@ -45328,7 +45328,7 @@ function pathResolveLinkTailChain( test )
   provider.filesDelete( context.provider.path.dir( filePath ) );
   provider.fileWrite( filePath, filePath );
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( filePath ));
-  var o = _.mapExtend( null, o1, { filePath : linkPath } );
+  var o = _.props.extend( null, o1, { filePath : linkPath } );
   var got = provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath, filePath ] )
   test.identical( o.found, [ linkPath, filePath ] )
@@ -45336,7 +45336,7 @@ function pathResolveLinkTailChain( test )
   test.case = 'softLink to missing';
   provider.filesDelete( context.provider.path.dir( filePath ) );
   provider.softLink({ dstPath : linkPath, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
-  var o = _.mapExtend( null, o1, { filePath : linkPath } );
+  var o = _.props.extend( null, o1, { filePath : linkPath } );
   test.mustNotThrowError( () => provider.pathResolveLinkTailChain( o ) );
   test.identical( o.result, [ linkPath, filePath, null ] )
   test.identical( o.found, [ linkPath, filePath, null ] )
@@ -45344,7 +45344,7 @@ function pathResolveLinkTailChain( test )
   test.case = 'relative softLink to missing';
   provider.filesDelete( context.provider.path.dir( filePath ) );
   provider.softLink({ dstPath : linkPath, srcPath : '../file', allowingMissed : 1, makingDirectory : 1 });
-  var o = _.mapExtend( null, o1, { filePath : linkPath } );
+  var o = _.props.extend( null, o1, { filePath : linkPath } );
   test.mustNotThrowError( () => provider.pathResolveLinkTailChain( o ) );
   test.identical( o.result, [ linkPath, filePath, null ] )
   test.identical( o.found, [ linkPath, filePath, null ] )
@@ -45352,7 +45352,7 @@ function pathResolveLinkTailChain( test )
   test.case = 'relative softLink to missing';
   provider.filesDelete( context.provider.path.dir( filePath ) );
   provider.softLink({ dstPath : linkPath, srcPath : '../file', allowingMissed : 1, makingDirectory : 1 });
-  var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
+  var o = _.props.extend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
   test.mustNotThrowError( () => provider.pathResolveLinkTailChain( o ) );
   test.identical( o.result, [ linkPath, test.context.globalFromPreferred( '../file' ), null ] )
   test.identical( o.found, [ linkPath, filePath, null ] )
@@ -45360,7 +45360,7 @@ function pathResolveLinkTailChain( test )
   test.case = 'textLink to missing';
   provider.filesDelete( context.provider.path.dir( filePath ) );
   provider.textLink({ dstPath : linkPath, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
-  var o = _.mapExtend( null, o1, { filePath : linkPath } );
+  var o = _.props.extend( null, o1, { filePath : linkPath } );
   test.mustNotThrowError( () => provider.pathResolveLinkTailChain( o ) );
   test.identical( o.result, [ linkPath, filePath, null ] )
   test.identical( o.found, [ linkPath, filePath, null ] )
@@ -45368,7 +45368,7 @@ function pathResolveLinkTailChain( test )
   test.case = 'textLink to missing';
   provider.filesDelete( context.provider.path.dir( filePath ) );
   provider.textLink({ dstPath : linkPath, srcPath : '../file', allowingMissed : 1, makingDirectory : 1 });
-  var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
+  var o = _.props.extend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
   test.mustNotThrowError( () => provider.pathResolveLinkTailChain( o ) );
   test.identical( o.result, [ linkPath, test.context.globalFromPreferred( '../file' ), null ] )
   test.identical( o.found, [ linkPath, filePath, null ] )
@@ -45377,7 +45377,7 @@ function pathResolveLinkTailChain( test )
   provider.filesDelete( context.provider.path.dir( filePath ) );
   provider.textLink({ dstPath : linkPath2, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
   provider.textLink({ dstPath : linkPath, srcPath : linkPath2 });
-  var o = _.mapExtend( null, o1, { filePath : linkPath } );
+  var o = _.props.extend( null, o1, { filePath : linkPath } );
   test.mustNotThrowError( () => provider.pathResolveLinkTailChain( o ) );
   test.identical( o.result, [ linkPath, linkPath2, filePath, null ] )
   test.identical( o.found, [ linkPath, linkPath2, filePath, null ] )
@@ -45386,7 +45386,7 @@ function pathResolveLinkTailChain( test )
   provider.filesDelete( context.provider.path.dir( filePath ) );
   provider.softLink({ dstPath : linkPath2, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
-  var o = _.mapExtend( null, o1, { filePath : linkPath } );
+  var o = _.props.extend( null, o1, { filePath : linkPath } );
   test.mustNotThrowError( () => provider.pathResolveLinkTailChain( o ) );
   test.identical( o.result, [ linkPath, linkPath2, filePath, null ] )
   test.identical( o.found, [ linkPath, linkPath2, filePath, null ] )
@@ -45395,7 +45395,7 @@ function pathResolveLinkTailChain( test )
   provider.filesDelete( context.provider.path.dir( filePath ) );
   provider.textLink({ dstPath : linkPath2, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2 });
-  var o = _.mapExtend( null, o1, { filePath : linkPath } );
+  var o = _.props.extend( null, o1, { filePath : linkPath } );
   test.mustNotThrowError( () => provider.pathResolveLinkTailChain( o ) );
   test.identical( o.result, [ linkPath, linkPath2, filePath, null ] )
   test.identical( o.found, [ linkPath, linkPath2, filePath, null ] )
@@ -45404,12 +45404,45 @@ function pathResolveLinkTailChain( test )
   provider.filesDelete( context.provider.path.dir( filePath ) );
   provider.softLink({ dstPath : linkPath2, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
   provider.textLink({ dstPath : linkPath, srcPath : linkPath2 });
-  var o = _.mapExtend( null, o1, { filePath : linkPath } );
+  var o = _.props.extend( null, o1, { filePath : linkPath } );
   test.mustNotThrowError( () => provider.pathResolveLinkTailChain( o ) );
   test.identical( o.result, [ linkPath, linkPath2, filePath, null ] )
   test.identical( o.found, [ linkPath, linkPath2, filePath, null ] )
 
   provider.fieldPop( 'usingTextLink', true );
+}
+
+//
+
+function pathResolveLinkFullBasic( test )
+{
+  let context = this;
+  let a = context.assetFor( test, false );
+  let provider = a.provider;
+  let path = provider.path;
+
+  /* */
+
+  test.case = 'basic';
+  provider.fileWrite( a.abs( 'f1' ), 'f1' );
+  provider.softLink( a.abs( 's1' ), a.abs( 'f1' ) );
+  var exp =
+  {
+    'filePath' : a.abs( 'f1' ),
+    'relativePath' : '../f1',
+    'absolutePath' : a.abs( 'f1' ),
+  }
+  var got = provider.pathResolveLinkFull( a.abs( 's1' ) );
+  test.identical( got, exp );
+  test.true( path.isAbsolute( got.filePath ) );
+  test.true( !path.isAbsolute( got.relativePath ) );
+  test.true( path.isAbsolute( got.absolutePath ) );
+  test.true( !path.isGlobal( got.filePath ) );
+  test.true( !path.isGlobal( got.relativePath ) );
+  test.true( !path.isGlobal( got.absolutePath ) );
+
+  /* */
+
 }
 
 //
@@ -45838,7 +45871,7 @@ function pathResolveLinkFull( test )
   // provider.fileWrite( filePath, filePath );
   // provider.softLink( linkPath, '..' );
   // provider.softLink( linkPath2, '../file' );
-  // var o = _.mapExtend( null, o1, { filePath : path.join( routinePath, 'link/link2' ), preservingRelative : 1, resolvingHeadDirect : 0, resolvingHeadReverse : 0 } );
+  // var o = _.props.extend( null, o1, { filePath : path.join( routinePath, 'link/link2' ), preservingRelative : 1, resolvingHeadDirect : 0, resolvingHeadReverse : 0 } );
   // var got = provider.pathResolveLinkFull( o );
   // var expected = path.join( routinePath, 'link/file' );
   // test.identical( got, expected )
@@ -45850,7 +45883,7 @@ function pathResolveLinkFull( test )
   // provider.fileWrite( filePath, filePath );
   // provider.softLink( linkPath, '..' );
   // provider.softLink( linkPath2, '../file' );
-  // var o = _.mapExtend( null, o1, { filePath : path.join( routinePath, 'link/link2' ), preservingRelative : 1, resolvingHeadDirect : 0, resolvingHeadReverse : 1 } );
+  // var o = _.props.extend( null, o1, { filePath : path.join( routinePath, 'link/link2' ), preservingRelative : 1, resolvingHeadDirect : 0, resolvingHeadReverse : 1 } );
   // var got = provider.pathResolveLinkFull( o );
   // var expected = filePath;
   // test.identical( got, expected );
@@ -45887,7 +45920,7 @@ function pathResolveLinkFull( test )
   // */
 
   // var routinePath = path.join( dirPath, 'linkToDir1/linkToDir2/linkToTerminal' )
-  // var o = _.mapExtend( null, o1, { filePath : routinePath, preservingRelative : 1, resolvingHeadDirect : 0, resolvingHeadReverse : 0 } );
+  // var o = _.props.extend( null, o1, { filePath : routinePath, preservingRelative : 1, resolvingHeadDirect : 0, resolvingHeadReverse : 0 } );
   // var got = provider.pathResolveLinkFull( o );
   // test.identical( got, path.join( dirPath, pathToFile ) );
 
@@ -45923,7 +45956,7 @@ function pathResolveLinkFull( test )
   // */
 
   // var routinePath = path.join( dirPath, 'linkToDir1/linkToDir2/linkToTerminal' )
-  // var o = _.mapExtend( null, o1, { filePath : routinePath, preservingRelative : 1, resolvingHeadDirect : 0, resolvingHeadReverse : 1 } );
+  // var o = _.props.extend( null, o1, { filePath : routinePath, preservingRelative : 1, resolvingHeadDirect : 0, resolvingHeadReverse : 1 } );
   // var got = provider.pathResolveLinkFull( o );
   // test.identical( got, pathToFile );
 
@@ -45959,7 +45992,7 @@ function pathResolveLinkFull( test )
   // */
 
   // var routinePath = path.join( dirPath, 'linkToDir1/linkToDir2/linkToTerminal' )
-  // var o = _.mapExtend( null, o1, { filePath : routinePath, preservingRelative : 1, resolvingHeadDirect : 0, resolvingHeadReverse : 0 } );
+  // var o = _.props.extend( null, o1, { filePath : routinePath, preservingRelative : 1, resolvingHeadDirect : 0, resolvingHeadReverse : 0 } );
   // var got = provider.pathResolveLinkFull( o );
   // var expected = path.join( dirPath, 'linkToDir1/file' );
   // test.identical( got, expected );
@@ -45998,7 +46031,7 @@ function pathResolveLinkFull( test )
 
   routinePath = path.join( dirPath, 'linkToDir1/linkToDir2/linkToTerminal' )
   var o2 = { filePath : routinePath, preservingRelative : 0, resolvingHeadDirect : 1, resolvingHeadReverse : 1 };
-  var o = _.mapExtend( null, o1, o2 );
+  var o = _.props.extend( null, o1, o2 );
   var got = provider.pathResolveLinkFull( o );
   test.identical( got.absolutePath, pathToFile );
 
@@ -46035,7 +46068,7 @@ function pathResolveLinkFull( test )
 
   routinePath = path.join( dirPath, 'linkToDir1/linkToDir2/linkToTerminal' )
   var o2 = { filePath : routinePath, preservingRelative : 1, resolvingHeadDirect : 1, resolvingHeadReverse : 1 };
-  var o = _.mapExtend( null, o1, o2 );
+  var o = _.props.extend( null, o1, o2 );
   var got = provider.pathResolveLinkFull( o );
   var expected = provider.path.relative( linkInDir2, pathToFile );
   test.identical( got.filePath, expected );
@@ -46072,7 +46105,7 @@ function pathResolveLinkFull( test )
   // */
 
   // var routinePath = path.join( dirPath, 'linkToDir1/linkToDir2/linkToTerminal' )
-  // var o = _.mapExtend( null, o1, { filePath : routinePath, preservingRelative : 1, resolvingHeadDirect : 1, resolvingHeadReverse : 0 } );
+  // var o = _.props.extend( null, o1, { filePath : routinePath, preservingRelative : 1, resolvingHeadDirect : 1, resolvingHeadReverse : 0 } );
   // var got = provider.pathResolveLinkFull( o );
   // test.identical( got, routinePath );
 
@@ -46108,7 +46141,7 @@ function pathResolveLinkFull( test )
   // */
 
   // var routinePath = path.join( dirPath, 'linkToDir1/linkToDir2/linkToTerminal' )
-  // var o = _.mapExtend( null, o1, { filePath : routinePath, preservingRelative : 1, resolvingHeadDirect : 0, resolvingHeadReverse : 1 } );
+  // var o = _.props.extend( null, o1, { filePath : routinePath, preservingRelative : 1, resolvingHeadDirect : 0, resolvingHeadReverse : 1 } );
   // var got = provider.pathResolveLinkFull( o );
   // test.identical( got, pathToFile );
 
@@ -46507,14 +46540,14 @@ function pathResolveSoftLink( test )
 
   test.case = 'not existing file';
   provider.filesDelete( routinePath );
-  var o = _.mapExtend( null, o1, { filePath } );
+  var o = _.props.extend( null, o1, { filePath } );
   var got = provider.pathResolveSoftLink( o );
   test.identical( got, filePath );
 
   test.case = 'existing regular file';
   provider.filesDelete( routinePath );
   provider.fileWrite( filePath, testData );
-  var o = _.mapExtend( null, o1, { filePath } );
+  var o = _.props.extend( null, o1, { filePath } );
   var got = provider.pathResolveSoftLink( o );
   test.identical( got, filePath );
 
@@ -46522,7 +46555,7 @@ function pathResolveSoftLink( test )
   provider.filesDelete( routinePath );
   provider.fileWrite( filePath, testData );
   provider.hardLink( linkPath, filePath );
-  var o = _.mapExtend( null, o1, { filePath : linkPath } );
+  var o = _.props.extend( null, o1, { filePath : linkPath } );
   var got = provider.pathResolveSoftLink( o );
   test.identical( got, linkPath );
 
@@ -46532,7 +46565,7 @@ function pathResolveSoftLink( test )
   provider.filesDelete( routinePath );
   provider.fileWrite( filePath, testData );
   provider.fileWrite( linkPath, 'link ' + provider.path.preferredFromGlobal( filePath ));
-  var o = _.mapExtend( null, o1, { filePath : linkPath } );
+  var o = _.props.extend( null, o1, { filePath : linkPath } );
   var got = provider.pathResolveSoftLink( o );
   test.identical( got, linkPath );
 
@@ -46547,14 +46580,14 @@ function pathResolveSoftLink( test )
   test.case = 'absolute textlink to file that does not exist';
   provider.filesDelete( routinePath );
   provider.textLink({ dstPath : linkPath, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
-  var o = _.mapExtend( null, o1, { filePath : linkPath } );
+  var o = _.props.extend( null, o1, { filePath : linkPath } );
   var got = provider.pathResolveSoftLink( o );
   test.identical( got, linkPath );
 
   test.case = 'relative textlink to file that does not exist';
   provider.filesDelete( routinePath );
   provider.textLink({ dstPath : linkPath, srcPath : '../file2', allowingMissed : 1, makingDirectory : 1 });
-  var o = _.mapExtend( null, o1, { filePath : linkPath } );
+  var o = _.props.extend( null, o1, { filePath : linkPath } );
   var got = provider.pathResolveSoftLink( o );
   test.identical( got, linkPath );
 
@@ -46564,7 +46597,7 @@ function pathResolveSoftLink( test )
   provider.filesDelete( routinePath );
   provider.fileWrite( filePath, testData );
   provider.softLink( linkPath, filePath );
-  var o = _.mapExtend( null, o1, { filePath : linkPath } );
+  var o = _.props.extend( null, o1, { filePath : linkPath } );
   var got = provider.pathResolveSoftLink( o );
   test.identical( got, filePath );
 
@@ -46572,7 +46605,7 @@ function pathResolveSoftLink( test )
   provider.filesDelete( routinePath );
   provider.fileWrite( filePath, testData );
   provider.softLink( linkPath, '../file' );
-  var o = _.mapExtend( null, o1, { filePath : linkPath } );
+  var o = _.props.extend( null, o1, { filePath : linkPath } );
   var got = provider.pathResolveSoftLink( o );
   test.identical( got, test.context.globalFromPreferred( '../file' ) );
 
@@ -46585,7 +46618,7 @@ function pathResolveSoftLink( test )
     makingDirectory : 1,
     allowingMissed : 1
   });
-  var o = _.mapExtend( null, o1, { filePath : linkPath } );
+  var o = _.props.extend( null, o1, { filePath : linkPath } );
   var got = provider.pathResolveSoftLink( o );
   test.identical( got, filePath );
 
@@ -46599,7 +46632,7 @@ function pathResolveSoftLink( test )
     makingDirectory : 1,
     allowingMissed : 1
   });
-  var o = _.mapExtend( null, o1, { filePath : linkPath } );
+  var o = _.props.extend( null, o1, { filePath : linkPath } );
   var got = provider.pathResolveSoftLink( o );
   test.identical( got, filePathRelative );
 
@@ -46687,7 +46720,7 @@ function pathResolveSoftLink( test )
   provider.filesDelete( routinePath );
   provider.fileWrite( filePath, testData );
   provider.softLink( linkPath, filePath );
-  var o = _.mapExtend( null, o1, { filePath : linkPath, resolvingMultiple : 1 } );
+  var o = _.props.extend( null, o1, { filePath : linkPath, resolvingMultiple : 1 } );
   var got = provider.pathResolveSoftLink( o );
   test.identical( got, filePath );
 
@@ -46696,7 +46729,7 @@ function pathResolveSoftLink( test )
   provider.fileWrite( filePath, testData );
   provider.softLink( linkPath2, filePath );
   provider.softLink( linkPath, linkPath2 );
-  var o = _.mapExtend( null, o1, { filePath : linkPath, resolvingMultiple : 3 } );
+  var o = _.props.extend( null, o1, { filePath : linkPath, resolvingMultiple : 3 } );
   var got = provider.pathResolveSoftLink( o );
   test.identical( got, filePath );
 
@@ -46745,7 +46778,7 @@ function pathResolveSoftLink( test )
   provider.softLink( linkPath, '..' );
   provider.softLink( linkPath2, test.context.globalFromPreferred( '../file' ) );
   var pathToResolve = provider.path.join( routinePath, 'link/link2' )
-  var o = _.mapExtend( null, o1, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 1 } );
+  var o = _.props.extend( null, o1, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 1 } );
   var got = provider.pathResolveSoftLink( o );
   test.identical( got, filePath );
 
@@ -46754,7 +46787,7 @@ function pathResolveSoftLink( test )
   provider.fileWrite( terminalInDirPath, terminalInDirPath );
   provider.softLink( linkPath, dirPath );
   var pathToResolve = provider.path.join( linkPath, 'terminal' );
-  var o = _.mapExtend( null, o1, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 1 } );
+  var o = _.props.extend( null, o1, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 1 } );
   var got = provider.pathResolveSoftLink( o );
   test.identical( got, terminalInDirPath );
 
@@ -46763,7 +46796,7 @@ function pathResolveSoftLink( test )
   provider.fileWrite( terminalInDirPath, terminalInDirPath );
   provider.softLink( linkPath, dirPath );
   var pathToResolve = provider.path.join( linkPath, 'terminal' );
-  var o = _.mapExtend( null, o1, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 3 } );
+  var o = _.props.extend( null, o1, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 3 } );
   var got = provider.pathResolveSoftLink( o );
   test.identical( got, terminalInDirPath );
 
@@ -46773,7 +46806,7 @@ function pathResolveSoftLink( test )
   provider.softLink( linkPath2, dirPath );
   provider.softLink( linkPath, linkPath2 );
   var pathToResolve = provider.path.join( linkPath, 'terminal' );
-  var o = _.mapExtend( null, o1, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 1 } );
+  var o = _.props.extend( null, o1, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 1 } );
   var got = provider.pathResolveSoftLink( o );
   var expected = provider.path.join( linkPath2, 'terminal' );
   test.identical( got, expected );
@@ -46784,7 +46817,7 @@ function pathResolveSoftLink( test )
   provider.softLink( linkPath2, dirPath );
   provider.softLink( linkPath, linkPath2 );
   var pathToResolve = provider.path.join( linkPath, 'terminal' );
-  var o = _.mapExtend( null, o1, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 3 } );
+  var o = _.props.extend( null, o1, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 3 } );
   var got = provider.pathResolveSoftLink( o );
   test.identical( got, terminalInDirPath );
 
@@ -46794,7 +46827,7 @@ function pathResolveSoftLink( test )
   provider.softLink( linkPath2, '../dir' );
   provider.softLink( linkPath, test.context.globalFromPreferred( '../link2' ) );
   var pathToResolve = provider.path.join( linkPath, 'terminal' );
-  var o = _.mapExtend( null, o1, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 1 } );
+  var o = _.props.extend( null, o1, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 1 } );
   var got = provider.pathResolveSoftLink( o );
   var expected = provider.path.join( linkPath2, 'terminal' );
   test.identical( got, expected );
@@ -46805,7 +46838,7 @@ function pathResolveSoftLink( test )
   provider.softLink( linkPath2, '../dir' );
   provider.softLink( linkPath, test.context.globalFromPreferred( '../link2' ) );
   var pathToResolve = provider.path.join( linkPath, 'terminal' );
-  var o = _.mapExtend( null, o1, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 3 } );
+  var o = _.props.extend( null, o1, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 3 } );
   var got = provider.pathResolveSoftLink( o );
   test.identical( got, terminalInDirPath );
 
@@ -48070,7 +48103,7 @@ function pathResolveTextLink( test )
   provider.textLink( linkPath, test.context.globalFromPreferred( '..' ) );
   provider.textLink( linkPath2, '../file' );
   var pathToResolve = provider.path.join( routinePath, 'link/link2' )
-  var o = _.mapExtend( null, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 1 } );
+  var o = _.props.extend( null, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 1 } );
   var got = provider.pathResolveTextLink( o );
   test.identical( got, filePath );
 
@@ -48079,7 +48112,7 @@ function pathResolveTextLink( test )
   provider.fileWrite( terminalInDirPath, terminalInDirPath );
   provider.textLink( linkPath, dirPath );
   var pathToResolve = provider.path.join( linkPath, 'terminal' );
-  var o = _.mapExtend( null, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 1 } );
+  var o = _.props.extend( null, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 1 } );
   var got = provider.pathResolveTextLink( o );
   test.identical( got, terminalInDirPath );
 
@@ -48088,7 +48121,7 @@ function pathResolveTextLink( test )
   provider.fileWrite( terminalInDirPath, terminalInDirPath );
   provider.softLink( linkPath, dirPath );
   var pathToResolve = provider.path.join( linkPath, 'terminal' );
-  var o = _.mapExtend( null, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 3 } );
+  var o = _.props.extend( null, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 3 } );
   var got = provider.pathResolveTextLink( o );
   test.identical( got, pathToResolve );
 
@@ -48098,7 +48131,7 @@ function pathResolveTextLink( test )
   provider.textLink( linkPath2, dirPath );
   provider.textLink( linkPath, linkPath2 );
   var pathToResolve = provider.path.join( linkPath, 'terminal' );
-  var o = _.mapExtend( null, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 1 } );
+  var o = _.props.extend( null, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 1 } );
   var got = provider.pathResolveTextLink( o );
   var expected = provider.path.join( linkPath2, 'terminal' );
   test.identical( got, expected );
@@ -48109,7 +48142,7 @@ function pathResolveTextLink( test )
   provider.textLink( linkPath2, dirPath );
   provider.textLink( linkPath, linkPath2 );
   var pathToResolve = provider.path.join( linkPath, 'terminal' );
-  var o = _.mapExtend( null, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 3 } );
+  var o = _.props.extend( null, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 3 } );
   var got = provider.pathResolveTextLink( o );
   test.identical( got, terminalInDirPath );
 
@@ -48119,7 +48152,7 @@ function pathResolveTextLink( test )
   provider.textLink( linkPath2, '../dir' );
   provider.textLink( linkPath, test.context.globalFromPreferred( '../link2' ) );
   var pathToResolve = provider.path.join( linkPath, 'terminal' );
-  var o = _.mapExtend( null, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 1 } );
+  var o = _.props.extend( null, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 1 } );
   var got = provider.pathResolveTextLink( o );
   var expected = provider.path.join( linkPath2, 'terminal' );
   test.identical( got, expected );
@@ -48130,7 +48163,7 @@ function pathResolveTextLink( test )
   provider.textLink( linkPath2, '../dir' );
   provider.textLink( linkPath, test.context.globalFromPreferred( '../link2' ) );
   var pathToResolve = provider.path.join( linkPath, 'terminal' );
-  var o = _.mapExtend( null, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 3 } );
+  var o = _.props.extend( null, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 3 } );
   var got = provider.pathResolveTextLink( o );
   test.identical( got, terminalInDirPath );
 
@@ -49027,7 +49060,7 @@ function pathResolveLinkFullSpecial( test )
     resolvingHeadDirect : 1,
     resolvingHeadReverse : 1,
   }
-  var o = _.mapExtend( null, o1, o2 );
+  var o = _.props.extend( null, o1, o2 );
   var got = provider.pathResolveLinkFull( o ).relativePath;
   var expected = test.context.globalFromPreferred( '../file' );
   test.identical( got, expected );
@@ -49095,7 +49128,7 @@ function pathResolveLinkFullSpecial( test )
     resolvingHeadDirect : 1,
     resolvingHeadReverse : 1,
   }
-  var o = _.mapExtend( null, o1, o2 );
+  var o = _.props.extend( null, o1, o2 );
   debugger;
   var got = provider.pathResolveLinkFull( o );
   debugger;
@@ -49139,7 +49172,7 @@ function pathResolveLinkFullSpecial( test )
     resolvingHeadDirect : 1,
     resolvingHeadReverse : 1,
   }
-  var o = _.mapExtend( null, o1, o2 );
+  var o = _.props.extend( null, o1, o2 );
   var got = provider.pathResolveLinkFull( o );
   test.true( !!provider.usingTextLink );
   test.identical( got.absolutePath, pathToFile );
@@ -49176,18 +49209,18 @@ function pathResolveLinkFullResult( test )
   test.case = 'missing path';
   provider.filesDelete( routinePath );
   var o2 = { filePath : srcPath };
-  var got = provider.pathResolveLinkFull( _.mapExtend( null, o, o2 ));
+  var got = provider.pathResolveLinkFull( _.props.extend( null, o, o2 ));
   test.identical( got.filePath, srcPath );
-  test.identical( got.relativePath, srcPath );
+  test.identical( got.relativePath, '.' );
   test.identical( got.absolutePath, srcPath );
 
   test.case = 'terminal';
   provider.filesDelete( routinePath );
   provider.fileWrite( srcPath, srcPath );
   var o2 = { filePath : srcPath };
-  var got = provider.pathResolveLinkFull( _.mapExtend( null, o, o2 ));
+  var got = provider.pathResolveLinkFull( _.props.extend( null, o, o2 ));
   test.identical( got.filePath, srcPath );
-  test.identical( got.relativePath, srcPath );
+  test.identical( got.relativePath, '.' );
   test.identical( got.absolutePath, srcPath );
 
   /* */
@@ -49199,9 +49232,9 @@ function pathResolveLinkFullResult( test )
   provider.fileWrite( srcPath, srcPath );
   provider.softLink( dstPath, srcPath )
   var o2 = { filePath : dstPath };
-  var got = provider.pathResolveLinkFull( _.mapExtend( null, o, o2 ));
+  var got = provider.pathResolveLinkFull( _.props.extend( null, o, o2 ));
   test.identical( got.filePath, srcPath );
-  test.identical( got.relativePath, srcPath );
+  test.identical( got.relativePath, '../file' );
   test.identical( got.absolutePath, srcPath );
 
   test.case = 'relative soft link to terminal';
@@ -49209,9 +49242,10 @@ function pathResolveLinkFullResult( test )
   provider.fileWrite( srcPath, srcPath );
   provider.softLink( dstPath, '../file' )
   var o2 = { filePath : dstPath };
-  var got = provider.pathResolveLinkFull( _.mapExtend( null, o, o2 ));
+  var got = provider.pathResolveLinkFull( _.props.extend( null, o, o2 ));
   test.identical( got.filePath, srcPath );
-  test.identical( got.relativePath, test.context.globalFromPreferred( '../file' ) );
+  // test.identical( got.relativePath, test.context.globalFromPreferred( '../file' ) );
+  test.identical( got.relativePath, '../file' );
   test.identical( got.absolutePath, srcPath );
 
   test.case = 'relative soft link to terminal, preservingRelative:1';
@@ -49219,7 +49253,7 @@ function pathResolveLinkFullResult( test )
   provider.fileWrite( srcPath, srcPath );
   provider.softLink( dstPath, '../file' )
   var o2 = { filePath : dstPath, preservingRelative : 1 };
-  var got = provider.pathResolveLinkFull( _.mapExtend( null, o, o2 ));
+  var got = provider.pathResolveLinkFull( _.props.extend( null, o, o2 ));
   test.identical( got.filePath, test.context.globalFromPreferred( '../file' ) );
   test.identical( got.relativePath, test.context.globalFromPreferred( '../file' ) );
   test.identical( got.absolutePath, srcPath );
@@ -49229,7 +49263,7 @@ function pathResolveLinkFullResult( test )
   provider.fileWrite( srcPath, srcPath );
   provider.softLink( dstPath, '../file' )
   var o2 = { filePath : dstPath, preservingRelative : 0 };
-  var got = provider.pathResolveLinkFull( _.mapExtend( null, o, o2 ));
+  var got = provider.pathResolveLinkFull( _.props.extend( null, o, o2 ));
   test.identical( got.filePath, srcPath );
   test.identical( got.relativePath, test.context.globalFromPreferred( '../file' ) );
   test.identical( got.absolutePath, srcPath );
@@ -49240,9 +49274,9 @@ function pathResolveLinkFullResult( test )
   provider.softLink( src2Path,  srcPath )
   provider.softLink( dstPath,  src2Path )
   var o2 = { filePath : dstPath };
-  var got = provider.pathResolveLinkFull( _.mapExtend( null, o, o2 ));
+  var got = provider.pathResolveLinkFull( _.props.extend( null, o, o2 ));
   test.identical( got.filePath, srcPath );
-  test.identical( got.relativePath, srcPath );
+  test.identical( got.relativePath, '../file' );
   test.identical( got.absolutePath, srcPath );
 
   test.case = 'chain of absolute soft links, preservingRelative:1'
@@ -49251,7 +49285,7 @@ function pathResolveLinkFullResult( test )
   provider.softLink( src2Path,  '../file' )
   provider.softLink( dstPath,  '../file2' )
   var o2 = { filePath : dstPath, preservingRelative : 1 };
-  var got = provider.pathResolveLinkFull( _.mapExtend( null, o, o2 ));
+  var got = provider.pathResolveLinkFull( _.props.extend( null, o, o2 ));
   test.identical( got.filePath, test.context.globalFromPreferred( '../file' ) );
   test.identical( got.relativePath, test.context.globalFromPreferred( '../file' ) );
   test.identical( got.absolutePath, srcPath );
@@ -49262,7 +49296,7 @@ function pathResolveLinkFullResult( test )
   provider.softLink( src2Path,  '../file' )
   provider.softLink( dstPath,  '../file2' )
   var o2 = { filePath : dstPath, preservingRelative : 0 };
-  var got = provider.pathResolveLinkFull( _.mapExtend( null, o, o2 ));
+  var got = provider.pathResolveLinkFull( _.props.extend( null, o, o2 ));
   test.identical( got.filePath, srcPath );
   test.identical( got.relativePath, test.context.globalFromPreferred( '../file' ) );
   test.identical( got.absolutePath, srcPath );
@@ -49280,9 +49314,9 @@ function pathResolveLinkFullResult( test )
   provider.fileWrite( srcPath, srcPath );
   provider.textLink( dstPath, srcPath )
   var o2 = { filePath : dstPath, resolvingTextLink : 1 };
-  var got = provider.pathResolveLinkFull( _.mapExtend( null, o, o2 ));
+  var got = provider.pathResolveLinkFull( _.props.extend( null, o, o2 ));
   test.identical( got.filePath, srcPath );
-  test.identical( got.relativePath, srcPath );
+  test.identical( got.relativePath, '../file' );
   test.identical( got.absolutePath, srcPath );
 
   test.case = 'relative soft link to terminal';
@@ -49290,7 +49324,7 @@ function pathResolveLinkFullResult( test )
   provider.fileWrite( srcPath, srcPath );
   provider.textLink( dstPath,  test.context.globalFromPreferred( '../file' ) );
   var o2 = { filePath : dstPath, resolvingTextLink : 1 };
-  var got = provider.pathResolveLinkFull( _.mapExtend( null, o, o2 ));
+  var got = provider.pathResolveLinkFull( _.props.extend( null, o, o2 ));
   test.identical( got.filePath, srcPath );
   test.identical( got.relativePath, test.context.globalFromPreferred( '../file' ) );
   test.identical( got.absolutePath, srcPath );
@@ -49300,7 +49334,7 @@ function pathResolveLinkFullResult( test )
   provider.fileWrite( srcPath, srcPath );
   provider.textLink( dstPath,  test.context.globalFromPreferred( '../file' ) );
   var o2 = { filePath : dstPath, resolvingTextLink : 1, preservingRelative : 1 };
-  var got = provider.pathResolveLinkFull( _.mapExtend( null, o, o2 ));
+  var got = provider.pathResolveLinkFull( _.props.extend( null, o, o2 ));
   test.identical( got.filePath, test.context.globalFromPreferred( '../file' ) );
   test.identical( got.relativePath, test.context.globalFromPreferred( '../file' ) );
   test.identical( got.absolutePath, srcPath );
@@ -49310,7 +49344,7 @@ function pathResolveLinkFullResult( test )
   provider.fileWrite( srcPath, srcPath );
   provider.textLink( dstPath,  test.context.globalFromPreferred( '../file' ) );
   var o2 = { filePath : dstPath, resolvingTextLink : 1, preservingRelative : 0 };
-  var got = provider.pathResolveLinkFull( _.mapExtend( null, o, o2 ));
+  var got = provider.pathResolveLinkFull( _.props.extend( null, o, o2 ));
   test.identical( got.filePath, srcPath );
   test.identical( got.relativePath, test.context.globalFromPreferred( '../file' ) );
   test.identical( got.absolutePath, srcPath );
@@ -49321,9 +49355,9 @@ function pathResolveLinkFullResult( test )
   provider.textLink( src2Path,  srcPath )
   provider.textLink( dstPath,  src2Path )
   var o2 = { filePath : dstPath, resolvingTextLink : 1 };
-  var got = provider.pathResolveLinkFull( _.mapExtend( null, o, o2 ));
+  var got = provider.pathResolveLinkFull( _.props.extend( null, o, o2 ));
   test.identical( got.filePath, srcPath );
-  test.identical( got.relativePath, srcPath );
+  test.identical( got.relativePath, '../file' );
   test.identical( got.absolutePath, srcPath );
 
   test.case = 'chain of absolute soft links, preservingRelative:1'
@@ -49332,7 +49366,7 @@ function pathResolveLinkFullResult( test )
   provider.textLink( src2Path,  test.context.globalFromPreferred( '../file' ) );
   provider.textLink( dstPath,  test.context.globalFromPreferred( '../file2' ) );
   var o2 = { filePath : dstPath, resolvingTextLink : 1, preservingRelative : 1 };
-  var got = provider.pathResolveLinkFull( _.mapExtend( null, o, o2 ));
+  var got = provider.pathResolveLinkFull( _.props.extend( null, o, o2 ));
   test.identical( got.filePath, test.context.globalFromPreferred( '../file' ) );
   test.identical( got.relativePath, test.context.globalFromPreferred( '../file' ) );
   test.identical( got.absolutePath, srcPath );
@@ -49343,7 +49377,7 @@ function pathResolveLinkFullResult( test )
   provider.textLink( src2Path,  test.context.globalFromPreferred( '../file' ) );
   provider.textLink( dstPath,  test.context.globalFromPreferred( '../file2' ) );
   var o2 = { filePath : dstPath, resolvingTextLink : 1, preservingRelative : 0 };
-  var got = provider.pathResolveLinkFull( _.mapExtend( null, o, o2 ));
+  var got = provider.pathResolveLinkFull( _.props.extend( null, o, o2 ));
   test.identical( got.filePath, srcPath );
   test.identical( got.relativePath, test.context.globalFromPreferred( '../file' ) );
   test.identical( got.absolutePath, srcPath );
@@ -51517,6 +51551,7 @@ const Proto =
 
     linkingCriticalCases,
     pathResolveLinkTailChain,
+    pathResolveLinkFullBasic,
     pathResolveLinkFull,
     pathResolveLinkFullRecursive,
     pathResolveSoftLink,

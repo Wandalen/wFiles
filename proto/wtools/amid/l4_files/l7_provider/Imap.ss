@@ -283,9 +283,9 @@ function fileReadAct( o )
   let result = null;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assertRoutineOptions( fileReadAct, o );
+  _.routine.assertOptions( fileReadAct, o );
   _.assert( _.strIs( o.encoding ) );
-  o.advanced = _.routineOptions( null, o.advanced || Object.create( null ), fileReadAct.advanced );
+  o.advanced = _.routine.options_( null, o.advanced || Object.create( null ), fileReadAct.advanced );
 
   let parsed = self.pathParse( o.filePath );
   parsed.dirPath = path.unabsolute( parsed.dirPath );
@@ -320,7 +320,7 @@ function fileReadAct( o )
       let message = '{\n';
       if( o.advanced.withHeader )
       {
-        if( _.mapKeys( result.header ).length > 0 )
+        if( _.props.keys( result.header ).length > 0 )
         message += '"header" : ' + _.entity.exportJson( result.header ) + ',\n';
       }
       if( o.advanced.withBody )
@@ -414,7 +414,7 @@ function fileReadAct( o )
       let headers = result.parts.filter( ( e ) => e.which === 'HEADER' );
       headers.forEach( ( header ) =>
       {
-        _.mapExtend( result.header, header.body );
+        _.props.extend( result.header, header.body );
       });
     }
   }
@@ -441,7 +441,7 @@ function attachmentsGet( o )
   let conWithdata;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.routineOptions( attachmentsGet, o );
+  _.routine.options_( attachmentsGet, o );
 
   let parsed = self.pathParse( o.filePath );
   parsed.dirPath = path.unabsolute( parsed.dirPath );
@@ -603,7 +603,7 @@ function dirReadAct( o )
   let ready = self.ready.split();
   let result;
 
-  _.assertRoutineOptions( dirReadAct, o );
+  _.routine.assertOptions( dirReadAct, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( self.path.isNormalized( o.filePath ) );
 
@@ -671,7 +671,7 @@ function dirReadAct( o )
   function filter( map )
   {
     if( o.filePath === path.rootToken )
-    return _.mapKeys( map );
+    return _.props.keys( map );
     let isAbsolute = path.isAbsolute( o.filePath );
 
     let filePath = path.unabsolute( o.filePath );
@@ -687,7 +687,7 @@ function dirReadAct( o )
     return [];
     if( !result )
     return null;
-    return _.mapKeys( result );
+    return _.props.keys( result );
   }
 
   /* */
@@ -708,7 +708,7 @@ function statReadAct( o )
   let stat;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assertRoutineOptions( statReadAct, o );
+  _.routine.assertOptions( statReadAct, o );
 
   /* */
 
@@ -754,7 +754,7 @@ function statReadAct( o )
         withTail : 0,
         structing : 0,
       }
-      let o2 = _.mapSupplement( { filePath : o.filePath, advanced, throwing, sync, encoding : 'map' }, self.fileReadAct.defaults );
+      let o2 = _.props.supplement( { filePath : o.filePath, advanced, throwing, sync, encoding : 'map' }, self.fileReadAct.defaults );
       let read = self.fileRead( o2 );
       stat = statMake();
       stat.isFile = returnTrue;
@@ -894,10 +894,10 @@ function fileWriteAct( o )
   let path = self.path;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assertRoutineOptions( fileWriteAct, o );
+  _.routine.assertOptions( fileWriteAct, o );
   _.assert( self.path.isNormalized( o.filePath ) );
   _.assert( self.WriteMode.indexOf( o.writeMode ) !== -1 );
-  o.advanced = _.routineOptions( null, o.advanced || Object.create( null ), fileWriteAct.advanced );
+  o.advanced = _.routine.options_( null, o.advanced || Object.create( null ), fileWriteAct.advanced );
 
   /* data conversion */
 
@@ -975,7 +975,7 @@ function fileDeleteAct( o )
   let path = self.path;
   let parsed = self.pathParse( o.filePath );
 
-  _.assertRoutineOptions( fileDeleteAct, o );
+  _.routine.assertOptions( fileDeleteAct, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( path.isNormalized( o.filePath ) );
 
@@ -1073,7 +1073,7 @@ function dirMakeAct( o )
   let path = self.path;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assertRoutineOptions( dirMakeAct, o );
+  _.routine.assertOptions( dirMakeAct, o );
   _.assert( self.path.isNormalized( o.filePath ) );
 
   let ready = _dirMake();
@@ -1124,7 +1124,7 @@ function fileRenameAct( o )
   let ready = new _.Consequence();
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assertRoutineOptions( fileRenameAct, arguments );
+  _.routine.assertOptions( fileRenameAct, arguments );
   _.assert( self.path.isNormalized( o.srcPath ) );
   _.assert( self.path.isNormalized( o.dstPath ) );
 
@@ -1180,7 +1180,7 @@ function fileCopyAct( o )
   let ready = new _.Consequence();
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assertRoutineOptions( fileCopyAct, arguments );
+  _.routine.assertOptions( fileCopyAct, arguments );
   _.assert( path.isNormalized( o.srcPath ) );
   _.assert( path.isNormalized( o.dstPath ) );
 
@@ -1252,7 +1252,7 @@ function _fileCopyPrepare( o )
   let self = this;
 
   _.assert( arguments.length === 1, 'Expects single options map {-o-}.' );
-  _.routineOptions( _fileCopyPrepare, o );
+  _.routine.options_( _fileCopyPrepare, o );
 
   let read = o.srcProvider.system.fileRead({ filePath : o.options.srcPath, encoding : 'utf8', sync : 1 });
 
@@ -1302,7 +1302,7 @@ function softLinkAct( o )
 {
   let self = this;
 
-  _.assertRoutineOptions( softLinkAct, arguments );
+  _.routine.assertOptions( softLinkAct, arguments );
   _.assert( self.path.is( o.srcPath ) );
   _.assert( self.path.isAbsolute( o.dstPath ) );
   _.assert( self.path.isNormalized( o.srcPath ) );
@@ -1320,7 +1320,7 @@ function hardLinkAct( o )
 {
   let self = this;
 
-  _.assertRoutineOptions( hardLinkAct, arguments );
+  _.routine.assertOptions( hardLinkAct, arguments );
   _.assert( self.path.isNormalized( o.srcPath ) );
   _.assert( self.path.isNormalized( o.dstPath ) );
   _.assert( 0, 'not implemented' );
@@ -1350,7 +1350,7 @@ function areHardLinkedAct( o )
 {
   let self = this;
 
-  _.assertRoutineOptions( areHardLinkedAct, arguments );
+  _.routine.assertOptions( areHardLinkedAct, arguments );
   _.assert( o.filePath.length === 2, 'Expects exactly two arguments' );
   _.assert( self.path.isNormalized( o.filePath[ 0 ] ) );
   _.assert( self.path.isNormalized( o.filePath[ 1 ] ) );

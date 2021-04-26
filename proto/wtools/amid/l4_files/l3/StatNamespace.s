@@ -192,7 +192,7 @@ let Tools =
 
 /* zzz : clean */
 
-_.mapExtend( _, Tools );
+_.props.extend( _, Tools );
 
 let Stat =
 {
@@ -202,7 +202,7 @@ let Stat =
   hashStatFrom,
 }
 
-_.mapExtend( _.files.stat, Stat );
+_.props.extend( _.files.stat, Stat );
 
 // --
 // export

@@ -269,6 +269,81 @@ function mustNotThrowError( test )
 
 //
 
+function readWriteBasic( test )
+{
+  let context = this;
+  let a = context.assetFor( test, false );
+
+  /* */
+
+  test.case = 'args array';
+  a.reflect();
+  var data = 'data1';
+  var filePath = a.abs( 'file1.txt' );
+  a.fileProvider.fileWrite( filePath, data );
+  var got = a.fileProvider.fileRead( filePath );
+  test.identical( got, data );
+
+  /* */
+
+  test.case = 'options map';
+  a.reflect();
+  var data = 'data1';
+  var filePath = a.abs( 'file1.txt' );
+  a.fileProvider.fileWrite({ filePath, data });
+  var got = a.fileProvider.fileRead( filePath );
+  test.identical( got, data );
+
+  /* */
+
+}
+
+//
+
+function readWriteOptionWriteMode( test )
+{
+  let context = this;
+  let a = context.assetFor( test, false );
+
+  /* */
+
+  test.case = 'writeMode:rewrite';
+  a.reflect();
+  var data = 'data1';
+  var filePath = a.abs( 'file1.txt' );
+  var writeMode = 'rewrite';
+  a.fileProvider.fileWrite({ filePath, data, writeMode });
+  var got = a.fileProvider.fileRead( filePath );
+  test.identical( got, data );
+
+  /* */
+
+  test.case = 'writeMode:append';
+  a.reflect();
+  var data = 'data1';
+  var filePath = a.abs( 'file1.txt' );
+  var writeMode = 'append';
+
+  /* qqq : for junior : implement please */
+  // test.true( false );
+
+  /* */
+
+  test.case = 'more test cases?';
+  a.reflect();
+  var data = 'data1';
+  var filePath = a.abs( 'file1.txt' );
+  var writeMode = 'append';
+
+  /* qqq : for junior : implement please */
+  // test.true( false );
+
+  /* */
+
+}
+
+//
+
 function readWriteSync( test )
 {
   let context = this;
@@ -51350,6 +51425,9 @@ const Proto =
 
     // testDelaySample,
     mustNotThrowError,
+
+    readWriteBasic,
+    readWriteOptionWriteMode,
 
     readWriteSync,
     readWriteAsync,

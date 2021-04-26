@@ -194,6 +194,7 @@ module:
           - ../proto/node_modules/Tools
           - ../proto/node_modules/wFiles
           - ../proto/wtools
+          - ../proto/wtools/abase
           - ../proto/wtools/amid
           - ../proto/wtools/amid/l4_files
           - ../proto/wtools/amid/l4_files/entry
@@ -280,6 +281,7 @@ module:
           - ../proto/wtools/amid/l4_files.test/Secondary.test.ss
           - ../proto/wtools/amid/l4_files.test/SystemDefaultExtract.test.s
           - ../proto/wtools/amid/l4_files.test/SystemDefaultHardDrive.test.ss
+          - ../proto/wtools/atop
     submodule:
       wTools:
         path: 'npm:///wTools'

@@ -832,7 +832,7 @@ function filesFind_body( o )
   _.assert( !o.orderingExclusion.length || o.orderingExclusion.length === 0 || o.outputFormat === 'record' );
 
   if( o.mandatory )
-  if( _.entityLengthOf( o.filePath ) !== _.entityLengthOf( o.filter.filePath ) )
+  if( _.entity.lengthOf( o.filePath ) !== _.entity.lengthOf( o.filter.filePath ) )
   {
     for( let stemPath in o.filter.filePath )
     {

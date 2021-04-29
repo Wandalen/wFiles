@@ -309,36 +309,78 @@ function readWriteOptionWriteMode( test )
 
   test.case = 'writeMode:rewrite';
   a.reflect();
-  var data = 'data1';
+  var data1 = 'data1';
+  var data2 = 'otherdata';
+
   var filePath = a.abs( 'file1.txt' );
   var writeMode = 'rewrite';
-  a.fileProvider.fileWrite({ filePath, data, writeMode });
+  
+  a.fileProvider.fileWrite({ 
+    filePath, 
+    data: data1,
+    writeMode: writeMode
+  });
+
+  a.fileProvider.fileWrite({
+    filePath,
+    data: data2,
+    writeMode: writeMode
+  });
+
   var got = a.fileProvider.fileRead( filePath );
-  test.identical( got, data );
+  test.identical( got, data2 );
 
   /* */
 
   test.case = 'writeMode:append';
   a.reflect();
-  var data = 'data1';
+  var data1 = 'data1';
+  var data2 = 'otherdata';
+
   var filePath = a.abs( 'file1.txt' );
   var writeMode = 'append';
 
-  /* qqq : for junior : implement please */
-  // test.true( false );
+  a.fileProvider.fileWrite({ 
+    filePath, 
+    data: data1, 
+    writeMode: writeMode
+  });
+  
+  a.fileProvider.fileWrite({
+    filePath,
+    data: data2, 
+    writeMode: writeMode
+  });
+
+  var got = a.fileProvider.fileRead( filePath );
+  var res = data1 + data2;
+  test.identical( got, res );
 
   /* */
 
-  test.case = 'more test cases?';
+  test.case = 'writeMode:prepend';
   a.reflect();
-  var data = 'data1';
+  var data1 = 'data1';
+  var data2 = 'otherdata';
+
   var filePath = a.abs( 'file1.txt' );
-  var writeMode = 'append';
+  var writeMode = 'prepend';
 
-  /* qqq : for junior : implement please */
-  // test.true( false );
+  a.fileProvider.fileWrite({
+    filePath,
+    data: data1,
+    writeMode: writeMode
+  });
 
-  /* */
+  a.fileProvider.fileWrite({
+    filePath,
+    data: data2,
+    writeMode: writeMode
+  });
+
+  var got = a.fileProvider.fileRead( filePath );
+  var res = data2 + data1;
+  test.identical( got, res );
 
 }
 

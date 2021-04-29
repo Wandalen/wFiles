@@ -318,6 +318,17 @@ function readWriteOptionWriteMode( test )
 
   /* */
 
+  test.case = 'writeMode:readWrite';
+  a.reflect();
+  var data = 'data1';
+  var filePath = a.abs( 'file1.txt' );
+  var got = a.fileProvider.fileRead( filePath );
+  a.fileProvider.fileWrite( filePath, data );
+  got = a.fileProvider.fileRead( filePath );
+  test.identical( got, data );
+
+  /* */
+
   test.case = 'writeMode:append';
   a.reflect();
   var data = 'data1';

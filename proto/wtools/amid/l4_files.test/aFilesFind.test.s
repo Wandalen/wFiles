@@ -1946,7 +1946,7 @@ function filesFind( test )
       var keys = _.props.onlyOwnKeys( test );
       keys.forEach( ( key ) =>
       {
-        if( _.objectIs( test[ key ] ) )
+        if( _.object.isBasic( test[ key ] ) )
         {
           var terminalPath = path.join( _path, key );
           filesNames.forEach( ( n ) =>
@@ -36785,8 +36785,8 @@ function filesFindDifference( test )
       withTerminals : 1,
       withDirs : 1,
       filter : { recursive : 2 },
-      onDown : function( record ){ test.identical( _.objectIs( record ), true ); },
-      onUp : function( record ){ test.identical( _.objectIs( record ), true ); },
+      onDown : function( record ){ test.identical( _.object.isBasic( record ), true ); },
+      onUp : function( record ){ test.identical( _.object.isBasic( record ), true ); },
       src : { ends : sample.ends }
     }
 

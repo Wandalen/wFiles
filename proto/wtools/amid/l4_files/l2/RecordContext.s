@@ -59,7 +59,7 @@ function TolerantFrom( o )
 {
   let Cls = _.workpiece.constructorOf( this );
   _.assert( arguments.length >= 1, 'Expects at least one argument' );
-  _.assert( _.objectIs( Cls.prototype.Composes ) );
+  _.assert( _.object.isBasic( Cls.prototype.Composes ) );
   o = _.mapsExtend( null, arguments );
   return new Cls( _.mapOnly_( null, o, Cls.prototype.fieldsOfCopyableGroups ) );
 }

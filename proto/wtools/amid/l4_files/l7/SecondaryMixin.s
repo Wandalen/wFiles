@@ -51,13 +51,13 @@ Self.shortName = 'SecondaryMixin';
 //
 //   if( o.preset )
 //   {
-//     _.assert( _.objectIs( filesReadOld.presets[ o.preset ] ), 'unknown preset', o.preset );
+//     _.assert( _.object.isBasic( filesReadOld.presets[ o.preset ] ), 'unknown preset', o.preset );
 //     _.mapSupplementAppending( o, filesReadOld.presets[ o.preset ] );
 //   }
 //
 //   _.routine.options_( filesReadOld, o );
 //   _.assert( arguments.length === 1, 'Expects single argument' );
-//   _.assert( _.arrayIs( o.paths ) || _.objectIs( o.paths ) || _.strIs( o.paths ) );
+//   _.assert( _.arrayIs( o.paths ) || _.object.isBasic( o.paths ) || _.strIs( o.paths ) );
 //
 //   o.onBegin = o.onBegin ? _.arrayAs( o.onBegin ) : [];
 //   o.onEnd = o.onEnd ? _.arrayAs( o.onEnd ) : [];
@@ -83,7 +83,7 @@ Self.shortName = 'SecondaryMixin';
 //
 //   /* paths */
 //
-//   if( _.objectIs( o.paths ) )
+//   if( _.object.isBasic( o.paths ) )
 //   {
 //     let _paths = [];
 //     for( let p in o.paths )
@@ -123,7 +123,7 @@ Self.shortName = 'SecondaryMixin';
 //     let readOptions = _.mapOnly_( null, o, self.fileRead.defaults );
 //     readOptions.onEnd = o.onEach;
 //
-//     if( _.objectIs( src ) )
+//     if( _.object.isBasic( src ) )
 //     {
 //       if( _.FileRecord && src instanceof _.FileRecord )
 //       readOptions.filePath = src.absolute;
@@ -181,7 +181,7 @@ Self.shortName = 'SecondaryMixin';
 //         {
 //           name = self.path.name( path );
 //         }
-//         else if( _.objectIs( path ) )
+//         else if( _.object.isBasic( path ) )
 //         {
 //           _.assert( _.strIs( path.name ) )
 //           name = path.name;
@@ -411,7 +411,7 @@ function _filesReadOldAsync( o )
 //     return  { stat : file };
 //     else if( _.strIs( file ) )
 //     return { stat : self.statResolvedRead( file ) };
-//     else if( !_.objectIs( file ) )
+//     else if( !_.object.isBasic( file ) )
 //     throw _.err( 'unknown descriptor of file' );
 //   }
 //

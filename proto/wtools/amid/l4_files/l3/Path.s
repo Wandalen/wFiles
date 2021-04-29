@@ -7,7 +7,7 @@ const _global = _global_;
 const _ = _global_.wTools;
 const Self = _global_.wTools.path;
 
-_.assert( _.objectIs( Self ) );
+_.assert( _.object.isBasic( Self ) );
 
 let vectorizeKeysAndVals = _.files._.vectorizeKeysAndVals;
 let vectorize = _.files._.vectorize;
@@ -128,7 +128,7 @@ function current()
   let path = this;
   let provider = this.fileProvider;
 
-  _.assert( _.objectIs( provider ) );
+  _.assert( _.object.isBasic( provider ) );
   _.assert( arguments.length === 0 || arguments.length === 1 );
   _.assert( _.routineIs( provider.pathCurrentAct ) );
   _.assert( _.routineIs( path.isAbsolute ) );

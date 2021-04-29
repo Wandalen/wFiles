@@ -98,7 +98,7 @@ function _filesFindPrepare0( routine, args ) /* qqq : cover each case */
     o = o || Object.create( null );
     o.onUp = args[ 0 ];
   }
-  else if( _.objectIs( args[ 0 ] ) )
+  else if( _.object.isBasic( args[ 0 ] ) )
   {
     o = args[ 0 ];
   }
@@ -135,7 +135,7 @@ function _filesFindPrepare0( routine, args ) /* qqq : cover each case */
     _.assert( o.basePath === undefined );
     _.assert( o.prefixPath === undefined );
     _.assert( o.postfixPath === undefined );
-    _.assert( _.objectIs( o.filter ) );
+    _.assert( _.object.isBasic( o.filter ) );
   }
 
   return o;
@@ -329,7 +329,7 @@ function filesFindNominal_head( routine, args )
     _.assert( _.routineIs( o.onUp ) );
     _.assert( _.routineIs( o.onDown ) );
     _.assert( o.filter.formed === 5, 'Expects formed filter' );
-    _.assert( _.objectIs( o.filter.effectiveProvider ) );
+    _.assert( _.object.isBasic( o.filter.effectiveProvider ) );
     _.assert( _.mapIs( o.filter.formedBasePath ), 'Expects base path' );
     _.assert( o.filter.effectiveProvider instanceof _.FileProvider.Abstract );
     _.assert( o.filter.defaultProvider instanceof _.FileProvider.Abstract );
@@ -551,7 +551,7 @@ function filesFindSingle_head( routine, args )
     _.assert( path.isNormalized( o.filePath ), 'Expects normalized path {-o.filePath-}' );
     _.assert( path.isAbsolute( o.filePath ), 'Expects absolute path {-o.filePath-}' );
     _.assert( o.filter.formed === 5, 'Expects formed filter' );
-    _.assert( _.objectIs( o.filter.effectiveProvider ) );
+    _.assert( _.object.isBasic( o.filter.effectiveProvider ) );
     _.assert( _.mapIs( o.filter.formedBasePath ), 'Expects base path' );
     _.assert( _.boolLike( o.withTerminals ) );
     _.assert( _.boolLike( o.withDirs ) );
@@ -1351,7 +1351,7 @@ function filesGlob( o )
   }
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( _.objectIs( o ) );
+  _.assert( _.object.isBasic( o ) );
 
   let result = self.filesFind( o );
 
@@ -1411,7 +1411,7 @@ function filesFinder_functor( routine )
       {
         let op2 = arguments[ a ];
 
-        if( !_.objectIs( op2 ) )
+        if( !_.object.isBasic( op2 ) )
         op2 = { filePath : op2 }
 
         op2.filter = self.recordFilter( op2.filter || Object.create( null ) );
@@ -1690,12 +1690,12 @@ function _filesFiltersPrepare( routine, o )
 
   /* */
 
-  _.assert( _.objectIs( o.src ) );
-  _.assert( _.objectIs( o.dst ) );
+  _.assert( _.object.isBasic( o.src ) );
+  _.assert( _.object.isBasic( o.dst ) );
   _.assert( o.src.formed <= 1 );
   _.assert( o.dst.formed <= 1 );
-  _.assert( _.objectIs( o.src.defaultProvider ) );
-  _.assert( _.objectIs( o.dst.defaultProvider ) );
+  _.assert( _.object.isBasic( o.src.defaultProvider ) );
+  _.assert( _.object.isBasic( o.dst.defaultProvider ) );
   _.assert( !( o.src.effectiveProvider instanceof _.FileProvider.System ) );
   _.assert( !( o.dst.effectiveProvider instanceof _.FileProvider.System ) );
   _.assert( o.srcProvider === undefined );
@@ -1849,8 +1849,8 @@ function filesReflectEvaluate_body( o )
       o.dst.form();
     }
 
-    _.assert( o.dst.basePath === null || _.objectIs( o.dst.basePath ) );
-    _.assert( _.objectIs( o.dst.formedBasePath ) );
+    _.assert( o.dst.basePath === null || _.object.isBasic( o.dst.basePath ) );
+    _.assert( _.object.isBasic( o.dst.formedBasePath ) );
     _.assert( !!o.dst.effectiveProvider );
     _.assert( !!o.dst.defaultProvider );
 
@@ -4261,7 +4261,7 @@ function filesFindSame_body( o )
   /* result */
 
   _.assert( arguments.length === 1 );
-  _.assert( _.objectIs( r ) );
+  _.assert( _.object.isBasic( r ) );
   _.assert( _.strIs( o.filePath ) );
   _.assert( o.outputFormat === 'record' );
 
@@ -5384,7 +5384,7 @@ function filesResolve( o )
   let result;
   var o = _.routine.options_( filesResolve, arguments );
 
-  _.assert( _.objectIs( o.translator ) );
+  _.assert( _.object.isBasic( o.translator ) );
 
   let globPath = o.translator.realFor( o.globPath );
   let globOptions = _.mapOnly_( null, o, self.filesGlob.defaults );

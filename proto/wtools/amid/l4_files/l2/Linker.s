@@ -6,7 +6,7 @@
 const _global = _global_;
 const _ = _global_.wTools;
 
-_.assert( _.objectIs( _.files ) );
+_.assert( _.object.isBasic( _.files ) );
 
 const Self = _.files.linker = _.files.linker || Object.create( null );
 
@@ -239,7 +239,7 @@ function verify1( args )
 
   _.assert( args.length === 1, 'Expects single argument' );
   _.assert( _.routineIs( c.linkDo ), 'method', c.actMethodName, 'is not implemented' );
-  _.assert( _.objectIs( c.linkDo.defaults ), 'method', c.actMethodName, 'does not have defaults, but should' );
+  _.assert( _.object.isBasic( c.linkDo.defaults ), 'method', c.actMethodName, 'does not have defaults, but should' );
   _.routine.assertOptions( c.linkBody, args );
   _.assert( _.boolLike( o.resolvingSrcSoftLink ) || _.numberIs( o.resolvingSrcSoftLink ) );
   _.assert( _.boolLike( o.resolvingSrcTextLink ) || _.numberIs( o.resolvingSrcTextLink ) );
@@ -1217,7 +1217,7 @@ function functor( fop )
   let hardLinking = fop.hardLinking;
 
   _.assert( _.routineIs( onDo ) );
-  _.assert( _.objectIs( onDo.defaults ) );
+  _.assert( _.object.isBasic( onDo.defaults ) );
   _.assert( onVerify1 === null || _.routineIs( onVerify1 ) );
   _.assert( onVerify2 === null || _.routineIs( onVerify2 ) );
   _.assert( onIsLink2 === null || _.routineIs( onIsLink2 ) );

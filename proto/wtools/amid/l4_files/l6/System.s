@@ -423,7 +423,7 @@ function _pathLocalize( filePath )
   let path = self.path;
   let r = self._pathLocalizeMaybe( filePath );
 
-  _.sure( _.objectIs( r.provider ), () => 'No provider for path ' + _.strQuote( filePath ) );
+  _.sure( _.object.isBasic( r.provider ), () => 'No provider for path ' + _.strQuote( filePath ) );
 
   return r;
 }
@@ -506,7 +506,7 @@ function pathNativizeAct( filePath )
   let r = self._pathLocalize( self, filePath );
   r.localPath = r.provider.path.nativize( r.localPath );
   _.assert( 0, 'not implemented' );
-  _.assert( _.objectIs( r.provider ), 'No provider for path', filePath );
+  _.assert( _.object.isBasic( r.provider ), 'No provider for path', filePath );
   _.assert( arguments.length === 1 );
 }
 
@@ -780,9 +780,9 @@ function _link_functor( fop )
 
   _.assert( _.routineIs( fop.onDifferentProviders ) || _.boolIs( fop.onDifferentProviders ) );
   _.assert( _.strDefined( routineName ) );
-  _.assert( _.objectIs( routine.defaults ) );
+  _.assert( _.object.isBasic( routine.defaults ) );
   _.assert( routine.paths === undefined );
-  _.assert( _.objectIs( routine.having ) );
+  _.assert( _.object.isBasic( routine.having ) );
 
   _.routineExtend( hubLink, routine );
 
@@ -1264,9 +1264,9 @@ function _Setup1()
     return;
 
     if(  original.defaults )
-    _.assert( _.objectIs( original.operates ) );
+    _.assert( _.object.isBasic( original.operates ) );
     if(  original.operates )
-    _.assert( _.objectIs( original.defaults ) );
+    _.assert( _.object.isBasic( original.defaults ) );
 
     let hubResolving = having.hubResolving;
     let havingBare = having.driving;
@@ -1317,7 +1317,7 @@ function _Setup1()
         }
       }
 
-      _.assert( _.objectIs( provider ), 'No provider for path', filePath );
+      _.assert( _.object.isBasic( provider ), 'No provider for path', filePath );
       return provider;
     }
 

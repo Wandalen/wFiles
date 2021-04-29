@@ -7,7 +7,7 @@ const _global = _global_;
 const _ = _global_.wTools;
 const Self = _global_.wTools.path;
 
-_.assert( _.objectIs( Self ) );
+_.assert( _.object.isBasic( Self ) );
 
 // --
 // path
@@ -860,7 +860,7 @@ function tempClose( filePath )
 // {
 //   let self = this;
 
-//   _.assert( _.objectIs( self.Index ) )
+//   _.assert( _.object.isBasic( self.Index ) )
 
 //   let lockReady = self.fileProvider.fileLock
 //   ({

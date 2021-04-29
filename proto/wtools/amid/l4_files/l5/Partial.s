@@ -223,7 +223,7 @@ function _fileOptionsGet( filePath, o )
   let self = this;
   o = o || Object.create( null );
 
-  if( _.objectIs( filePath ) )
+  if( _.object.isBasic( filePath ) )
   {
     o = filePath;
   }
@@ -250,7 +250,7 @@ function _providerDefaultsApply( o )
 {
   let self = this;
 
-  _.assert( _.objectIs( o ), 'Expects map { o }' );
+  _.assert( _.object.isBasic( o ), 'Expects map { o }' );
 
   if( o.verbosity === null && self.verbosity !== null )
   o.verbosity = _.numberClamp( self.verbosity - 4, 0, 9 );
@@ -306,7 +306,7 @@ function _preFilePathScalarWithoutProviderDefaults( routine, args )
   let path = self.path;
 
   _.assert( arguments.length === 2, 'Expects exactly two arguments' );
-  _.assert( _.objectIs( args[ 0 ] ) || path.is( args[ 0 ] ), 'Expects options map or path' );
+  _.assert( _.object.isBasic( args[ 0 ] ) || path.is( args[ 0 ] ), 'Expects options map or path' );
   _.assert( args && args.length === 1, `Routine ${ routine.name } expects exactly one argument` );
 
   let o = args[ 0 ];
@@ -329,7 +329,7 @@ function _preFilePathScalarWithProviderDefaults( routine, args )
 {
   let self = this;
 
-  if( _.objectIs( args[ 0 ] ) )
+  if( _.object.isBasic( args[ 0 ] ) )
   if( args[ 0 ].verbosity !== undefined )
   if( routine.defaults.logger !== undefined )
   {
@@ -2499,7 +2499,7 @@ function fileSize_body( o )
   if( !o.throwing && stat === null )
   return null;
 
-  _.sure( _.objectIs( stat ) );
+  _.sure( _.object.isBasic( stat ) );
 
   if( stat.isDir() )
   return self.UsingBigIntForStat ? 0n : 0;
@@ -2581,7 +2581,7 @@ function fileExistsAct( o )
   o2.resolvingSoftLink = 0;
   debugger;
   let result = self.statReadAct( o2 );
-  _.assert( result === null || _.objectIs( result ) );
+  _.assert( result === null || _.object.isBasic( result ) );
   _.assert( arguments.length === 1 );
   return !!result;
 }
@@ -4844,7 +4844,7 @@ function fileWrite_head( routine, args )
   {
     o = args[ 0 ];
     _.assert( args.length === 1 );
-    _.assert( _.objectIs( o ), 'Expects 2 arguments {-o.filePath-} and {-o.data-} to write, or single options map' );
+    _.assert( _.object.isBasic( o ), 'Expects 2 arguments {-o.filePath-} and {-o.data-} to write, or single options map' );
   }
 
   if( o.verbosity !== undefined )
@@ -8308,7 +8308,7 @@ _.FieldsStack.mixin( Self );
 _.Verbal.mixin( Self );
 
 _.assert( _.routineIs( Self.prototype.statsResolvedRead ) );
-_.assert( _.objectIs( Self.prototype.statsResolvedRead.defaults ) );
+_.assert( _.object.isBasic( Self.prototype.statsResolvedRead.defaults ) );
 _.assert( Self.prototype.statRead.defaults.resolvingSoftLink === 0 );
 _.assert( Self.prototype.statRead.defaults.resolvingTextLink === 0 );
 

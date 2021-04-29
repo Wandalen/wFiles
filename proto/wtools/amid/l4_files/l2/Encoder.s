@@ -309,7 +309,7 @@ function deduce( o )
   if( encodersMap[ o.ext ] )
   {
     let encoder = encodersMap[ o.ext ];
-    _.assert( _.objectIs( encoder ), `Write encoder ${o.ext} is missing` );
+    _.assert( _.object.isBasic( encoder ), `Write encoder ${o.ext} is missing` );
     _.assert( _.longHas( encoder.exts, o.ext ) );
     _.arrayAppendOnce( result, encoder );
   }

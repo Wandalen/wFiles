@@ -186,7 +186,7 @@ function configFind_body( o )
     let encoder = _.files.ReadEncoders[ e ];
     if( encoder === null )
     continue;
-    _.assert( _.objectIs( encoder ), `Read encoder ${e} is missing` );
+    _.assert( _.object.isBasic( encoder ), `Read encoder ${e} is missing` );
     if( encoder.exts )
     {
       for( let s = 0 ; s < encoder.exts.length ; s++ )

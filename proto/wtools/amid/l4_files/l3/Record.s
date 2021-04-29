@@ -41,7 +41,7 @@ function init( o )
   _.assert( arguments.length === 1 );
   _.assert( !( arguments[ 0 ] instanceof _.FileRecordFactory ) );
   _.assert( _.strIs( o.input ), () => 'Expects string {-o.input-}, but got ' + _.entity.strType( o.input ) );
-  _.assert( _.objectIs( o.factory ) );
+  _.assert( _.object.isBasic( o.factory ) );
 
   _.workpiece.initFields( record );
 
@@ -177,7 +177,7 @@ function toAbsolute( record )
   if( _.strIs( record ) )
   return record;
 
-  _.assert( _.objectIs( record ) );
+  _.assert( _.object.isBasic( record ) );
 
   let result = record.absolute;
 

@@ -468,7 +468,7 @@ function dirReadAct( o )
 
     if( file !== undefined )
     {
-      if( _.objectIs( file ) )
+      if( _.object.isBasic( file ) )
       {
         result = Object.keys( file );
       }
@@ -2286,7 +2286,7 @@ function _DescriptorIs( file )
 
 function _DescriptorIsDir( file )
 {
-  return _.objectIs( file );
+  return _.object.isBasic( file );
 }
 
 //
@@ -2355,7 +2355,7 @@ function _DescriptorIsTextLink( file )
   return false;
   if( _.arrayIs( file ) )
   return false;
-  if( _.objectIs( file ) )
+  if( _.object.isBasic( file ) )
   return false;
 
   let regexp = /^link ([^\n]+)\n?$/;
@@ -2723,7 +2723,7 @@ writeEncoders[ 'original.type' ] =
       else
       {
         _.assert( 0, 'not implemented for:', _.entity.strType( e.read ) );
-        // _.bufferFrom({ src : data, bufferConstructor : read.constructor });
+        // _.bufferCoerceFrom({ src : data, bufferConstructor : read.constructor });
       }
     }
   }

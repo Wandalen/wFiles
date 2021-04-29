@@ -675,7 +675,7 @@ function readWriteSync( test )
     onError : null,
   });
   debugger;
-  test.identical( _.objectIs( got ), false );
+  test.identical( _.object.isBasic( got ), false );
 
   /*onEnd returningRead 0*/
 
@@ -2040,7 +2040,7 @@ function readWriteAsync( test )
     return test.mustNotThrowError( con )
     .ifNoErrorThen( function( arg )
     {
-      test.identical( _.objectIs( got ), true );
+      test.identical( _.object.isBasic( got ), true );
       return null;
     });
   })
@@ -2063,7 +2063,7 @@ function readWriteAsync( test )
     return test.mustNotThrowError( con )
     .ifNoErrorThen( function( arg )
     {
-      test.identical( _.objectIs( got ), true );
+      test.identical( _.object.isBasic( got ), true );
       return null;
     });
   })
@@ -3678,7 +3678,7 @@ function fileTouch( test )
   provider.filesDelete( srcPath );
   provider.fileTouch( srcPath );
   var stat = provider.statResolvedRead( srcPath );
-  test.true( _.objectIs( stat ) );
+  test.true( _.object.isBasic( stat ) );
 
   test.case = 'filePath doesnt exist, filePath as record';
   provider.filesDelete( srcPath );
@@ -3686,7 +3686,7 @@ function fileTouch( test )
   test.identical( record.stat, null );
   provider.fileTouch( record );
   var stat = provider.statResolvedRead( srcPath );
-  test.true( _.objectIs( stat ) );
+  test.true( _.object.isBasic( stat ) );
 
   test.case = 'filePath is a directory';
   provider.filesDelete( srcPath );
@@ -51142,7 +51142,7 @@ function encoderDeduce( test )
     returning : 'encoder',
     single : 1
   })
-  test.true( _.objectIs( encoder ) )
+  test.true( _.object.isBasic( encoder ) )
   test.true( encoder.feature.reader );
 
   test.close( 'returning' );

@@ -1566,7 +1566,7 @@ function nextPathDirTemp( test )
   extract.dirMake = function dirMake( o )
   {
     let filePath = o;
-    if( _.objectIs( o ) )
+    if( _.object.isBasic( o ) )
     filePath = o.filePath;
     if( _.strHas( filePath, '/dir3' ) )
     throw _.err( 'Test err');

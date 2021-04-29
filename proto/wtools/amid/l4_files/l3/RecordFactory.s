@@ -246,7 +246,7 @@ function record( o )
   }
 
   _.assert( arguments.length === 1 );
-  _.assert( _.objectIs( o ) );
+  _.assert( _.object.isBasic( o ) );
   _.assert( _.strIs( o.input ), () => 'Expects string {-o.input-}, but got ' + _.entity.strType( o.input ) );
   _.assert( o.factory === undefined || o.factory === factory );
 

@@ -245,7 +245,7 @@ function recordFields( test )
   // normalizeStrict does not exist now
   //test.identical( _.path.normalizeStrict( got.dir ), _.path.normalize( __dirname ) );
   test.identical( _.path.normalize( got.dir ), _.path.normalize( __dirname ) );
-  test.identical( _.objectIs( got.stat), true );
+  test.identical( _.object.isBasic( got.stat), true );
 
   /*relative - path to other disk*/
 
@@ -271,7 +271,7 @@ function recordFields( test )
    test.identical( _.path.normalizeStrict( got.dir ), _.path.normalize( __dirname ) );
   */
   test.identical( _.path.normalize( got.dir ), _.path.normalize( __dirname ) );
-  test.identical( _.objectIs( got.stat), true );
+  test.identical( _.object.isBasic( got.stat), true );
 
   /*dir - path to dir that contains that file*/
 
@@ -283,7 +283,7 @@ function recordFields( test )
   //test.identical( _.path.canonize( got.dir ), _.path.normalize( __dirname ) );
   // test.identical( _.path.normalizeStrict( got.dir ), _.path.normalize( __dirname ) );
   test.identical( _.path.normalize( got.dir ), _.path.normalize( __dirname ) );
-  test.identical( _.objectIs( got.stat), true );
+  test.identical( _.object.isBasic( got.stat), true );
 
   /*relative - path to dir that contains that file*/
 
@@ -295,7 +295,7 @@ function recordFields( test )
   //test.identical( _.path.canonize( got.dir ), _.path.normalize( __dirname ) );
   // test.identical( _.path.normalizeStrict( got.dir ), _.path.normalize( __dirname ) );
   test.identical( _.path.normalize( got.dir ), _.path.normalize( __dirname ) );
-  test.identical( _.objectIs( got.stat), true );
+  test.identical( _.object.isBasic( got.stat), true );
 
   /*dir === filePath */
 
@@ -307,7 +307,7 @@ function recordFields( test )
   //test.identical( _.path.canonize( got.dir ), _.path.normalize( __dirname ) );
   // test.identical( _.path.normalizeStrict( got.dir ), _.path.normalize( __dirname ) );
   test.identical( _.path.normalize( got.dir ), _.path.normalize( __dirname ) );
-  test.identical( _.objectIs( got.stat), true );
+  test.identical( _.object.isBasic( got.stat), true );
 
   /*relative === filePath */
 
@@ -319,7 +319,7 @@ function recordFields( test )
   //test.identical( _.path.canonize( got.dir ), _.path.normalize( __dirname ));
   // test.identical( _.path.normalizeStrict( got.dir ), _.path.normalize( __dirname ));
   test.identical( _.path.normalize( got.dir ), _.path.normalize( __dirname ) );
-  test.identical( _.objectIs( got.stat), true );
+  test.identical( _.object.isBasic( got.stat), true );
 
   /*dir + relative, affects only on record.relative */
 
@@ -331,7 +331,7 @@ function recordFields( test )
   // test.identical( _.path.canonize( got.dir ), _.path.normalize( __dirname ));
   // test.identical( _.path.normalizeStrict( got.dir ), _.path.normalize( __dirname ));
   test.identical( _.path.normalize( got.dir ), _.path.normalize( __dirname ) );
-  test.identical( _.objectIs( got.stat), true );
+  test.identical( _.object.isBasic( got.stat), true );
 
   //
 
@@ -381,7 +381,7 @@ function recordFields( test )
   // test.identical( _.path.canonize( got.dir ), factory.dirPath );
   // test.identical( _.path.normalizeStrict( got.dir ), factory.dirPath );
   test.identical( _.path.normalize( got.dir ), factory.dirPath );
-  test.identical( _.objectIs( got.stat ), true );
+  test.identical( _.object.isBasic( got.stat ), true );
 
   /*relative - path to dir with file*/
 
@@ -393,7 +393,7 @@ function recordFields( test )
   // test.identical( _.path.canonize( got.dir ), factory.basePath );
   // test.identical( _.path.normalizeStrict( got.dir ), factory.basePath );
   test.identical( _.path.normalize( got.dir ), factory.basePath );
-  test.identical( _.objectIs( got.stat ), true );
+  test.identical( _.object.isBasic( got.stat ), true );
 
   /*dir === filePath*/
 

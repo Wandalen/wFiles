@@ -96,7 +96,7 @@ function _routineDrivingAndChanging( routine )
   if( !routine.having.driving )
   return false;
 
-  _.assert( _.objectIs( routine.operates ), () => 'Method ' + routine.name + ' does not have map {-operates-}' );
+  _.assert( _.object.isBasic( routine.operates ), () => 'Method ' + routine.name + ' does not have map {-operates-}' );
 
   if( _.props.keys( routine.operates ).length === 0 )
   return false;

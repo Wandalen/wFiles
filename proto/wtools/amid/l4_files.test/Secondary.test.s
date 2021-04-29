@@ -198,7 +198,7 @@ function filesReadOld( test )
 
 //     for( var k in tree )
 //     {
-//       if( _.objectIs( tree[ k ] ) )
+//       if( _.object.isBasic( tree[ k ] ) )
 //       {
 //         if( o.includingDirs )
 //         paths[ _.path.resolve( currentPath, k ) ] = Object.create( null );

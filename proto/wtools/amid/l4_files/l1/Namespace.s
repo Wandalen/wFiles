@@ -333,7 +333,7 @@ function _fileOptionsGet( filePath, o ) /* xxx : check */
 {
   o = o || Object.create( null );
 
-  if( _.objectIs( filePath ) )
+  if( _.object.isBasic( filePath ) )
   {
     o = filePath;
   }
@@ -394,14 +394,14 @@ function filesNewer( dst, src )
   src = { stat : src };
   else if( _.strIs( src ) )
   src = { stat : _.fileProvider.statRead( src ) };
-  else if( !_.objectIs( src ) )
+  else if( !_.object.isBasic( src ) )
   throw _.err( 'unknown src type' );
 
   if( _.fileStatIs( dst ) )
   dst = { stat : dst };
   else if( _.strIs( dst ) )
   dst = { stat : _.fileProvider.statRead( dst ) };
-  else if( !_.objectIs( dst ) )
+  else if( !_.object.isBasic( dst ) )
   throw _.err( 'unknown dst type' );
 
 
@@ -578,14 +578,14 @@ function filesShadow( shadows, owners ) /* xxx : check */
   for( let s = 0 ; s < shadows.length ; s++ )
   {
     let shadow = shadows[ s ];
-    shadow = _.objectIs( shadow ) ? shadow.relative : shadow;
+    shadow = _.object.isBasic( shadow ) ? shadow.relative : shadow;
 
     for( let o = 0 ; o < owners.length ; o++ )
     {
 
       let owner = owners[ o ];
 
-      owner = _.objectIs( owner ) ? owner.relative : owner;
+      owner = _.object.isBasic( owner ) ? owner.relative : owner;
 
       if( _.strBegins( shadow, _.path.prefixGet( owner ) ) )
       {

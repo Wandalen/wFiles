@@ -331,7 +331,7 @@ function _formFinal()
     _.assert( _.strIs( filter.filePath ) || _.arrayIs( filter.filePath ) || _.mapIs( filter.filePath ) );
     _.assert( !!filter.src || _.mapIs( filter.formedBasePath ) || _.props.keys( filter.formedFilePath ).length === 0 );
     _.assert( !!filter.src || _.mapIs( filter.formedFilePath ) );
-    _.assert( _.objectIs( filter.effectiveProvider ) );
+    _.assert( _.object.isBasic( filter.effectiveProvider ) );
     _.assert( filter.system === filter.effectiveProvider.system || filter.system === filter.effectiveProvider );
     _.assert( filter.system instanceof _.FileProvider.Abstract );
     _.assert( filter.defaultProvider instanceof _.FileProvider.Abstract );
@@ -1655,7 +1655,7 @@ function basePathsGet()
   _.assert( arguments.length === 0, 'Expects no arguments' );
   _.assert( filter.basePath === null || _.strIs( filter.basePath ) || _.mapIs( filter.basePath ) );
 
-  if( _.objectIs( filter.basePath ) )
+  if( _.object.isBasic( filter.basePath ) )
   return _./*longOnce*/arrayAppendArrayOnce( null, _.props.vals( filter.basePath ) )
   else if( _.strIs( filter.basePath ) )
   return [ filter.basePath ];
@@ -2027,7 +2027,7 @@ function filePathMove( o )
 
     _.assert( o.value === null || _.strIs( o.value ) || _.arrayIs( o.value ) || _.mapIs( o.value ) );
 
-    if( _.objectIs( o.dstInstance.src ) )
+    if( _.object.isBasic( o.dstInstance.src ) )
     {
       const fileProvider = o.dstInstance.system || o.dstInstance.effectiveProvider || o.dstInstance.defaultProvider;
       const path = fileProvider.path;
@@ -2040,7 +2040,7 @@ function filePathMove( o )
         o.dstInstance.src[ filePathSymbol ] = o.value;
       }
     }
-    else if( _.objectIs( o.dstInstance.dst ) )
+    else if( _.object.isBasic( o.dstInstance.dst ) )
     {
       const fileProvider = o.dstInstance.system || o.dstInstance.effectiveProvider || o.dstInstance.defaultProvider;
       const path = fileProvider.path;
@@ -3699,7 +3699,7 @@ function compactField( it )
   if( !it.dst.hasData() )
   return;
 
-  if( _.objectIs( it.dst ) && _.props.keys( it.dst ).length === 0 )
+  if( _.object.isBasic( it.dst ) && _.props.keys( it.dst ).length === 0 )
   return;
 
   return it.dst;

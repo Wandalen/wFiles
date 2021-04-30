@@ -187,7 +187,7 @@ function _formAssociations()
   // _.assert
   // (
   //   !filter.system || filter.system instanceof _.FileProvider.System,
-  //   () => '{- filter.system -} should be instance of {- _.FileProvider.System -}, but it is ' + _.entity.exportStringShallow( filter.system )
+  //   () => '{- filter.system -} should be instance of {- _.FileProvider.System -}, but it is ' + _.entity.exportStringDiagnosticShallow( filter.system )
   // );
   // _.assert
   // (
@@ -197,7 +197,7 @@ function _formAssociations()
   // _.assert
   // (
   //   filter.defaultProvider instanceof _.FileProvider.Abstract,
-  //   () => '{- filter.system -} should be instance of {- _.FileProvider.Abstract -}, but it is ' + _.entity.exportStringShallow( filter.defaultProvider )
+  //   () => '{- filter.system -} should be instance of {- _.FileProvider.Abstract -}, but it is ' + _.entity.exportStringDiagnosticShallow( filter.defaultProvider )
   // );
 
   /* */

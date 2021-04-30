@@ -4964,7 +4964,7 @@ function fileWrite_body( o )
   {
     // if( o.verbosity >= 3 )
     if( o.logger && o.logger.verbosity >= 3 )
-    o.logger.log( ' + writing', _.entity.exportStringShallow( o.data ), 'to', o.filePath );
+    o.logger.log( ' + writing', _.entity.exportStringDiagnosticShallow( o.data ), 'to', o.filePath );
   }
 
 }

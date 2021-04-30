@@ -491,7 +491,7 @@ function filesFindNominal_body( o )
   {
     _.assert( arguments.length === 2 );
     let r = op.onUp.call( self, record, op );
-    _.assert( r === _.dont || r === record, 'Callback onUp should return original record or _.dont, but returned', _.entity.exportStringShallow( r ) );
+    _.assert( r === _.dont || r === record, 'Callback onUp should return original record or _.dont, but returned', _.entity.exportStringDiagnosticShallow( r ) );
     return r;
   }
 
@@ -501,7 +501,7 @@ function filesFindNominal_body( o )
   {
     _.assert( arguments.length === 2 );
     let r = op.onDown.call( self, record, op );
-    _.assert( r === undefined, 'Callback onDown should return nothing( undefined ), but returned', _.entity.exportStringShallow( r ) );
+    _.assert( r === undefined, 'Callback onDown should return nothing( undefined ), but returned', _.entity.exportStringDiagnosticShallow( r ) );
   }
 
 }
@@ -623,7 +623,7 @@ function filesFindSingle_body( o )
 
     _.assert( arguments.length === 2 );
     let r = o.onUp.call( self, record, o );
-    _.assert( r === _.dont || r === record, 'Callback onUp should return original record or _.dont, but returned', _.entity.exportStringShallow( r ) );
+    _.assert( r === _.dont || r === record, 'Callback onUp should return original record or _.dont, but returned', _.entity.exportStringDiagnosticShallow( r ) );
 
     return r;
   }
@@ -634,7 +634,7 @@ function filesFindSingle_body( o )
   {
     _.assert( arguments.length === 2 );
     let r = o.onDown.call( self, record, o );
-    _.assert( r === undefined, 'Callback onDown should return nothing( undefined ), but returned', _.entity.exportStringShallow( r ) );
+    _.assert( r === undefined, 'Callback onDown should return nothing( undefined ), but returned', _.entity.exportStringDiagnosticShallow( r ) );
   }
 
 }
@@ -717,7 +717,7 @@ function filesFind_head( routine, args )
       _.assert
       (
         _.longHas( knownFormats, o.outputFormat ),
-        'Unknown output format ' + _.entity.exportStringShallow( o.outputFormat )
+        'Unknown output format ' + _.entity.exportStringDiagnosticShallow( o.outputFormat )
         + '\nKnown output formats : ' + _.entity.exportString( knownFormats )
       );
     }
@@ -1005,7 +1005,7 @@ function filesFind_body( o )
     }
 
     let r = o.onUp.call( self, record, o );
-    _.assert( r === _.dont || r === record, 'Callback onUp should return original record or _.dont, but returned', _.entity.exportStringShallow( r ) );
+    _.assert( r === _.dont || r === record, 'Callback onUp should return original record or _.dont, but returned', _.entity.exportStringDiagnosticShallow( r ) );
     if( r === _.dont )
     return _.dont;
 
@@ -1054,7 +1054,7 @@ function filesFind_body( o )
     }
 
     let r = o.onDown.call( self, record, o );
-    _.assert( r === undefined, 'Callback onDown should return undefined', _.entity.exportStringShallow( r ) );
+    _.assert( r === undefined, 'Callback onDown should return undefined', _.entity.exportStringDiagnosticShallow( r ) );
 
   }
 
@@ -2219,7 +2219,7 @@ function filesReflectEvaluate_body( o )
 
     handleDown2.call( self, record, o );
     let r = o.onDown.call( self, record, o );
-    _.assert( r === undefined, () => 'Callback onDown should return nothing( undefined ), but returned ' + _.entity.exportStringShallow( r ) );
+    _.assert( r === undefined, () => 'Callback onDown should return nothing( undefined ), but returned ' + _.entity.exportStringDiagnosticShallow( r ) );
 
     _.assert( record.action !== 'exclude' || record.touch === false, () => 'Attempt to exclude touched ' + record.dst.absolute );
 
@@ -3769,7 +3769,7 @@ function filesReflect_head( routine, args )
     _.assert
     (
       _.longHas( knownFormats, o.outputFormat ),
-      'Unknown output format ' + _.entity.exportStringShallow( o.outputFormat )
+      'Unknown output format ' + _.entity.exportStringDiagnosticShallow( o.outputFormat )
       + '\nKnown output formats : ' + _.entity.exportString( knownFormats )
     );
 

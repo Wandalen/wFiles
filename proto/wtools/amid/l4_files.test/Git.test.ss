@@ -15,6 +15,7 @@ if( typeof module !== 'undefined' )
 //
 
 const _ = _global_.wTools;
+const __ = _globals_.testing.wTools;
 var RunningInsideTestContainer = _.process.insideTestContainer();
 
 //
@@ -1960,47 +1961,67 @@ function filesReflectPerformance( test )
   let clonePathGlobal = a.fileProvider.path.globalFromPreferred( localPath );
   let start;
 
-  /* */
+  /* - */
 
-  init().then( () =>
-  {
-    test.case = 'without installed dependencies';
-    return null;
-  });
+  const times = 5;
+  const runsWithout = [];
+  const runsWith = [];
+  for( let i = 0 ; i < times; i++ )
+  run();
+
   a.ready.then( () =>
   {
-    start = _.time.now();
-    return system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 });
-  });
-  a.ready.then( () =>
-  {
-    let spent = _.time.now() - start;
-    console.log( spent );
-    test.le( spent, 20000 );
+    const averageWithout = runsWithout.reduce( ( s, e ) => s + e ) / times;
+    const averageWith = runsWith.reduce( ( s, e ) => s + e ) / times;
+    console.log( averageWithout );
+    console.log( averageWith );
     return null;
   });
 
   /* */
 
-  init().then( () =>
+  function run()
   {
-    test.case = 'with installed dependencies';
-    return null;
-  });
-  a.shell({ currentPath : a.abs( 'clone' ), execPath : 'npm install' });
-  a.shell({ currentPath : a.abs( 'clone' ), execPath : 'git reset --hard' });
-  a.ready.then( () =>
-  {
-    start = _.time.now();
-    return system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 });
-  });
-  a.ready.then( () =>
-  {
-    let spent = _.time.now() - start;
-    console.log( spent );
-    test.le( spent, 20000 );
-    return null;
-  });
+    init().then( () =>
+    {
+      test.case = 'without installed dependencies';
+      return null;
+    });
+    a.ready.then( () =>
+    {
+      start = _.time.now();
+      return system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 });
+    });
+    a.ready.then( () =>
+    {
+      let spent = _.time.now() - start;
+      runsWithout.push( spent );
+      test.le( spent, 10000 );
+      return null;
+    });
+
+    /* */
+
+    init().then( () =>
+    {
+      test.case = 'with installed dependencies';
+      return null;
+    });
+    a.shell({ currentPath : a.abs( 'clone' ), execPath : 'npm install' });
+    a.shell({ currentPath : a.abs( 'clone' ), execPath : 'git reset --hard' });
+    a.ready.then( () =>
+    {
+      start = _.time.now();
+      return system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 });
+    });
+    a.ready.then( () =>
+    {
+      let spent = _.time.now() - start;
+      runsWith.push( spent );
+      test.le( spent, 10000 );
+      return null;
+    });
+  }
 
   /* - */
 
@@ -2038,7 +2059,7 @@ function filesReflectPerformance( test )
   */
 }
 
-filesReflectPerformance.timeOut = 100000;
+filesReflectPerformance.timeOut = 500000;
 filesReflectPerformance.experimental = 1;
 
 //

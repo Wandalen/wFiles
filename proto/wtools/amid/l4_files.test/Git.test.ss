@@ -1866,6 +1866,187 @@ filesReflectFetchingTags.timeOut = 60000;
 
 //
 
+// function filesReflectPerformance( test )
+// {
+//   let context = this;
+//   let providerSrc = context.providerSrc;
+//   let providerDst = context.providerDst;
+//   let system = context.system;
+//   let path = context.providerDst.path;
+//
+//   let testPath = path.join( context.suiteTempPath, 'routine-' + test.name );
+//   let localPath = path.join( testPath, '' );
+//   let clonePathGlobal = providerDst.path.globalFromPreferred( localPath );
+//
+//   let shellLocal = _.process.starter
+//   ({
+//     currentPath : localPath,
+//     mode : 'shell'
+//   })
+//
+//   let con = new _.Consequence().take( null )
+//
+//   .then( () =>
+//   {
+//     let t1;
+//     providerDst.filesDelete( localPath );
+//     let remotePathFixate =
+//     'git+https:///github.com/Wandalen/wPathBasic.git#05930d3a7964b253ea3bbfeca7eb86848f550e96';
+//     let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git';
+//
+//     let ready = system.filesReflect({ reflectMap : { [ remotePath ] :
+//     clonePathGlobal }, verbosity : 5 });
+//
+//     ready.then( () =>
+//     {
+//       let structure = { dependencies : { 'willbe' : 'alpha' } };
+//       providerDst.fileWrite({ filePath : path.join( localPath,
+//       'package.json' ), data : structure, encoding : 'json' });
+//       return null;
+//     })
+//
+//     ready.then( () => shellLocal({ execPath : 'npm install', outputPiping : 0 }) );
+//     ready.then( () => shellLocal( 'git reset --hard' ) );
+//
+//     ready.then( () =>
+//     {
+//       t1 = _.time.now();
+//       return system.filesReflect({ reflectMap : { [ remotePathFixate ] :
+//       clonePathGlobal }, verbosity : 5 })
+//     });
+//
+//     ready.then( ( got ) =>
+//     {
+//       console.log( _.time.spent( t1 ) );
+//       test.identical( got.exitCode, 0 );
+//       return null;
+//     })
+//
+//     return ready;
+//   })
+//
+//   return con;
+//
+//   /* */
+//
+//   function init()
+//   {
+//     let data = { dependencies : { willbe : '', wTesting : '' } };
+//     a.shell( 'git init' );
+//     a.shell( 'git commit --allow-empty -m "init"' );
+//     a.shell( 'git branch one' );
+//     a.shell( 'git branch two' );
+//     a.ready.then( () =>
+//     {
+//       a.fileProvider.configWrite({ filePath : a.abs( 'package.json' ), data, encoding : 'json' });
+//       return null;
+//     });
+//     a.shell( 'git add .' );
+//     a.shell( 'git commit -m "package"' );
+//     return a.ready;
+//   }
+// }
+//
+// filesReflectPerformance.timeOut = 120000;
+
+function filesReflectPerformance( test )
+{
+  let context = this;
+  let system = context.system;
+  let a = test.assetFor( false );
+  let repoPath = a.abs( 'repo' );
+  let remotePath = `git+hd://${repoPath}`;
+  let localPath = a.abs( 'clone' );
+  let clonePathGlobal = a.fileProvider.path.globalFromPreferred( localPath );
+  let start;
+
+  /* */
+
+  init().then( () =>
+  {
+    test.case = 'without installed dependencies';
+    return null;
+  });
+  a.ready.then( () =>
+  {
+    start = _.time.now();
+    return system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 });
+  });
+  a.ready.then( () =>
+  {
+    let spent = _.time.now() - start;
+    console.log( spent );
+    test.le( spent, 20000 );
+    return null;
+  });
+
+  /* */
+
+  init().then( () =>
+  {
+    test.case = 'with installed dependencies';
+    return null;
+  });
+  a.shell({ currentPath : a.abs( 'clone' ), execPath : 'npm install' });
+  a.shell({ currentPath : a.abs( 'clone' ), execPath : 'git reset --hard' });
+  a.ready.then( () =>
+  {
+    start = _.time.now();
+    return system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 });
+  });
+  a.ready.then( () =>
+  {
+    let spent = _.time.now() - start;
+    console.log( spent );
+    test.le( spent, 20000 );
+    return null;
+  });
+
+  /* - */
+
+  return a.ready;
+
+  /* */
+
+  function init()
+  {
+    a.ready.then( () => a.fileProvider.filesDelete( a.abs( '.' ) ) );
+    a.ready.then( () => { a.fileProvider.dirMake( a.abs( 'repo' ) ); return null } );
+    a.shell({ currentPath : repoPath, execPath : 'git init --bare' });
+    a.shell( 'git clone repo clone' );
+    a.shell({ currentPath : a.abs( 'clone' ), execPath : 'git commit --allow-empty -m "init"' });
+    a.shell({ currentPath : a.abs( 'clone' ), execPath : 'git branch one' });
+    a.shell({ currentPath : a.abs( 'clone' ), execPath : 'git branch two' });
+    a.ready.then( () =>
+    {
+      let data = { dependencies : { willbe : '', wTesting : '' } };
+      a.fileProvider.fileWrite({ filePath : a.abs( 'clone/package.json' ), data, encoding : 'json' });
+      return null;
+    });
+    a.shell({ currentPath : a.abs( 'clone' ), execPath : 'git add .' });
+    a.shell({ currentPath : a.abs( 'clone' ), execPath : 'git commit -m "package"' });
+    a.shell({ currentPath : a.abs( 'clone' ), execPath : 'git push' });
+    a.shell({ currentPath : a.abs( 'clone' ), execPath : 'git push -u origin one' });
+    a.shell({ currentPath : a.abs( 'clone' ), execPath : 'git push -u origin two' });
+    return a.ready;
+  }
+}
+
+filesReflectPerformance.timeOut = 100000;
+filesReflectPerformance.experimental = 1;
+
+/* Results of benchmark. Routine filesReflectPerformance
+   | # | without dependencies | with dependencies |
+   |---|----------------------|-------------------|
+   | 1 | 515                  | 34150             |
+   | 2 | 547                  | 34967             |
+   | 3 | 524                  | 34364             |
+   | 4 | 509                  | 34781             |
+   | 5 | 532                  | 34650             |
+*/
+
+//
+
 // --
 // declare
 // --
@@ -1898,7 +2079,8 @@ const Proto =
     filesReflectNoStashing,
     filesReflectDownloadThrowing,
     filesReflectEol,
-    filesReflectFetchingTags
+    filesReflectFetchingTags,
+    filesReflectPerformance,
   },
 
 }

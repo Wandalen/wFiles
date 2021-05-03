@@ -2030,20 +2030,16 @@ function filesReflectPerformance( test )
     a.shell({ currentPath : a.abs( 'clone' ), execPath : 'git push -u origin two' });
     return a.ready;
   }
+
+  /*
+     Results of benchmark. The average time for 5 runs:
+     without dependencies - 0.52s
+     with dependencies - 34.58s
+  */
 }
 
 filesReflectPerformance.timeOut = 100000;
 filesReflectPerformance.experimental = 1;
-
-/* Results of benchmark. Routine filesReflectPerformance
-   | # | without dependencies | with dependencies |
-   |---|----------------------|-------------------|
-   | 1 | 515                  | 34150             |
-   | 2 | 547                  | 34967             |
-   | 3 | 524                  | 34364             |
-   | 4 | 509                  | 34781             |
-   | 5 | 532                  | 34650             |
-*/
 
 //
 

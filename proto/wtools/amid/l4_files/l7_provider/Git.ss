@@ -416,7 +416,7 @@ function filesReflectSingle_body( o )
       'git branch'
     ]);
 
-    ready.ifNoErrorThen( function( arg )
+    ready.ifNoErrorThen( ( arg ) =>
     {
       // let args = arg.runs;
       let args = arg.sessions;

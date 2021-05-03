@@ -3177,7 +3177,7 @@ function filesReflectSingle_body( o )
   {
     if( !srcToDstHash )
     {
-      srcToDstHash = new Map();
+      srcToDstHash = new HashMap();
       for( let r = 0 ; r < o.result.length ; r++ )
       srcToDstHash.set( o.result[ r ].src, o.result[ r ].dst );
     }

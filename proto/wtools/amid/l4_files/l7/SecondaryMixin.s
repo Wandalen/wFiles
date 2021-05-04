@@ -164,7 +164,7 @@ Self.shortName = 'SecondaryMixin';
 //
 //     let read = got;
 //     if( !o.returningRead )
-//     read = _.map_( null, got, ( e ) => e.result );
+//     read = _.entity.map_( null, got, ( e ) => e.result );
 //
 //     if( o.map === 'name' )
 //     {

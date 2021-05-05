@@ -4775,6 +4775,7 @@ function filesDelete_body( o )
     if( o.verbosity > 1 || ( o.verbosity === 1 && o.result.length ) )
     {
       let spentTime = _.time.now() - time;
+      debugger;
       let groupsMap = path.group({ keys : o.filter.filePath, vals : o.result });
       let textualReport = path.groupTextualReport
       ({

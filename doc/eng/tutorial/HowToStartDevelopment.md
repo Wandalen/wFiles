@@ -5,7 +5,7 @@ Explain how to start extending tests and the functionality of the module.
 ### Fork and clone
 
 Use your github account to fork the repository `https://github.com/Wandalen/wTools`.
-After forking the repository clone it on your local machine. It looks like that:
+After forking the repository clone it on your local machine. It looks like below:
 ```bash
 git clone https://github.com/{{ your account }}/wFiles
 cd wFiles
@@ -17,7 +17,7 @@ Further commands should be entered from the directory to which you've to cloned 
 
 You need utility willbe to build the project. To installl willbe use npm:
 ```bash
-npm intall -g willbe@delta
+npm install -g willbe@delta
 ```
 
 You need utility wTesting to test the project. To installl wTesting use npm:
@@ -120,32 +120,37 @@ You can see 2 test cases: `args array` and `options map`. The first case covers 
 ```js
 let a = context.assetFor( test, false );
 ```
-This code initializes the test asset and does the preparation required for the test routine.
+Above code initializes the test asset and does the preparation required for the test routine.
 
 ```js
 test.case = 'args array';
 ```
-This code starts a new test case naming it.
+Above code starts a new test case naming it.
 
 ```js
 test.case = 'a.reflect()';
 ```
-This code creates a temp directory and copies associated with the test routine test files if such exists.
+Above code creates a temp directory and copies associated with the test routine test files if such exists.
 
 ```js
 var filePath = a.abs( 'file1.txt' );
 ```
-This code returns the absolute path to the file which is going to be created.
+Above code returns the absolute path to the file which is going to be created.
 
 ```js
-var filePath = a.abs( 'file1.txt' );
+a.fileProvider.fileWrite( {filePath, data} );
 ```
-This code writes the file `file1.txt` into the temp directory.
+Above code writes the file `file1.txt` into the temp directory with the content of variable data.
 
 ```js
 var got = a.fileProvider.fileRead( filePath );
 ```
-This code read the file `file1.txt` into variable `got`.
+Above code read the file `file1.txt` into variable `got`.
+
+```js
+test.identical( got, data );
+```
+Above code checks if the contents of variable data and content of file are identical.
 
 ### The first task
 

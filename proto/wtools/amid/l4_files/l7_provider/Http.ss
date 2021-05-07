@@ -361,9 +361,7 @@ function filesReflectSingle_body( o )
   {
     /* qqq : fast solution to return some records instead of empty arrray. find better solution */
     debugger;
-    if( o.extra.makingRecordsFast )
-    o.result = dstFileProvider.dirRead({ filePath : dstPath, outputFormat : 'record' });
-    else
+    if( o.outputFormat !== 'nothing' )
     o.result = dstFileProvider.filesReflectEvaluate
     ({
       src : { filePath : dstPath },
@@ -394,7 +392,6 @@ _.routineExtend( filesReflectSingle_body, _.FileProvider.FindMixin.prototype.fil
 
 var extra = filesReflectSingle_body.extra = Object.create( null );
 extra.fetching = 1;
-extra.makingRecordsFast = 0;
 
 var defaults = filesReflectSingle_body.defaults;
 let filesReflectSingle =

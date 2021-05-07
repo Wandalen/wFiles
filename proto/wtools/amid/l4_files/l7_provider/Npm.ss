@@ -449,9 +449,7 @@ function filesReflectSingle_body( o )
   function recordsMake()
   {
     /* qqq : fast solution to return some records instead of empty arrray. find better solution */
-    if( o.extra.makingRecordsFast )
-    o.result = localProvider.dirRead({ filePath : dstPath, outputFormat : 'record' });
-    else
+    if( o.outputFormat !== 'nothing' )
     o.result = localProvider.filesReflectEvaluate
     ({
       src : { filePath : dstPath },
@@ -475,7 +473,6 @@ _.routineExtend( filesReflectSingle_body, _.FileProvider.FindMixin.prototype.fil
 var extra = filesReflectSingle_body.extra = Object.create( null );
 extra.fetching = 0;
 extra.usingNpm = 1;
-extra.makingRecordsFast = 0;
 
 var defaults = filesReflectSingle_body.defaults;
 

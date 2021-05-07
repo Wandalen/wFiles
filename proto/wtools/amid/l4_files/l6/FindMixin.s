@@ -3118,7 +3118,7 @@ function filesReflectSingle_body( o )
   _.assert( o.filter === undefined );
   _.assert( o.src.dst === o.dst );
   _.assert( o.dst.src === o.src );
-  _.assert( o.outputFormat === undefined );
+  // _.assert( o.outputFormat === undefined );
   _.assert( _.boolLike( o.allowingMissed ) );
 
   if( o.rebasingLink && o.visitedMap === null )

@@ -362,9 +362,9 @@ function filesReflectSingle_body( o )
     /* qqq : fast solution to return some records instead of empty arrray. find better solution */
     debugger;
     if( o.extra.makingRecordsFast )
-    o.result = localProvider.dirRead({ filePath : dstPath, outputFormat : 'record' });
+    o.result = dstFileProvider.dirRead({ filePath : dstPath, outputFormat : 'record' });
     else
-    o.result = localProvider.filesReflectEvaluate
+    o.result = dstFileProvider.filesReflectEvaluate
     ({
       src : { filePath : dstPath },
       dst : { filePath : dstPath },

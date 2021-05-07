@@ -317,31 +317,52 @@ function readWriteOptionWriteMode( test )
   test.identical( got, data );
 
   /* */
+  // test.case = 'writeMode:append';
+  // a.reflect();
+  // var data = 'data1';
+  // var filePath = a.abs( 'file1.txt' );
+  // var writeMode = 'append';
+  
 
+
+  
+  /* qqq : for junior : implement please */
+  // test.true( false );
+  
+  /* */
+
+  //extend a test for append value of writeMode
+  
   test.case = 'writeMode:append';
   a.reflect();
   var data = 'data1';
   var filePath = a.abs( 'file1.txt' );
   var writeMode = 'append';
+  a.fileProvider.fileWrite({filePath,data,writeMode});
+  var got = a.fileProvider.fileRead( filePath)
+  test.identical( got , data)
+
+  
 
   /* qqq : for junior : implement please */
   // test.true( false );
 
-  /* */
+  // extend a test for test value prepend of writeMode
 
-  test.case = 'more test cases?';
+  test.case = 'writeMode:prepend';
   a.reflect();
-  var data = 'data1';
-  var filePath = a.abs( 'file1.txt' );
-  var writeMode = 'append';
+  var data = 'data1'
+  var filePath = a.abs('file1.txt');
+  var writeMode = 'prepend'
+  a.fileProvider.fileWrite({filePath,data,writeMode});
+  var got = a.fileProvider.fileRead(filePath)
+  test.identical( got, data)
 
-  /* qqq : for junior : implement please */
-  // test.true( false );
+
 
   /* */
 
 }
-
 //
 
 function readWriteSync( test )

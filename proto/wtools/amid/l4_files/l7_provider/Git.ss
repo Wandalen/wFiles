@@ -495,6 +495,9 @@ function filesReflectSingle_body( o )
   function recordsMake()
   {
     /* zzz : fast solution to return records instead of empty array */
+    if( o.extra.makingRecordsFast )
+    o.result = localProvider.dirRead({ filePath : dstPath, outputFormat : 'record' });
+    else
     o.result = localProvider.filesReflectEvaluate
     ({
       src : { filePath : dstPath },
@@ -584,6 +587,7 @@ var extra = filesReflectSingle_body.extra = Object.create( null );
 extra.fetching = 1;
 extra.fetchingTags = 0;
 extra.stashing = 0;
+extra.makingRecordsFast = 0;
 
 var defaults = filesReflectSingle_body.defaults;
 let filesReflectSingle =

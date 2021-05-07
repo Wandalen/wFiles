@@ -365,14 +365,9 @@ function filesReflectSingle_body( o )
   // !!! : remove GitConfig
   // if( gitConfigExists )
   // {
-  //   debugger;
   //   let read = localProvider.fileRead( path.join( dstPath, '.git/config' ) );
   //   let config = Ini.parse( read );
-  //   debugger;
   // }
-
-  // if( gitConfigExists )
-  // debugger;
 
   if( gitConfigExists )
   ready.then( () =>

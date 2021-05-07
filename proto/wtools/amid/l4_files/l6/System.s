@@ -41,7 +41,6 @@ function init( o )
   if( o )
   if( o.defaultOrigin !== undefined )
   {
-    debugger;
     throw _.err( 'not tested' );
   }
 
@@ -491,6 +490,7 @@ function _pathPrepend( provider, filePath )
   if( !provider.originPath )
   return filePath;
   if( provider.originPath === self.defaultOrigin )
+  // if( provider instanceof _.FileProvider.Default && provider.originPath === self.defaultOrigin )
   return filePath;
   if( _.strBegins( filePath, provider.originPath ) )
   return filePath;
@@ -560,10 +560,8 @@ function pathNativizeAct( filePath )
   let r = self._pathLocalize( filePath );
   if( r && r.provider )
   return r.provider.pathNativizeAct.call( r.provider, r.localPath );
-  debugger;
   if( self.defaultProvider )
   return self.defaultProvider.path.dirTemp.apply( self.defaultProvider.path, arguments );
-  debugger;
   return filePath;
 }
 
@@ -578,9 +576,7 @@ function pathResolveLinkFull_body( o )
   let r = self._pathLocalize( o.filePath );
   o.filePath = r.localPath;
 
-  // debugger;
   let result = r.provider.pathResolveLinkFull.body.call( r.provider, o );
-  // debugger;
 
   if( o.sync )
   {
@@ -686,8 +682,7 @@ function pathResolveSoftLink_body( o )
 
   if( result === o.filePath )
   {
-    debugger;
-    _.assert( 0, 'not tested' );
+    // _.assert( 0, 'not tested' );
     return r.originalPath;
   }
 
@@ -723,8 +718,7 @@ function pathResolveTextLink_body( o )
 
   if( result === o.filePath )
   {
-    debugger;
-    _.assert( 0, 'not tested' );
+    // _.assert( 0, 'not tested' );
     return r.originalPath;
   }
 
@@ -950,7 +944,6 @@ function _fileCopyActDifferent( op )
   {
     _.assert( 0, 'Expects terminal file, not soft link' );
     // let resolvedPath = op.src.provider.pathResolveSoftLink( op.src.localPath );
-    // debugger;
     // c.result = op.dst.provider.softLink
     // ({
     //   dstPath : op.dst.localPath,
@@ -1200,9 +1193,6 @@ function _defaultOriginSet( src )
 //   for( var f in self.providersWithProtocolMap )
 //   {
 //     const fileProvider = self.providersWithProtocolMap[ f ];
-//     if( fileProvider.verbosity !== self.verbosity )
-//     debugger;
-//     // debugger;
 //     fileProvider.verbosity = self.verbosity;
 //   }
 //

@@ -381,7 +381,6 @@ function readWriteSync( test )
   /* - */
   // test.mustNotThrowError( function()
   // {
-  //   debugger
   //   var got = provider.fileRead
   //   ({
   //     filePath : a.abs( 'invalid path' ),
@@ -646,7 +645,6 @@ function readWriteSync( test )
 
   /* onBegin outputFormat : 'o' */
 
-  debugger;
   got = provider.fileRead
   ({
     sync : 1,
@@ -658,7 +656,6 @@ function readWriteSync( test )
     onEnd : null,
     onError : null,
   });
-  debugger;
   test.identical( got.result, testData );
 
   /*onBegin returningRead 1*/
@@ -674,7 +671,6 @@ function readWriteSync( test )
     onEnd : null,
     onError : null,
   });
-  debugger;
   test.identical( _.object.isBasic( got ), false );
 
   /*onEnd returningRead 0*/
@@ -694,7 +690,6 @@ function readWriteSync( test )
 
   /*onEnd returningRead 1*/
 
-  debugger;
   var got = provider.fileRead
   ({
     sync : 1,
@@ -706,13 +701,10 @@ function readWriteSync( test )
     onEnd,
     onError : null,
   });
-  debugger;
   test.identical( got, testData );
-  debugger;
 
   /*onError is no called*/
 
-  debugger;
   test.shouldThrowErrorSync( function()
   {
     var got = provider.fileRead
@@ -727,9 +719,7 @@ function readWriteSync( test )
       onError,
     });
   });
-  debugger;
   test.identical( _.errIs( got ), true )
-  debugger;
 
   /*onError is no called*/
 
@@ -4759,7 +4749,6 @@ function fileCopyActSync( test )
   // provider.fileWrite( srcPath, srcPath );
   // provider.fileWrite( otherPath, otherPath );
   // provider.hardLink( dstPath, srcPath );
-  // debugger
   // provider.fileCopyAct
   // ({
   //   dstPath,
@@ -6701,7 +6690,6 @@ function fileCopyAsync( test )
 
   .finally( function()
   {
-    debugger
     var con = provider.fileCopy
     ({
       srcPath : test.context.pathFor( 'not_existing_path' ),
@@ -7488,7 +7476,6 @@ function fileCopySoftLinkResolving( test )
   provider.softLink( srcPath, srcPathTerminal );
   provider.softLink( dstPath, dstPathTerminal );
   var o = { resolvingSrcSoftLink : 2, resolvingDstSoftLink : 0 };
-  debugger
   fileCopy( o );
   test.identical( o.srcPath, srcPathTerminal );
   test.identical( o.dstPath, dstPath );
@@ -10436,7 +10423,6 @@ function fileCopyAsyncThrowingError( test )
 //       });
 //     } catch ( err ) { }
 
-//     debugger;
 //     var con = provider.fileCopy
 //     ({
 //         srcPath : test.context.pathFor( 'written/fileCopyAsync/copydir' ),
@@ -11019,7 +11005,6 @@ function fileRenameSync( test )
 
   /* */
 
-  debugger
   provider.filesDelete( routinePath );
   provider.fileWrite( srcPath, ' ' );
   dstPath = test.context.pathFor( 'written/fileRename/routinePath/dst' );
@@ -18597,7 +18582,6 @@ function statResolvedReadAsync( test )
 
   .ifNoErrorThen( function( arg )
   {
-    debugger
     return provider.statResolvedRead
     ({
       sync : 0,
@@ -20205,7 +20189,6 @@ function hashReadAsync( test )
 
   .finally( function()
   {
-    debugger;
     var con = provider.hashRead
     ({
       filePath,
@@ -22763,7 +22746,6 @@ function softLinkSync( test )
 
   /* */
 
-  debugger
   provider.softLink
   ({
     srcPath,
@@ -24867,8 +24849,6 @@ function softLinkChain( test )
   // var routinePath = path.tempOpen();
   var routinePath = test.context.pathFor( 'written/softLinkChain' );
 
-  debugger;
-
   provider.dirMake( path.join( routinePath, 'a' ) );
   provider.fileWrite( path.join( routinePath, 'x' ), 'x' );
   provider.softLink( path.join( routinePath, 'a/b' ), '..' );
@@ -24904,7 +24884,6 @@ function softLinkChain( test )
   // test.true( !!acStat );
   // test.true( !!abcStat );
 
-  debugger;
 }
 
 //
@@ -29960,7 +29939,6 @@ function hardLinkSync( test )
 
   test.mustNotThrowError( function()
   {
-    debugger
     provider.hardLink
     ({
       srcPath,
@@ -32154,7 +32132,6 @@ function hardLinkAsync( test )
     var fileNames = [ 'a1', 'a2', 'a3', 'a4', 'a5', 'a6' ];
     provider.filesDelete( test.context.pathFor( currentTestDir ) );
     var paths = fileNames.map( ( n )  => context.pathFor( path.join( currentTestDir, n ) ) );
-    debugger
     var con = provider.hardLink
     ({
       sync : 0,
@@ -34565,7 +34542,6 @@ function hardLinkHardLinkBreaking( test )
   provider.fileWrite( dstPath, dstPath );
   provider.hardLink( srcPath, srcPathTerminal );
   var o = { breakingSrcHardLink : 1, breakingDstHardLink : 0 };
-  debugger
   hardLink( o );
   test.identical( provider.areHardLinked([ srcPath, dstPath ]), hardLinked );
   test.identical( provider.areHardLinked([ srcPath, srcPathTerminal ]), false );
@@ -35411,7 +35387,6 @@ function hardLinkRelativeTextLinking( test )
   provider.filesDelete( routinePath );
   provider.fileWrite( src2Path, src2Path );
   provider.textLink( src1Path, '../src2' );
-  debugger
   provider.hardLink({ srcPath : src1Path, dstPath, resolvingSrcTextLink : 2, resolvingSrcSoftLink : 0 });
   test.true( provider.isTextLink( src1Path ) );
   test.true( provider.isTerminal( src2Path ) );
@@ -43845,13 +43820,10 @@ function pathResolve( test )
   var got = resolve( null, '/a', 'b' );
   test.identical( got, expected );
 
-  debugger;
   // var expected = join( current(), 'b' );
   var expected = 'b';
-  debugger;
   var got = resolve( '/a', null, 'b' );
   test.identical( got, expected );
-  debugger;
 
   var expected = null;
   var got = resolve( '/a', 'b', null );
@@ -44740,8 +44712,6 @@ function pathResolveLinkTailChain( test )
   ]
   test.identical( o.result, expectedResult );
   test.identical( o.found, expectedFound);
-
-  debugger;
 
   test.case = 'soft-hard-text-file';
   provider.filesDelete( context.provider.path.dir( filePath ) );
@@ -46456,7 +46426,6 @@ function pathResolveLinkFullRecursive( test )
   })
   test.identical( got.absolutePath, linkPath );
 
-  debugger
   var got = provider.pathResolveLinkFull
   ({
     filePath : linkPath,
@@ -49204,9 +49173,7 @@ function pathResolveLinkFullSpecial( test )
     resolvingHeadReverse : 1,
   }
   var o = _.props.extend( null, o1, o2 );
-  debugger;
   var got = provider.pathResolveLinkFull( o );
-  debugger;
   test.identical( got.absolutePath, pathToFile );
 
   /* - */
@@ -50716,7 +50683,6 @@ function pathNativize( t )
 
     /* */
 
-    debugger
     var path = '/A/abc/';
     var got = provider.path.nativize( path );
     var expected = 'A:\\abc\\';
@@ -50899,10 +50865,6 @@ function encodersFromGdfs( test )
         if( encoders[ ext ].gdf.feature.default )
         {
           test.will = 'Expects only one default gdf for encoder: ' + ext;
-          if( ext === 'json' )
-          debugger;
-          if( ext === 'json.min' )
-          debugger;
 
           let defaultConverter = _.gdf.extMap[ ext ].filter( ( c ) => !!c.feature.default );
 
@@ -50919,8 +50881,6 @@ function encodersFromGdfs( test )
           test.will = ext + ' encoder should exist';
           test.true( _.mapIs( encoders[ ext ] ) );
           test.will = ext + ' encoder should exist and use gdf: ' + gdf.name;
-          // if( encoders[ ext ].gdf !== gdf )
-          // debugger;
           test.true( encoders[ ext ].gdf === gdf );
         }
 
@@ -51274,9 +51234,7 @@ function statReadExperiment( test )
 
   test.shouldThrowErrorOfAnyKind( () =>
   {
-    debugger
     provider.statRead({ filePath : srcPath, throwing : 1 });
-    debugger;
   })
 
   /* - */
@@ -51294,9 +51252,7 @@ function experiment( test )
   let provider = context.provider;
   let path = provider.path;
 
-  debugger;
   var got = provider.dirRead( '/xxx' );
-  debugger;
 
 }
 

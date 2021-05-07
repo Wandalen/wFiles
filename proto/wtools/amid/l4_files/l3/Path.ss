@@ -347,6 +347,7 @@ function tempOpen( o )
       resolvingSoftLink : 1
     }).absolutePath;
 
+    if( self.fileProvider instanceof _.FileProvider.Default ) /* xxx qqq : for Dmytro : find better way to fix problem */ /* Dmytro : it is hack, temporary */
     _.assert( !self.path.isGlobal( result ), 'Expects non-global path' );
     /* xxx : qqq : uncomment and fix */
 
@@ -525,7 +526,6 @@ close /dir1
 //   {
 //     _.appExitHandlerOnce( () =>
 //     {
-//       debugger;
 //       self.tempClose()
 //     });
 //     logger.log( ' . Open temp directory ' + filePath2 );
@@ -671,8 +671,6 @@ pathDirTempMake.defaults = Object.create( tempOpen.defaults );
 //   _.assert( arguments.length <= 1 );
 //   _.assert( !!self.fileProvider );
 
-//   debugger;
-
 //   if( !self.pathDirTempForMap )
 //   return;
 
@@ -690,7 +688,6 @@ pathDirTempMake.defaults = Object.create( tempOpen.defaults );
 
 //     let devicePath = devicePathGet( tempDirPath );
 
-//     debugger;
 //     if( !self.pathDirTempForMap[ devicePath ] )
 //     throw _.err( 'Not found temp dir for device ' + devicePath );
 
@@ -721,7 +718,6 @@ pathDirTempMake.defaults = Object.create( tempOpen.defaults );
 //     delete self.pathDirTempForMap[ keyPath ];
 //     _.assert( !self.fileProvider.fileExists( tempPath ) );
 //     logger.log( ' . Close temp directory ' + tempPath );
-//     debugger;
 //     return tempPath;
 //   }
 
@@ -810,7 +806,6 @@ function tempClose( filePath )
     delete cache[ filePath ];
     _.assert( !self.fileProvider.fileExists( tempPath ), 'Temp dir:', _.strQuote( tempPath ), 'was closed, but still exist in file system.' );
     // logger.log( ' . Close temp directory ' + tempPath );
-    // debugger;
     return tempPath;
   }
 }
@@ -1121,7 +1116,6 @@ function tempClose( filePath )
 //     if( o.auto )
 //     _.process._exitHandlerOnce( () =>
 //     {
-//       debugger;
 //       self._nextPathDirTempClose({ syncLock : 1 })
 //     });
 
@@ -1237,7 +1231,6 @@ function tempClose( filePath )
 //     delete tempDirMap[ filePath ];
 //     _.assert( !self.fileProvider.fileExists( tempPath ), 'Temp dir:', _.strQuote( tempPath ), 'was closed, but still exist in file system.' );
 //     // logger.log( ' . Close temp directory ' + tempPath );
-//     // debugger;
 //     return tempPath;
 //   }
 // }

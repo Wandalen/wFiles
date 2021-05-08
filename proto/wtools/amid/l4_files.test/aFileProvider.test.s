@@ -322,6 +322,8 @@ function readWriteOptionWriteMode( test )
   a.reflect();
   var data = 'data1';
   var filePath = a.abs( 'file1.txt' );
+  var writeMode = 'rewrite';
+  a.fileProvider.fileWrite({ filePath, data, writeMode });
   var writeMode = 'append';
   let content = a.fileProvider.fileRead( filePath );
   a.fileProvider.fileWrite({ filePath, data, writeMode });
@@ -337,6 +339,8 @@ function readWriteOptionWriteMode( test )
   a.reflect();
   var data = '';
   var filePath = a.abs( 'file1.txt' );
+  var writeMode = 'rewrite';
+  a.fileProvider.fileWrite({ filePath, data, writeMode });
   var writeMode = 'append';
   content = a.fileProvider.fileRead( filePath );
   a.fileProvider.fileWrite({ filePath, data, writeMode });

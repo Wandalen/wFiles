@@ -323,6 +323,9 @@ function readWriteOptionWriteMode( test )
   var data = 'data1';
   var filePath = a.abs( 'file1.txt' );
   var writeMode = 'append';
+  a.fileProvider.fileWrite({ filePath, data, writeMode });
+  var got = a.fileProvider.fileRead( filePath );
+  test.identical( got, data + data );
 
   /* qqq : for junior : implement please */
   // test.true( false );
@@ -331,9 +334,12 @@ function readWriteOptionWriteMode( test )
 
   test.case = 'more test cases?';
   a.reflect();
-  var data = 'data1';
+  var data = '';
   var filePath = a.abs( 'file1.txt' );
   var writeMode = 'append';
+  a.fileProvider.fileWrite({ filePath, data, writeMode });
+  var got = a.fileProvider.fileRead( filePath );
+  test.identical( got, 'data1data1' );
 
   /* qqq : for junior : implement please */
   // test.true( false );

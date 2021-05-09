@@ -321,31 +321,63 @@ function readWriteOptionWriteMode( test )
   test.case = 'writeMode:append';
   a.reflect();
   var data = 'data1';
+  var dataForWrite = 'data2';
   var filePath = a.abs( 'file1.txt' );
   var writeMode = 'rewrite';
   a.fileProvider.fileWrite({ filePath, data, writeMode });
   var writeMode = 'append';
-  let content = a.fileProvider.fileRead( filePath );
-  a.fileProvider.fileWrite({ filePath, data, writeMode });
+  var content = a.fileProvider.fileRead( filePath );
+  a.fileProvider.fileWrite({ filePath, data: dataForWrite, writeMode });
   var got = a.fileProvider.fileRead( filePath );
-  test.identical( got, content + data );
+  test.identical( got, data + dataForWrite );
 
   /* qqq : for junior : implement please */
   // test.true( false );
 
   /* */
 
-  test.case = 'more test cases?';
+  test.case = 'writeMode:prepend';
   a.reflect();
-  var data = '';
+  var data = 'data1';
+  var dataForWrite = 'data2';
+  var filePath = a.abs( 'file1.txt' );
+  var writeMode = 'rewrite';
+  a.fileProvider.fileWrite({ filePath, data, writeMode });
+  var writeMode = 'prepend';
+  var content = a.fileProvider.fileRead( filePath );
+  a.fileProvider.fileWrite({ filePath, data: dataForWrite, writeMode });
+  var got = a.fileProvider.fileRead( filePath );
+  test.identical( got, dataForWrite + data );
+
+  /* */
+
+  test.case = 'append blank data';
+  a.reflect();
+  var data = 'data';
+  var dataForWrite = '';
   var filePath = a.abs( 'file1.txt' );
   var writeMode = 'rewrite';
   a.fileProvider.fileWrite({ filePath, data, writeMode });
   var writeMode = 'append';
-  content = a.fileProvider.fileRead( filePath );
-  a.fileProvider.fileWrite({ filePath, data, writeMode });
+  var content = a.fileProvider.fileRead( filePath );
+  a.fileProvider.fileWrite({ filePath, data: dataForWrite, writeMode });
   var got = a.fileProvider.fileRead( filePath );
-  test.identical( got, content );
+  test.identical( got, data );
+
+  /* */
+
+  test.case = 'prepend blank data';
+  a.reflect();
+  var data = 'data';
+  var dataForWrite = '';
+  var filePath = a.abs( 'file1.txt' );
+  var writeMode = 'rewrite';
+  a.fileProvider.fileWrite({ filePath, data, writeMode });
+  var writeMode = 'prepend';
+  var content = a.fileProvider.fileRead( filePath );
+  a.fileProvider.fileWrite({ filePath, data: dataForWrite, writeMode });
+  var got = a.fileProvider.fileRead( filePath );
+  test.identical( got, data );
 
   /* qqq : for junior : implement please */
   // test.true( false );

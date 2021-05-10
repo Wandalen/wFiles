@@ -49105,7 +49105,7 @@ function pathResolveLinkFullSpecial( test )
   }
   var o = _.props.extend( null, o1, o2 );
   var got = provider.pathResolveLinkFull( o ).relativePath;
-  var expected = test.context.globalFromPreferred( '../file' );
+  var expected = '../file';
   test.identical( got, expected );
 
   /* - */

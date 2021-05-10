@@ -23707,7 +23707,7 @@ function softLinkRelativePath( test )
   var got = provider.fileRead({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got, pathToFile );
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
-  test.identical( got, path.normalize( srcPath ) );
+  test.identical( got, '../file' );
 
   var srcPath = test.context.globalFromPreferred( './../file' );
   var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstFile' );
@@ -23719,7 +23719,7 @@ function softLinkRelativePath( test )
   var got = provider.fileRead({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got, pathToFile );
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
-  test.identical( got, path.normalize( srcPath ) );
+  test.identical( got, path.normalize( './../file' ) );
 
   var srcPath = test.context.globalFromPreferred( '../../file' );
   var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstPath/dstFile' );
@@ -23732,7 +23732,7 @@ function softLinkRelativePath( test )
   var got = provider.fileRead({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got, pathToFile );
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
-  test.identical( got, path.normalize( srcPath ) );
+  test.identical( got, path.normalize( '../../file' ) );
 
   var srcPath = test.context.globalFromPreferred( './../../file' );
   var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstPath/dstFile' );
@@ -23745,7 +23745,7 @@ function softLinkRelativePath( test )
   var got = provider.fileRead({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got, pathToFile );
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
-  test.identical( got, path.normalize( srcPath ) );
+  test.identical( got, path.normalize( './../../file'  ) );
 
   var srcPath = test.context.globalFromPreferred( './../../../file' );
   var pathToFile2 = test.context.pathFor( 'written/softLinkRelativePath/a/file' );
@@ -23760,7 +23760,7 @@ function softLinkRelativePath( test )
   var got = provider.fileRead({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got, pathToFile2 );
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
-  test.identical( got, path.normalize( srcPath ) );
+  test.identical( got, path.normalize( './../../../file' ) );
 
   var srcPath = test.context.globalFromPreferred( '../../../file' );
   var pathToFile2 = test.context.pathFor( 'written/softLinkRelativePath/a/file' );
@@ -23775,7 +23775,7 @@ function softLinkRelativePath( test )
   var got = provider.fileRead({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got, pathToFile2 );
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
-  test.identical( got, path.normalize( srcPath ) );
+  test.identical( got, path.normalize( '../../../file' ) );
 
   var srcPath = test.context.globalFromPreferred( './.././a/b/c' );
   var pathToFile2 = test.context.pathFor( 'written/softLinkRelativePath/a/b/c' );
@@ -23791,7 +23791,7 @@ function softLinkRelativePath( test )
   var got = provider.fileRead({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got, pathToFile2 );
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
-  test.identical( got, path.normalize( srcPath ) );
+  test.identical( got, path.normalize( './.././a/b/c' ) );
 
   var srcPath = test.context.globalFromPreferred( '.././z/b/c' );
   var pathToFile2 = test.context.pathFor( 'written/softLinkRelativePath/z/b/c' );
@@ -23807,7 +23807,7 @@ function softLinkRelativePath( test )
   var got = provider.fileRead({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got, pathToFile2 );
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
-  test.identical( got, path.normalize( srcPath ) );
+  test.identical( got, path.normalize( '.././z/b/c' ) );
 
   var srcPath = test.context.globalFromPreferred( '.\\..\\.\\z\\b\\c' );
   var pathToFile2 = test.context.pathFor( 'written/softLinkRelativePath/z/b/c' );
@@ -23823,7 +23823,7 @@ function softLinkRelativePath( test )
   var got = provider.fileRead({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got, pathToFile2 );
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
-  test.identical( got, path.normalize( srcPath ) );
+  test.identical( got, path.normalize( '.\\..\\.\\z\\b\\c' ) );
 
   var srcPath = test.context.globalFromPreferred( '..\\.\\z\\b\\c' );
   var pathToFile2 = test.context.pathFor( 'written/softLinkRelativePath/z/b/c' );
@@ -23839,7 +23839,7 @@ function softLinkRelativePath( test )
   var got = provider.fileRead({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got, pathToFile2 );
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
-  test.identical( got, path.normalize( srcPath ) );
+  test.identical( got, path.normalize( '..\\.\\z\\b\\c' ) );
 
   var srcPath = test.context.globalFromPreferred( './../a/b/c/../..' );
   var pathToFile2 = test.context.pathFor( 'written/softLinkRelativePath/a' );
@@ -23855,7 +23855,7 @@ function softLinkRelativePath( test )
   var got = provider.fileRead({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got, pathToFile2 );
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
-  test.identical( got, path.normalize( srcPath ) );
+  test.identical( got, path.normalize( './../a/b/c/../..' ) );
 
   var srcPath = test.context.globalFromPreferred( '../a/b/c/../..' );
   var pathToFile2 = test.context.pathFor( 'written/softLinkRelativePath/a' );
@@ -23871,7 +23871,7 @@ function softLinkRelativePath( test )
   var got = provider.fileRead({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got, pathToFile2 );
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
-  test.identical( got, path.normalize( srcPath ) );
+  test.identical( got, path.normalize( '../a/b/c/../..' ) );
 
   var srcPath = test.context.globalFromPreferred( '.\\..\\a\\b\\c\\..\\..' );
   var pathToFile2 = test.context.pathFor( 'written/softLinkRelativePath/a' );
@@ -23887,7 +23887,7 @@ function softLinkRelativePath( test )
   var got = provider.fileRead({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got, pathToFile2 );
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
-  test.identical( got, path.normalize( srcPath ) );
+  test.identical( got, path.normalize( '.\\..\\a\\b\\c\\..\\..' ) );
 
   var srcPath = test.context.globalFromPreferred( '..\\a\\b\\c\\..\\..' );
   var pathToFile2 = test.context.pathFor( 'written/softLinkRelativePath/a' );
@@ -23903,7 +23903,7 @@ function softLinkRelativePath( test )
   var got = provider.fileRead({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got, pathToFile2 );
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
-  test.identical( got, path.normalize( srcPath ) );
+  test.identical( got, path.normalize( '..\\a\\b\\c\\..\\..' ) );
 
   var srcPath = test.context.globalFromPreferred( '..\\a\\b\\c\\..\\..' );
   var pathToFile2 = test.context.pathFor( 'written/softLinkRelativePath/a' );
@@ -23934,7 +23934,7 @@ function softLinkRelativePath( test )
   var got = provider.dirRead({ filePath : dstPath });
   test.identical( got, [ 'fileInDir' ] );
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
-  test.identical( got, path.normalize( srcPath ) );
+  test.identical( got, path.normalize( '../dir' ) );
 
   var srcPath = test.context.globalFromPreferred( './../dir' );
   var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstPath' );
@@ -23946,7 +23946,7 @@ function softLinkRelativePath( test )
   var got = provider.dirRead({ filePath : dstPath });
   test.identical( got, [ 'fileInDir' ] );
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
-  test.identical( got, path.normalize( srcPath ) );
+  test.identical( got, path.normalize( './../dir' ) );
 
   var srcPath = test.context.globalFromPreferred( '../../dir' );
   var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstPath/dstDirLink' );
@@ -23959,7 +23959,7 @@ function softLinkRelativePath( test )
   var got = provider.dirRead({ filePath : dstPath });
   test.identical( got, [ 'fileInDir' ] );
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
-  test.identical( got, path.normalize( srcPath ) );
+  test.identical( got, path.normalize( '../../dir' ) );
 
   var srcPath = test.context.globalFromPreferred( './../../dir' );
   var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstPath/dstDirLink' );
@@ -23972,7 +23972,7 @@ function softLinkRelativePath( test )
   var got = provider.dirRead({ filePath : dstPath });
   test.identical( got, [ 'fileInDir' ] );
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
-  test.identical( got, path.normalize( srcPath ) );
+  test.identical( got, path.normalize( './../../dir' ) );
 
   var srcPath = test.context.globalFromPreferred( '../../../dir' );
   var pathToDir2 = test.context.pathFor( 'written/softLinkRelativePath/a/dir' );
@@ -23989,7 +23989,7 @@ function softLinkRelativePath( test )
   var got = provider.dirRead({ filePath : dstPath });
   test.identical( got, [ 'fileInDir' ] );
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
-  test.identical( got, path.normalize( srcPath ) );
+  test.identical( got, path.normalize( '../../../dir' ) );
 
   var srcPath = test.context.globalFromPreferred( './../../../dir' );
   var pathToDir2 = test.context.pathFor( 'written/softLinkRelativePath/a/dir' );
@@ -24006,7 +24006,7 @@ function softLinkRelativePath( test )
   var got = provider.dirRead({ filePath : dstPath });
   test.identical( got, [ 'fileInDir' ] );
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
-  test.identical( got, path.normalize( srcPath ) );
+  test.identical( got, path.normalize( './../../../dir' ) );
 
   /* - */
 
@@ -24025,7 +24025,7 @@ function softLinkRelativePath( test )
   var got = provider.dirRead({ filePath : dstPath });
   test.identical( got, [ 'fileInDir' ] );
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
-  test.identical( got, path.normalize( srcPath ) );
+  test.identical( got, path.normalize( './.././a/b/c' ) );
 
   var srcPath = test.context.globalFromPreferred( '.././a/b/c' );
   var pathToDir2 = test.context.pathFor( 'written/softLinkRelativePath/a/b/c' );
@@ -24042,7 +24042,7 @@ function softLinkRelativePath( test )
   var got = provider.dirRead({ filePath : dstPath });
   test.identical( got, [ 'fileInDir' ] );
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
-  test.identical( got, path.normalize( srcPath ) );
+  test.identical( got, path.normalize( '.././a/b/c' ) );
 
   var srcPath = test.context.globalFromPreferred( '.\\..\\.\\a\\b\\c' );
   var pathToDir2 = test.context.pathFor( 'written/softLinkRelativePath/a/b/c' );
@@ -24059,7 +24059,7 @@ function softLinkRelativePath( test )
   var got = provider.dirRead({ filePath : dstPath });
   test.identical( got, [ 'fileInDir' ] );
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
-  test.identical( got, path.normalize( srcPath ) );
+  test.identical( got, path.normalize( '.\\..\\.\\a\\b\\c' ) );
 
   var srcPath = test.context.globalFromPreferred( '..\\.\\a\\b\\c' );
   var pathToDir2 = test.context.pathFor( 'written/softLinkRelativePath/a/b/c' );
@@ -24076,7 +24076,7 @@ function softLinkRelativePath( test )
   var got = provider.dirRead({ filePath : dstPath });
   test.identical( got, [ 'fileInDir' ] );
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
-  test.identical( got, path.normalize( srcPath ) );
+  test.identical( got, path.normalize( '..\\.\\a\\b\\c' ) );
 
 
   var srcPath = test.context.globalFromPreferred( './../a/b/c/../..' );
@@ -24094,7 +24094,7 @@ function softLinkRelativePath( test )
   var got = provider.dirRead({ filePath : dstPath });
   test.identical( got, [ 'fileInDir' ] );
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
-  test.identical( got, path.normalize( srcPath ) );
+  test.identical( got, path.normalize( './../a/b/c/../..' ) );
 
   var srcPath = test.context.globalFromPreferred( '../a/b/c/../..' );
   var pathToDir2 = test.context.pathFor( 'written/softLinkRelativePath/a' );
@@ -24111,7 +24111,7 @@ function softLinkRelativePath( test )
   var got = provider.dirRead({ filePath : dstPath });
   test.identical( got, [ 'fileInDir' ] );
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
-  test.identical( got, path.normalize( srcPath ) );
+  test.identical( got, path.normalize( '../a/b/c/../..' ) );
 
 
   var srcPath = test.context.globalFromPreferred( '.\\..\\a\\b\\c\\..\\..' );
@@ -24129,7 +24129,7 @@ function softLinkRelativePath( test )
   var got = provider.dirRead({ filePath : dstPath });
   test.identical( got, [ 'fileInDir' ] );
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
-  test.identical( got, path.normalize( srcPath ) );
+  test.identical( got, path.normalize( '.\\..\\a\\b\\c\\..\\..' ) );
 
 
   var srcPath = test.context.globalFromPreferred( '..\\a\\b\\c\\..\\..' );
@@ -24147,7 +24147,7 @@ function softLinkRelativePath( test )
   var got = provider.dirRead({ filePath : dstPath });
   test.identical( got, [ 'fileInDir' ] );
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
-  test.identical( got, path.normalize( srcPath ) );
+  test.identical( got, path.normalize( '..\\a\\b\\c\\..\\..' ) );
 
   var srcPath = test.context.globalFromPreferred( '..\\a\\b\\c\\..\\..' );
   var pathToFile2 = test.context.pathFor( 'written/softLinkRelativePath/a' );
@@ -24353,7 +24353,7 @@ function softLinkRelativePath( test )
   //   test.identical( got.absolutePath, pathToFile );
   // }
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
-  test.identical( got, srcPath );
+  test.identical( got, '../file' );
 
   var srcPath = test.context.globalFromPreferred( '../file' );
   var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstFile' );
@@ -24391,7 +24391,7 @@ function softLinkRelativePath( test )
   //   test.identical( got.absolutePath, pathToFile );
   // }
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
-  test.identical( got, srcPath );
+  test.identical( got, '../file' );
 
   var srcPath = test.context.globalFromPreferred( '../file' );
   var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstFile' );
@@ -24429,7 +24429,7 @@ function softLinkRelativePath( test )
   //   test.identical( got.absolutePath, pathToFile );
   // }
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
-  test.identical( got, srcPath );
+  test.identical( got, '../file' );
 
   var srcPath = test.context.globalFromPreferred( '../file' );
   var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstFile' );
@@ -24467,7 +24467,7 @@ function softLinkRelativePath( test )
   //   test.identical( got.absolutePath, pathToFile );
   // }
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
-  test.identical( got, srcPath );
+  test.identical( got, '../file' );
 
   test.close( 'allowingMissed on, relative path to src' );
 
@@ -24499,12 +24499,12 @@ function softLinkRelativePath( test )
     })
   });
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
-  test.identical( got, srcPath );
+  test.identical( got, '../file' );
 
   /* - */
 
   var srcPath = pathToFile;
-  var dstPath = test.context.globalFromPreferred( '../file' );
+  var dstPath = pathToFile;
   var dstPathResolved = provider.path.resolve( srcPath, dstPath );
   provider.filesDelete( routinePath );
   provider.fileWrite( pathToFile, pathToFile );
@@ -24528,7 +24528,7 @@ function softLinkRelativePath( test )
     })
   });
   var got = provider.pathResolveSoftLink({ filePath : dstPathResolved/*, readLink : 1*/ });
-  test.identical( got, srcPath );
+  test.identical( got, pathToFile );
 
   test.close( 'allowingMissed on, same path' );
 
@@ -24604,7 +24604,7 @@ function softLinkRelativePath( test )
 
   test.open( 'allowingMissed off, same path' );
 
-  var srcPath = test.context.globalFromPreferred( '../file' );
+  var srcPath = '../file';
   var dstPath = pathToFile;
   provider.filesDelete( routinePath );
   provider.fileWrite( pathToFile, pathToFile );
@@ -24621,7 +24621,7 @@ function softLinkRelativePath( test )
   })
   test.true( !provider.isSoftLink( dstPath ) );
 
-  var srcPath = pathToFile;
+  var srcPath = 'current://../file';
   var dstPath = test.context.globalFromPreferred( '../file' );
   var dstPathResolved = provider.path.resolve( srcPath, dstPath );
   provider.filesDelete( routinePath );

@@ -44388,7 +44388,7 @@ function pathResolveLinkTailChain( test )
   var o = _.props.extend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
   provider.pathResolveLinkTailChain( o );
   var expectedFound = [ linkPath, filePath ]
-  var expectedResult = [ linkPath, test.context.globalFromPreferred( '../file' ) ]
+  var expectedResult = [ linkPath, '../file' ]
   test.identical( o.result, expectedResult );
   test.identical( o.found, expectedFound );
 
@@ -44509,7 +44509,7 @@ function pathResolveLinkTailChain( test )
   var expectedResult =
   [
     linkPath,
-    test.context.globalFromPreferred( '../file' ),
+    '../file',
     null
   ]
   test.identical( o.result, expectedResult );
@@ -44692,7 +44692,7 @@ function pathResolveLinkTailChain( test )
   provider.fileWrite( filePath, filePath );
   provider.softLink( linkPath3, filePath );
   provider.softLink( linkPath2, '../link3' );
-  provider.softLink( linkPath, test.context.globalFromPreferred( '../link2' ) );
+  provider.softLink( linkPath, '../link2' );
   var o = _.props.extend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
   provider.pathResolveLinkTailChain( o );
   var expectedFound =
@@ -44705,8 +44705,8 @@ function pathResolveLinkTailChain( test )
   var expectedResult =
   [
     linkPath,
-    test.context.globalFromPreferred( '../link2' ),
-    test.context.globalFromPreferred( '../link3' ),
+    '../link2',
+    '../link3',
     filePath
   ]
   test.identical( o.result, expectedResult );
@@ -44743,7 +44743,7 @@ function pathResolveLinkTailChain( test )
   var o = _.props.extend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
   provider.pathResolveLinkTailChain( o );
   test.identical( o.found, [ linkPath, linkPath2, linkPath3, filePath ] )
-  test.identical( o.result, [ linkPath, test.context.globalFromPreferred( '../link2' ), linkPath3, filePath ]  )
+  test.identical( o.result, [ linkPath, '../link2', linkPath3, filePath ]  )
 
   // /* chain, resolvingHeadDirectories : [ 0, 1 ] */
 
@@ -45264,7 +45264,7 @@ function pathResolveLinkTailChain( test )
   provider.softLink({ dstPath : linkPath, srcPath : '../file', allowingMissed : 1, makingDirectory : 1 });
   var o = _.props.extend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
   test.shouldThrowErrorOfAnyKind( () => provider.pathResolveLinkTailChain( o ) );
-  test.identical( o.result, [ linkPath, test.context.globalFromPreferred( '../file' ), null ] )
+  test.identical( o.result, [ linkPath, '../file', null ] )
   test.identical( o.found, [ linkPath, filePath, null ] )
 
   test.case = 'textLink to missing';
@@ -45280,7 +45280,7 @@ function pathResolveLinkTailChain( test )
   provider.textLink({ dstPath : linkPath, srcPath : '../file', allowingMissed : 1, makingDirectory : 1 });
   var o = _.props.extend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
   test.shouldThrowErrorOfAnyKind( () => provider.pathResolveLinkTailChain( o ) );
-  test.identical( o.result, [ linkPath, test.context.globalFromPreferred( '../file' ), null ] )
+  test.identical( o.result, [ linkPath, '../file', null ] )
   test.identical( o.found, [ linkPath, filePath, null ] )
 
   test.case = 'double textLink to missing';
@@ -45398,7 +45398,7 @@ function pathResolveLinkTailChain( test )
   provider.softLink({ dstPath : linkPath, srcPath : '../file', allowingMissed : 1, makingDirectory : 1 });
   var o = _.props.extend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
   test.mustNotThrowError( () => provider.pathResolveLinkTailChain( o ) );
-  test.identical( o.result, [ linkPath, test.context.globalFromPreferred( '../file' ), null ] )
+  test.identical( o.result, [ linkPath, '../file', null ] )
   test.identical( o.found, [ linkPath, filePath, null ] )
 
   test.case = 'textLink to missing';
@@ -45414,7 +45414,7 @@ function pathResolveLinkTailChain( test )
   provider.textLink({ dstPath : linkPath, srcPath : '../file', allowingMissed : 1, makingDirectory : 1 });
   var o = _.props.extend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
   test.mustNotThrowError( () => provider.pathResolveLinkTailChain( o ) );
-  test.identical( o.result, [ linkPath, test.context.globalFromPreferred( '../file' ), null ] )
+  test.identical( o.result, [ linkPath, '../file', null ] )
   test.identical( o.found, [ linkPath, filePath, null ] )
 
   test.case = 'double textLink to missing';
@@ -46650,7 +46650,7 @@ function pathResolveSoftLink( test )
   provider.softLink( linkPath, '../file' );
   var o = _.props.extend( null, o1, { filePath : linkPath } );
   var got = provider.pathResolveSoftLink( o );
-  test.identical( got, test.context.globalFromPreferred( '../file' ) );
+  test.identical( got, '../file' );
 
   test.case = 'absolute softlink to missing'
   provider.filesDelete( routinePath );
@@ -46701,7 +46701,7 @@ function pathResolveSoftLink( test )
   var got = provider.pathResolveSoftLink( { filePath : linkPath } );
   test.identical( got, linkPath2 );
   var got1 = provider.pathResolveSoftLink( { filePath : got } );
-  test.identical( got1, test.context.globalFromPreferred( '../file' ) );
+  test.identical( got1, '../file' );
   var got2 = provider.path.resolve( linkPath2, got1 );
   test.identical( got2, filePath );
 
@@ -46713,7 +46713,7 @@ function pathResolveSoftLink( test )
   var got = provider.pathResolveSoftLink( { filePath : linkPath } );
   test.identical( got, linkPath2 );
   var got1 = provider.pathResolveSoftLink( { filePath : got } );
-  test.identical( got1, test.context.globalFromPreferred( '../file0' ) );
+  test.identical( got1, '../file0' );
   var got2 = provider.path.resolve( linkPath2, got1 );
   test.identical( got2, filePath + '0' );
 
@@ -46803,7 +46803,7 @@ function pathResolveSoftLink( test )
   provider.softLink({ dstPath : linkPath, srcPath : '../file', allowingMissed : 1, makingDirectory : 1 });
   provider.softLink({ dstPath : linkPath2, srcPath : '../link' });
   var got = provider.pathResolveSoftLink( { filePath : linkPath2, resolvingMultiple : 3 } );
-  test.identical( got, test.context.globalFromPreferred( '../file' ) );
+  test.identical( got, '../file' );
 
   test.case = 'Chain with relative and absolute softLinks';
   provider.filesDelete( routinePath );
@@ -46811,7 +46811,7 @@ function pathResolveSoftLink( test )
   provider.softLink({ dstPath : linkPath2, srcPath : linkPath });
   provider.softLink({ dstPath : linkPath3, srcPath : '../link2' });
   var got = provider.pathResolveSoftLink( { filePath : linkPath3, resolvingMultiple : 3 } );
-  test.identical( got, test.context.globalFromPreferred( '../file' ) );
+  test.identical( got, '../file' );
 
   /* resolvingIntermediateDirectories */
 

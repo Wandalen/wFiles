@@ -33742,8 +33742,8 @@ function fileExchangeAsync( test )
     {
       test.true( provider.isSoftLink( srcPath ) );
       test.true( provider.isSoftLink( dstPath ) );
-      test.identical( provider.pathResolveSoftLink( srcPath ), test.context.globalFromPreferred( '../dst' ) );
-      test.identical( provider.pathResolveSoftLink( dstPath ), test.context.globalFromPreferred( '../src' ) );
+      test.identical( provider.pathResolveSoftLink( srcPath ), '../dst' );
+      test.identical( provider.pathResolveSoftLink( dstPath ), '../src' );
       return got;
     })
   })
@@ -33770,8 +33770,8 @@ function fileExchangeAsync( test )
     {
       test.true( provider.isSoftLink( srcPath ) );
       test.true( provider.isSoftLink( dstPath ) );
-      test.identical( provider.pathResolveSoftLink( srcPath ), test.context.globalFromPreferred( '../src' ) );
-      test.identical( provider.pathResolveSoftLink( dstPath ), test.context.globalFromPreferred( '../dst' ) );
+      test.identical( provider.pathResolveSoftLink( srcPath ), '../src' );
+      test.identical( provider.pathResolveSoftLink( dstPath ), '../dst' );
       return null;
     })
 
@@ -33799,8 +33799,8 @@ function fileExchangeAsync( test )
       test.identical( got, null );
       test.true( provider.isSoftLink( srcPath ) );
       test.true( provider.isSoftLink( dstPath ) );
-      test.identical( provider.pathResolveSoftLink( srcPath ), test.context.globalFromPreferred( '../src' ) );
-      test.identical( provider.pathResolveSoftLink( dstPath ), test.context.globalFromPreferred( '../dst' ) );
+      test.identical( provider.pathResolveSoftLink( srcPath ), '../src' );
+      test.identical( provider.pathResolveSoftLink( dstPath ), '../dst' );
       return null;
     })
   })
@@ -33827,7 +33827,7 @@ function fileExchangeAsync( test )
       test.true( provider.isTerminal( srcPath ) );
       test.true( provider.isSoftLink( dstPathTerminal ) );
       test.identical( provider.fileRead( srcPath ), dstPathTerminal );
-      test.identical( provider.pathResolveSoftLink( dstPathTerminal ), test.context.globalFromPreferred( '../src' ) );
+      test.identical( provider.pathResolveSoftLink( dstPathTerminal ), '../src' );
       return got;
     })
 
@@ -33856,7 +33856,7 @@ function fileExchangeAsync( test )
       test.true( provider.isTerminal( dstPathTerminal ) );
       test.true( provider.isSoftLink( srcPath ) );
       test.identical( provider.fileRead( dstPathTerminal ), dstPathTerminal );
-      test.identical( provider.pathResolveSoftLink( srcPath ), test.context.globalFromPreferred( '../src' ) );
+      test.identical( provider.pathResolveSoftLink( srcPath ), '../src' );
       return null;
     })
   })
@@ -33884,13 +33884,12 @@ function fileExchangeAsync( test )
       test.true( provider.isTerminal( dstPathTerminal ) );
       test.true( provider.isSoftLink( srcPath ) );
       test.identical( provider.fileRead( dstPathTerminal ), dstPathTerminal );
-      test.identical( provider.pathResolveSoftLink( srcPath ), test.context.globalFromPreferred( '../src' ) );
+      test.identical( provider.pathResolveSoftLink( srcPath ), '../src' );
       return null;
     })
   })
 
   return consequence;
-
 }
 
 //

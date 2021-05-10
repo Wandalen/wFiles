@@ -20466,7 +20466,7 @@ function dirReadSyncOutputFormats( test )
     outputFormat : 'relative',
     basePath
   })
-  test.identical( got, [ test.context.globalFromPreferred( '../file' ) ] );
+  test.identical( got, [ '../file' ] );
 
   test.case = 'directory';
   provider.fileWrite( filePath, filePath );
@@ -20476,7 +20476,7 @@ function dirReadSyncOutputFormats( test )
     outputFormat : 'relative',
     basePath
   })
-  test.identical( got, [ test.context.globalFromPreferred( '../file' ) ] );
+  test.identical( got, [ '../file' ] );
 
 }
 

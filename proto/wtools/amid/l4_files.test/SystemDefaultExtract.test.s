@@ -70,6 +70,15 @@ function onRoutineEnd( test )
 
 //
 
+function pathFor( filePath )
+{
+  let context = this;
+  filePath = _.path.join( context.suiteTempPath, filePath );
+  return filePath
+}
+
+//
+
 function providerMake()
 {
   let context = this;
@@ -109,6 +118,7 @@ const Proto =
 
   context :
   {
+    pathFor,
     providerMake,
     // filesTree,
     provider : null,

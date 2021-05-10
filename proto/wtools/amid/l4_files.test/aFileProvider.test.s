@@ -8304,8 +8304,8 @@ function fileCopyLinks( test )
   test.identical( o.dstPath, dstPath );
   test.true( provider.isSoftLink( srcPath ) );
   test.true( provider.isSoftLink( dstPath ) );
-  test.identical( provider.pathResolveSoftLink( srcPath ), test.context.globalFromPreferred( '../src' ) );
-  test.identical( provider.pathResolveSoftLink( dstPath ), test.context.globalFromPreferred( srcPath ) );
+  test.identical( provider.pathResolveSoftLink( srcPath ), '../src' );
+  test.identical( provider.pathResolveSoftLink( dstPath ), srcPath );
 
   test.case = 'both are context links';
   provider.filesDelete( routinePath );
@@ -8319,8 +8319,8 @@ function fileCopyLinks( test )
   test.identical( o.dstPath, dstPath );
   test.true( provider.isSoftLink( srcPath ) );
   test.true( provider.isSoftLink( dstPath ) );
-  test.identical( provider.pathResolveSoftLink( srcPath ), test.context.globalFromPreferred( '../src' ) );
-  test.identical( provider.pathResolveSoftLink( dstPath ), test.context.globalFromPreferred( srcPath ) );
+  test.identical( provider.pathResolveSoftLink( srcPath ), '../src' );
+  test.identical( provider.pathResolveSoftLink( dstPath ), srcPath );
 
   test.case = 'src cycled';
   provider.filesDelete( routinePath );

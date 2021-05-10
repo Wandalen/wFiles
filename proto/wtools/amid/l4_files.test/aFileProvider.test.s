@@ -47826,7 +47826,7 @@ function pathResolveTextLink( test )
   provider.textLink({ dstPath : linkPath, srcPath : '../file2', allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath };
   var got = provider.pathResolveTextLink( o );
-  test.identical( got, test.context.globalFromPreferred( '../file2' ) );
+  test.identical( got, '../file2' );
 
   test.case = 'relative textLink to regular file';
   provider.filesDelete( routinePath );
@@ -47834,7 +47834,7 @@ function pathResolveTextLink( test )
   provider.textLink({ dstPath : linkPath, srcPath : '../file' });
   var o = { filePath : linkPath };
   var got = provider.pathResolveTextLink( o );
-  test.identical( got, test.context.globalFromPreferred( '../file' ) );
+  test.identical( got, '../file' );
 
   test.case = 'absolute softLink to file that does not exist';
   provider.filesDelete( routinePath );  // remove temp files created by previous test case
@@ -47878,7 +47878,7 @@ function pathResolveTextLink( test )
   var got = provider.pathResolveTextLink( { filePath : linkPath } );
   test.identical( got, linkPath2 );
   var got1 = provider.pathResolveTextLink( { filePath : got } );
-  test.identical( got1, test.context.globalFromPreferred( '../file' ) );
+  test.identical( got1, '../file' );
   var got2 = provider.path.resolve( linkPath2, got1 );
   test.identical( got2, filePath );
 
@@ -47890,7 +47890,7 @@ function pathResolveTextLink( test )
   var got = provider.pathResolveTextLink( { filePath : linkPath } );
   test.identical( got, linkPath2 );
   var got1 = provider.pathResolveTextLink( { filePath : got } );
-  test.identical( got1, test.context.globalFromPreferred( '../file0' ) );
+  test.identical( got1, '../file0' );
   var got2 = provider.path.resolve( linkPath2, got1 );
   test.identical( got2, filePath + '0' );
 
@@ -48128,7 +48128,7 @@ function pathResolveTextLink( test )
   provider.textLink({ dstPath : linkPath, srcPath : '../file', allowingMissed : 1, makingDirectory : 1 });
   provider.textLink({ dstPath : linkPath2, srcPath : '../link' });
   var got = provider.pathResolveTextLink( { filePath : linkPath2, resolvingMultiple : 3 } );
-  test.identical( got, context.globalFromPreferred( '../file' ) );
+  test.identical( got, '../file' );
 
   test.case = 'Chain with relative and absolute textlinks';
   provider.filesDelete( routinePath );
@@ -48136,7 +48136,7 @@ function pathResolveTextLink( test )
   provider.textLink({ dstPath : linkPath2, srcPath : linkPath });
   provider.textLink({ dstPath : linkPath3, srcPath : '../link2' });
   var got = provider.pathResolveTextLink( { filePath : linkPath3, resolvingMultiple : 3 } );
-  test.identical( got, context.globalFromPreferred( '../file' ) );
+  test.identical( got, '../file' );
 
   /* resolvingIntermediateDirectories */
 
@@ -49285,7 +49285,7 @@ function pathResolveLinkFullResult( test )
   var o2 = { filePath : dstPath };
   var got = provider.pathResolveLinkFull( _.props.extend( null, o, o2 ));
   test.identical( got.filePath, srcPath );
-  // test.identical( got.relativePath, test.context.globalFromPreferred( '../file' ) );
+  // test.identical( got.relativePath, '../file' );
   test.identical( got.relativePath, '../file' );
   test.identical( got.absolutePath, srcPath );
 

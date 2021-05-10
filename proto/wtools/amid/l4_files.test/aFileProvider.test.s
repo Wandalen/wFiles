@@ -13371,7 +13371,7 @@ function fileRenameSoftLinkResolving( test )
   fileRename( o );
   test.true( !provider.fileExists( srcPath ) );
   test.true( provider.isSoftLink( dstPath ) );
-  test.identical( provider.pathResolveSoftLink( dstPath ), test.context.globalFromPreferred( '../src' ) );
+  test.identical( provider.pathResolveSoftLink( dstPath ), '../src' );
   //test.identical( provider.statResolvedRead( dstPath ), null );
 
   provider.filesDelete( routinePath );
@@ -13382,8 +13382,8 @@ function fileRenameSoftLinkResolving( test )
   test.shouldThrowErrorOfAnyKind( () => fileRename( o ) );
   test.true( provider.isSoftLink( srcPath ) );
   test.true( provider.isSoftLink( dstPath ) );
-  test.identical( provider.pathResolveSoftLink( srcPath ), test.context.globalFromPreferred( '../src' ) );
-  test.identical( provider.pathResolveSoftLink( dstPath ), test.context.globalFromPreferred( '../dst' ) );
+  test.identical( provider.pathResolveSoftLink( srcPath ), '../src' );
+  test.identical( provider.pathResolveSoftLink( dstPath ), '../dst' );
   //test.identical( provider.statResolvedRead( srcPath ), null );
   //test.identical( provider.statResolvedRead( dstPath ), null );
 
@@ -13395,7 +13395,7 @@ function fileRenameSoftLinkResolving( test )
   fileRename( o );
   test.true( !provider.fileExists( srcPath ) );
   test.true( provider.isSoftLink( dstPath ) );
-  test.identical( provider.pathResolveSoftLink( dstPath ), test.context.globalFromPreferred( '../src' ) );
+  test.identical( provider.pathResolveSoftLink( dstPath ), '../src' );
   //test.identical( provider.statResolvedRead( dstPath ), null );
 
   provider.filesDelete( routinePath );
@@ -13406,8 +13406,8 @@ function fileRenameSoftLinkResolving( test )
   test.shouldThrowErrorOfAnyKind( () => fileRename( o ) );
   test.true( provider.isSoftLink( srcPath ) );
   test.true( provider.isSoftLink( dstPath ) );
-  test.identical( provider.pathResolveSoftLink( srcPath ), test.context.globalFromPreferred( '../src' ) );
-  test.identical( provider.pathResolveSoftLink( dstPath ), test.context.globalFromPreferred( '../dst' ) );
+  test.identical( provider.pathResolveSoftLink( srcPath ), '../src' );
+  test.identical( provider.pathResolveSoftLink( dstPath ), '../dst' );
   //test.identical( provider.statResolvedRead( srcPath ), null );
   //test.identical( provider.statResolvedRead( dstPath ), null );
 

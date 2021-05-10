@@ -28251,7 +28251,7 @@ function textLinkSync( test )
   test.true( provider.isTextLink( linkPath1 ) );
   test.true( !provider.fileExists( filePath1 ) );
   var got = provider.pathResolveTextLink( linkPath1 );
-  test.identical( got, test.context.globalFromPreferred( '../file1' ) );
+  test.identical( got, '../file1' );
 
   test.case = 'relative text link to terminal';
   provider.filesDelete( routinePath );
@@ -28265,7 +28265,7 @@ function textLinkSync( test )
   test.true( provider.isTextLink( linkPath1 ) );
   test.true( provider.isTerminal( filePath1 ) );
   var got = provider.pathResolveTextLink( linkPath1 );
-  test.identical( got, test.context.globalFromPreferred( '../file1' ) );
+  test.identical( got, '../file1' );
 
   /* */
 

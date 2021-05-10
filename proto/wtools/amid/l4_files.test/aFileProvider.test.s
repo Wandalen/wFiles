@@ -47319,7 +47319,7 @@ function pathResolveSoftLinkExtended( test )
     resolvingMultiple : 1,
     throwing : 0
   });
-  test.identical( got, test.context.globalFromPreferred( '../link' ) )
+  test.identical( got, '../link' )
 
   var got = provider.pathResolveSoftLink
   ({
@@ -47389,7 +47389,7 @@ function pathResolveSoftLinkExtended( test )
     resolvingMultiple : 1,
     throwing : 1
   });
-  test.identical( got, test.context.globalFromPreferred( '../link' ) )
+  test.identical( got, '../link' )
 
   var got = provider.pathResolveSoftLink
   ({
@@ -47492,7 +47492,7 @@ function pathResolveSoftLinkExtended( test )
     resolvingMultiple : 1,
     throwing : 1
   });
-  test.identical( got, test.context.globalFromPreferred( '../link2' ) )
+  test.identical( got, '../link2' )
 
   var got = provider.pathResolveSoftLink
   ({
@@ -47502,7 +47502,7 @@ function pathResolveSoftLinkExtended( test )
     resolvingMultiple : 1,
     throwing : 1
   });
-  test.identical( got, test.context.globalFromPreferred( '../link2' ) )
+  test.identical( got, '../link2' )
 
   var got = provider.pathResolveSoftLink
   ({
@@ -47512,7 +47512,7 @@ function pathResolveSoftLinkExtended( test )
     resolvingMultiple : 2,
     throwing : 1
   });
-  test.identical( got, test.context.globalFromPreferred( '../link2' ) )
+  test.identical( got, '../link2' )
 
   test.shouldThrowErrorSync( () =>
   {
@@ -47544,7 +47544,7 @@ function pathResolveSoftLinkExtended( test )
     resolvingMultiple : 3,
     throwing : 1
   });
-  test.identical( got, test.context.globalFromPreferred( '../link2' ) )
+  test.identical( got, '../link2' )
 
   test.shouldThrowErrorSync( () =>
   {
@@ -47598,7 +47598,7 @@ function pathResolveSoftLinkExtended( test )
     resolvingMultiple : 1,
     throwing : 1
   });
-  test.identical( got, test.context.globalFromPreferred( '../link2' ) )
+  test.identical( got, '../link2' )
 
   var got = provider.pathResolveSoftLink
   ({
@@ -47608,7 +47608,7 @@ function pathResolveSoftLinkExtended( test )
     resolvingMultiple : 2,
     throwing : 1
   });
-  test.identical( got, test.context.globalFromPreferred( '../link' ) )
+  test.identical( got, '../link' )
 
   var got = provider.pathResolveSoftLink
   ({
@@ -47618,7 +47618,7 @@ function pathResolveSoftLinkExtended( test )
     resolvingMultiple : 3,
     throwing : 1
   });
-  test.identical( got, test.context.globalFromPreferred( '../file' ) )
+  test.identical( got, '../file' )
 
   test.close( 'relative links, option recursive' );
 
@@ -47650,7 +47650,7 @@ function pathResolveSoftLinkExtended( test )
     resolvingMultiple : 1,
     throwing : 1
   });
-  test.identical( got, test.context.globalFromPreferred( '../link2' ) )
+  test.identical( got, '../link2' )
 
   var got = provider.pathResolveSoftLink
   ({
@@ -47660,7 +47660,7 @@ function pathResolveSoftLinkExtended( test )
     resolvingMultiple : 1,
     throwing : 1
   });
-  test.identical( got, test.context.globalFromPreferred( '../link2' ) )
+  test.identical( got, '../link2' )
 
   var got = provider.pathResolveSoftLink
   ({
@@ -47670,7 +47670,7 @@ function pathResolveSoftLinkExtended( test )
     resolvingMultiple : 2,
     throwing : 1
   });
-  test.identical( got, test.context.globalFromPreferred( '../file' ) )
+  test.identical( got, '../file' )
 
   test.shouldThrowErrorSync( () =>
   {
@@ -47702,7 +47702,7 @@ function pathResolveSoftLinkExtended( test )
     resolvingMultiple : 3,
     throwing : 1
   });
-  test.identical( got, test.context.globalFromPreferred( '../file' ) )
+  test.identical( got, '../file' )
 
   test.shouldThrowErrorSync( () =>
   {

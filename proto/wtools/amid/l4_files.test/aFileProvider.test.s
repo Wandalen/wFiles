@@ -26336,8 +26336,8 @@ function softLinkRelativeLinkResolving( test )
   test.identical( o.dstPath, dstPath );
   test.true( provider.isSoftLink( srcPath ) );
   test.true( provider.isSoftLink( dstPath ) );
-  test.identical( provider.pathResolveSoftLink( srcPath ), test.context.globalFromPreferred( '../src' ) );
-  test.identical( provider.pathResolveSoftLink( dstPath ), test.context.globalFromPreferred( '../dst' ) );
+  test.identical( provider.pathResolveSoftLink( srcPath ), '../src' );
+  test.identical( provider.pathResolveSoftLink( dstPath ), '../dst' );
   //test.identical( provider.statResolvedRead( srcPath ), null );
   //test.identical( provider.statResolvedRead( dstPath ), null );
 
@@ -26351,7 +26351,7 @@ function softLinkRelativeLinkResolving( test )
   test.identical( o.dstPath, dstPath );
   test.true( provider.isSoftLink( srcPath ) );
   test.true( provider.isSoftLink( dstPath ) );
-  test.identical( provider.pathResolveSoftLink( srcPath ), test.context.globalFromPreferred( '../src' ) );
+  test.identical( provider.pathResolveSoftLink( srcPath ), '../src' );
   test.identical( provider.pathResolveSoftLink( dstPath ), srcPath );
   //test.identical( provider.statResolvedRead( srcPath ), null );
   //test.identical( provider.statResolvedRead( dstPath ), null );
@@ -26366,8 +26366,8 @@ function softLinkRelativeLinkResolving( test )
   test.identical( o.dstPath, dstPath );
   test.true( provider.isSoftLink( srcPath ) );
   test.true( provider.isSoftLink( dstPath ) );
-  test.identical( provider.pathResolveSoftLink( srcPath ), test.context.globalFromPreferred( '../src' ) );
-  test.identical( provider.pathResolveSoftLink( dstPath ), test.context.globalFromPreferred( '../dst' ) );
+  test.identical( provider.pathResolveSoftLink( srcPath ), '../src' );
+  test.identical( provider.pathResolveSoftLink( dstPath ), '../dst' );
   //test.identical( provider.statResolvedRead( srcPath ), null );
   //test.identical( provider.statResolvedRead( dstPath ), null );
 
@@ -26391,9 +26391,9 @@ function softLinkRelativeLinkResolving( test )
   test.true( provider.isSoftLink( srcPath2 ) );
   test.true( provider.isSoftLink( dstPath ) );
   test.true( provider.isSoftLink( dstPath2 ) );
-  test.identical( provider.pathResolveSoftLink( srcPath2 ), test.context.globalFromPreferred( '../src' ) );
+  test.identical( provider.pathResolveSoftLink( srcPath2 ), '../src' );
   test.identical( provider.pathResolveSoftLink( dstPath ), srcPath );
-  test.identical( provider.pathResolveSoftLink( dstPath2 ), test.context.globalFromPreferred( '../dst' ) );
+  test.identical( provider.pathResolveSoftLink( dstPath2 ), '../dst' );
   test.identical( provider.pathResolveLinkFull( dstPath ).absolutePath, srcPath );
 
   provider.filesDelete( routinePath );
@@ -26412,8 +26412,8 @@ function softLinkRelativeLinkResolving( test )
   test.true( provider.isSoftLink( dstPath2 ) );
   test.identical( provider.pathResolveSoftLink( srcPath ), srcPathRelative2 );
   test.identical( provider.pathResolveSoftLink( dstPath ), dstPathRelative2 );
-  test.identical( provider.pathResolveSoftLink( srcPath2 ), test.context.globalFromPreferred( '../src' ) );
-  test.identical( provider.pathResolveSoftLink( dstPath2 ), test.context.globalFromPreferred( '../dst' ) );
+  test.identical( provider.pathResolveSoftLink( srcPath2 ), '../src' );
+  test.identical( provider.pathResolveSoftLink( dstPath2 ), '../dst' );
   //test.identical( provider.statResolvedRead( srcPath ), null );
   //test.identical( provider.statResolvedRead( dstPath ), null );
 
@@ -26433,8 +26433,8 @@ function softLinkRelativeLinkResolving( test )
   test.true( provider.isSoftLink( dstPath2 ) );
   test.identical( provider.pathResolveSoftLink( srcPath ), srcPathRelative2 );
   test.identical( provider.pathResolveSoftLink( dstPath ), srcPath );
-  test.identical( provider.pathResolveSoftLink( srcPath2 ), test.context.globalFromPreferred( '../src' ) );
-  test.identical( provider.pathResolveSoftLink( dstPath2 ), test.context.globalFromPreferred( '../dst' ) );
+  test.identical( provider.pathResolveSoftLink( srcPath2 ), '../src' );
+  test.identical( provider.pathResolveSoftLink( dstPath2 ), '../dst' );
   //test.identical( provider.statResolvedRead( srcPath ), null );
   //test.identical( provider.statResolvedRead( dstPath ), null );
 

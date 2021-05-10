@@ -49296,8 +49296,8 @@ function pathResolveLinkFullResult( test )
   provider.softLink( dstPath, '../file' )
   var o2 = { filePath : dstPath, preservingRelative : 1 };
   var got = provider.pathResolveLinkFull( _.props.extend( null, o, o2 ));
-  test.identical( got.filePath, test.context.globalFromPreferred( '../file' ) );
-  test.identical( got.relativePath, test.context.globalFromPreferred( '../file' ) );
+  test.identical( got.filePath, '../file' );
+  test.identical( got.relativePath, '../file' );
   test.identical( got.absolutePath, srcPath );
 
   test.case = 'relative soft link to terminal, preservingRelative:0';
@@ -49307,7 +49307,7 @@ function pathResolveLinkFullResult( test )
   var o2 = { filePath : dstPath, preservingRelative : 0 };
   var got = provider.pathResolveLinkFull( _.props.extend( null, o, o2 ));
   test.identical( got.filePath, srcPath );
-  test.identical( got.relativePath, test.context.globalFromPreferred( '../file' ) );
+  test.identical( got.relativePath, '../file' );
   test.identical( got.absolutePath, srcPath );
 
   test.case = 'chain of absolute soft links'
@@ -49328,8 +49328,8 @@ function pathResolveLinkFullResult( test )
   provider.softLink( dstPath,  '../file2' )
   var o2 = { filePath : dstPath, preservingRelative : 1 };
   var got = provider.pathResolveLinkFull( _.props.extend( null, o, o2 ));
-  test.identical( got.filePath, test.context.globalFromPreferred( '../file' ) );
-  test.identical( got.relativePath, test.context.globalFromPreferred( '../file' ) );
+  test.identical( got.filePath, '../file' );
+  test.identical( got.relativePath, '../file' );
   test.identical( got.absolutePath, srcPath );
 
   test.case = 'chain of relative soft links, preservingRelative:0'
@@ -49340,7 +49340,7 @@ function pathResolveLinkFullResult( test )
   var o2 = { filePath : dstPath, preservingRelative : 0 };
   var got = provider.pathResolveLinkFull( _.props.extend( null, o, o2 ));
   test.identical( got.filePath, srcPath );
-  test.identical( got.relativePath, test.context.globalFromPreferred( '../file' ) );
+  test.identical( got.relativePath, '../file' );
   test.identical( got.absolutePath, srcPath );
 
   test.close( 'soft links' );
@@ -49368,7 +49368,7 @@ function pathResolveLinkFullResult( test )
   var o2 = { filePath : dstPath, resolvingTextLink : 1 };
   var got = provider.pathResolveLinkFull( _.props.extend( null, o, o2 ));
   test.identical( got.filePath, srcPath );
-  test.identical( got.relativePath, test.context.globalFromPreferred( '../file' ) );
+  test.identical( got.relativePath, '../file' );
   test.identical( got.absolutePath, srcPath );
 
   test.case = 'relative soft link to terminal, preservingRelative:1';
@@ -49377,8 +49377,8 @@ function pathResolveLinkFullResult( test )
   provider.textLink( dstPath,  test.context.globalFromPreferred( '../file' ) );
   var o2 = { filePath : dstPath, resolvingTextLink : 1, preservingRelative : 1 };
   var got = provider.pathResolveLinkFull( _.props.extend( null, o, o2 ));
-  test.identical( got.filePath, test.context.globalFromPreferred( '../file' ) );
-  test.identical( got.relativePath, test.context.globalFromPreferred( '../file' ) );
+  test.identical( got.filePath, '../file' );
+  test.identical( got.relativePath, '../file' );
   test.identical( got.absolutePath, srcPath );
 
   test.case = 'relative soft link to terminal, preservingRelative:0';
@@ -49388,7 +49388,7 @@ function pathResolveLinkFullResult( test )
   var o2 = { filePath : dstPath, resolvingTextLink : 1, preservingRelative : 0 };
   var got = provider.pathResolveLinkFull( _.props.extend( null, o, o2 ));
   test.identical( got.filePath, srcPath );
-  test.identical( got.relativePath, test.context.globalFromPreferred( '../file' ) );
+  test.identical( got.relativePath, '../file' );
   test.identical( got.absolutePath, srcPath );
 
   test.case = 'chain of absolute soft links'
@@ -49409,8 +49409,8 @@ function pathResolveLinkFullResult( test )
   provider.textLink( dstPath,  test.context.globalFromPreferred( '../file2' ) );
   var o2 = { filePath : dstPath, resolvingTextLink : 1, preservingRelative : 1 };
   var got = provider.pathResolveLinkFull( _.props.extend( null, o, o2 ));
-  test.identical( got.filePath, test.context.globalFromPreferred( '../file' ) );
-  test.identical( got.relativePath, test.context.globalFromPreferred( '../file' ) );
+  test.identical( got.filePath, '../file' );
+  test.identical( got.relativePath, '../file' );
   test.identical( got.absolutePath, srcPath );
 
   test.case = 'chain of relative soft links, preservingRelative:0'
@@ -49421,7 +49421,7 @@ function pathResolveLinkFullResult( test )
   var o2 = { filePath : dstPath, resolvingTextLink : 1, preservingRelative : 0 };
   var got = provider.pathResolveLinkFull( _.props.extend( null, o, o2 ));
   test.identical( got.filePath, srcPath );
-  test.identical( got.relativePath, test.context.globalFromPreferred( '../file' ) );
+  test.identical( got.relativePath, '../file' );
   test.identical( got.absolutePath, srcPath );
 
   provider.fieldPop( 'usingTextLink', 1 );

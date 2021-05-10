@@ -27639,7 +27639,7 @@ function softLinkToParentDirectorySync( test )
   });
   test.true( provider.isSoftLink( dstPath ) );
   test.true( provider.isDir( srcPath ) );
-  test.identical( provider.pathResolveSoftLink( dstPath ),  test.context.globalFromPreferred( '..' ) );
+  test.identical( provider.pathResolveSoftLink( dstPath ),  '..' );
 
   test.case = 'dir -> link -> link';
   srcPath  = test.context.pathFor( 'written/softLinkToParentDirectorySync/dir' );
@@ -27684,7 +27684,7 @@ function softLinkToParentDirectorySync( test )
   test.true( provider.isSoftLink( dstPath ) );
   test.true( provider.isSoftLink( dst2Path ) );
   test.true( provider.isDir( srcPath ) );
-  test.identical( provider.pathResolveSoftLink( dst2Path ), test.context.globalFromPreferred( '..' )  );
+  test.identical( provider.pathResolveSoftLink( dst2Path ), '..'  );
   test.identical( provider.pathResolveLinkFull( dst2Path ).filePath, srcPath  );
 
   test.case = 'dir -> link -> link';

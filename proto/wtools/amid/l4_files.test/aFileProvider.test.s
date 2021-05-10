@@ -29522,7 +29522,7 @@ function textLinkRelativeTextLinking( test )
   test.true( provider.isTextLink( src2Path ) );
   test.true( provider.isTextLink( dstPath ) );
   test.true( provider.isTerminal( src3Path ) );
-  test.identical( provider.pathResolveTextLink( dstPath ), test.context.globalFromPreferred( '../src3' ) );
+  test.identical( provider.pathResolveTextLink( dstPath ), '../src3' );
 
   test.case = 'src1 -> ../src2 -> ../src3, softLink dst ../src1, resolvingSrcTextLink : 2'
   provider.filesDelete( routinePath );
@@ -29534,7 +29534,7 @@ function textLinkRelativeTextLinking( test )
   test.true( provider.isTextLink( src2Path ) );
   test.true( provider.isTextLink( dstPath ) );
   test.true( provider.isTerminal( src3Path ) );
-  test.identical( provider.pathResolveTextLink( dstPath ), test.context.globalFromPreferred( '../src3' ) );
+  test.identical( provider.pathResolveTextLink( dstPath ), '../src3' );
 
   /*  */
 
@@ -33042,8 +33042,8 @@ function fileExchangeSync( test )
   });
   test.true( provider.isSoftLink( srcPath ) );
   test.true( provider.isSoftLink( dstPath ) );
-  test.identical( provider.pathResolveSoftLink( srcPath ), test.context.globalFromPreferred( '../dst' ) );
-  test.identical( provider.pathResolveSoftLink( dstPath ), test.context.globalFromPreferred( '../src' ) );
+  test.identical( provider.pathResolveSoftLink( srcPath ), '../dst' );
+  test.identical( provider.pathResolveSoftLink( dstPath ), '../src' );
 
   test.case = 'two context cycled soft links, cycled not allowed';
   provider.filesDelete( routinePath );
@@ -33063,8 +33063,8 @@ function fileExchangeSync( test )
   })
   test.true( provider.isSoftLink( srcPath ) );
   test.true( provider.isSoftLink( dstPath ) );
-  test.identical( provider.pathResolveSoftLink( srcPath ), test.context.globalFromPreferred( '../src' ) );
-  test.identical( provider.pathResolveSoftLink( dstPath ), test.context.globalFromPreferred( '../dst' ) );
+  test.identical( provider.pathResolveSoftLink( srcPath ), '../src' );
+  test.identical( provider.pathResolveSoftLink( dstPath ), '../dst' );
 
   test.case = 'two context cycled soft links, cycled not allowed, throwing off';
   provider.filesDelete( routinePath );
@@ -33082,8 +33082,8 @@ function fileExchangeSync( test )
   test.identical( got, null );
   test.true( provider.isSoftLink( srcPath ) );
   test.true( provider.isSoftLink( dstPath ) );
-  test.identical( provider.pathResolveSoftLink( srcPath ), test.context.globalFromPreferred( '../src' ) );
-  test.identical( provider.pathResolveSoftLink( dstPath ), test.context.globalFromPreferred( '../dst' ) );
+  test.identical( provider.pathResolveSoftLink( srcPath ), '../src' );
+  test.identical( provider.pathResolveSoftLink( dstPath ), '../dst' );
 
   test.case = 'context cycled and terminal, cycled allowed';
   provider.filesDelete( routinePath );
@@ -33101,7 +33101,7 @@ function fileExchangeSync( test )
   test.true( provider.isTerminal( srcPath ) );
   test.true( provider.isSoftLink( dstPathTerminal ) );
   test.identical( provider.fileRead( srcPath ), dstPathTerminal );
-  test.identical( provider.pathResolveSoftLink( dstPathTerminal ), test.context.globalFromPreferred( '../src' ) );
+  test.identical( provider.pathResolveSoftLink( dstPathTerminal ), '../src' );
 
   test.case = 'context cycled and terminal, cycled not allowed';
   provider.filesDelete( routinePath );
@@ -33122,7 +33122,7 @@ function fileExchangeSync( test )
   test.true( provider.isTerminal( dstPathTerminal ) );
   test.true( provider.isSoftLink( srcPath ) );
   test.identical( provider.fileRead( dstPathTerminal ), dstPathTerminal );
-  test.identical( provider.pathResolveSoftLink( srcPath ), test.context.globalFromPreferred( '../src' ) );
+  test.identical( provider.pathResolveSoftLink( srcPath ), '../src' );
 
   test.case = 'context cycled and terminal, cycled not allowed, throwing off';
   provider.filesDelete( routinePath );
@@ -33141,7 +33141,7 @@ function fileExchangeSync( test )
   test.true( provider.isTerminal( dstPathTerminal ) );
   test.true( provider.isSoftLink( srcPath ) );
   test.identical( provider.fileRead( dstPathTerminal ), dstPathTerminal );
-  test.identical( provider.pathResolveSoftLink( srcPath ), test.context.globalFromPreferred( '../src' ) );
+  test.identical( provider.pathResolveSoftLink( srcPath ), '../src' );
 
 }
 

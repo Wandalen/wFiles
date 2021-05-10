@@ -48778,7 +48778,7 @@ function pathResolveTextLinkExtended( test )
     resolvingMultiple : 2,
     throwing : 1
   });
-  test.identical( got, linkPath )
+  test.identical( got, test.context.pathFor( 'written/pathResolveTextLink/link' ) )
 
   var got = provider.pathResolveTextLink
   ({

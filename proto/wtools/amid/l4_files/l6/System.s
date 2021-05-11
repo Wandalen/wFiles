@@ -41,7 +41,6 @@ function init( o )
   if( o )
   if( o.defaultOrigin !== undefined )
   {
-    debugger;
     throw _.err( 'not tested' );
   }
 
@@ -491,6 +490,7 @@ function _pathPrepend( provider, filePath )
   if( !provider.originPath )
   return filePath;
   if( provider.originPath === self.defaultOrigin )
+  // if( provider instanceof _.FileProvider.Default && provider.originPath === self.defaultOrigin )
   return filePath;
   if( _.strBegins( filePath, provider.originPath ) )
   return filePath;
@@ -560,10 +560,8 @@ function pathNativizeAct( filePath )
   let r = self._pathLocalize( filePath );
   if( r && r.provider )
   return r.provider.pathNativizeAct.call( r.provider, r.localPath );
-  debugger;
   if( self.defaultProvider )
   return self.defaultProvider.path.dirTemp.apply( self.defaultProvider.path, arguments );
-  debugger;
   return filePath;
 }
 
@@ -578,9 +576,7 @@ function pathResolveLinkFull_body( o )
   let r = self._pathLocalize( o.filePath );
   o.filePath = r.localPath;
 
-  // debugger;
   let result = r.provider.pathResolveLinkFull.body.call( r.provider, o );
-  // debugger;
 
   if( o.sync )
   {
@@ -666,11 +662,12 @@ let pathResolveLinkTail = _.routine.uniteCloning_replaceByUnite( Parent.prototyp
 
 function pathResolveSoftLink_body( o )
 {
-  let self = this;
+  const self = this;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
 
-  let r = self._pathLocalize( o.filePath );
+  const filePath = o.filePath;
+  const r = self._pathLocalize( o.filePath );
 
   o.filePath = r.localPath;
 
@@ -684,10 +681,10 @@ function pathResolveSoftLink_body( o )
   result = self._pathPrepend( r.provider, result ); /* qqq : cover pathResolveSoftLink, take into account all branches of _pathPrepend */
   // result = self.path.join( r.provider.originPath, result );
 
-  if( result === o.filePath )
+  if( result === filePath )
+  // if( result === o.filePath )
   {
-    debugger;
-    _.assert( 0, 'not tested' );
+    // _.assert( 0, 'not tested' );
     return r.originalPath;
   }
 
@@ -702,11 +699,12 @@ let pathResolveSoftLink = _.routine.uniteCloning_replaceByUnite( Parent.prototyp
 
 function pathResolveTextLink_body( o )
 {
-  let self = this;
+  const self = this;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
 
-  let r = self._pathLocalize( o.filePath );
+  const filePath = o.filePath;
+  const r = self._pathLocalize( o.filePath );
 
   o.filePath = r.localPath;
 
@@ -721,10 +719,10 @@ function pathResolveTextLink_body( o )
   // result = self.path.join( r.provider.originPath, result );
   /* qqq : cover pathResolveTextLink, take into account all branches of _pathPrepend */
 
-  if( result === o.filePath )
+  // if( result === o.filePath )
+  if( result === filePath )
   {
-    debugger;
-    _.assert( 0, 'not tested' );
+    // _.assert( 0, 'not tested' );
     return r.originalPath;
   }
 
@@ -950,7 +948,6 @@ function _fileCopyActDifferent( op )
   {
     _.assert( 0, 'Expects terminal file, not soft link' );
     // let resolvedPath = op.src.provider.pathResolveSoftLink( op.src.localPath );
-    // debugger;
     // c.result = op.dst.provider.softLink
     // ({
     //   dstPath : op.dst.localPath,
@@ -1200,9 +1197,6 @@ function _defaultOriginSet( src )
 //   for( var f in self.providersWithProtocolMap )
 //   {
 //     const fileProvider = self.providersWithProtocolMap[ f ];
-//     if( fileProvider.verbosity !== self.verbosity )
-//     debugger;
-//     // debugger;
 //     fileProvider.verbosity = self.verbosity;
 //   }
 //

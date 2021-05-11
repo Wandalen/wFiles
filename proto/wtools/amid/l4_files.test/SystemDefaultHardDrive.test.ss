@@ -68,9 +68,10 @@ function pathFor( filePath )
 {
   let context = this;
 
-  filePath =  _.path.join( context.suiteTempPath,  filePath );
+  filePath = _.path.join( context.suiteTempPath, filePath );
 
-  return context.providerEffective.originPath + _.path.normalize( filePath );
+  return filePath
+  // return context.providerEffective.originPath + _.path.normalize( filePath );
 }
 
 //

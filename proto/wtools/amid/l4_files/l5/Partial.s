@@ -156,7 +156,6 @@ function init( o )
 
   // _.process._exitHandlerOnce( () =>
   // {
-  //   debugger;
   //   self.path.tempClose()
   // });
 
@@ -333,7 +332,6 @@ function _preFilePathScalarWithProviderDefaults( routine, args )
   if( args[ 0 ].verbosity !== undefined )
   if( routine.defaults.logger !== undefined )
   {
-    debugger
     _global_.logger.styleSet( 'negative' );
     _global_.logger.warn( 'Option verbosity will be deprecated. Please use option logger.' )
     _global_.logger.styleSet( 'default' );
@@ -1259,7 +1257,6 @@ function pathResolveLinkFull_body( o )
           result.isMissed = true;
           if( o.throwing )
           {
-            debugger;
             throw _.err( 'File does not exist', _.strQuote( o.filePath ) );
           }
         }
@@ -1325,12 +1322,10 @@ function pathResolveLinkFull_body( o )
       {
         if( !o.allowingMissed )
         {
-          debugger;
           result.relativePath = result.filePath = result.absolutePath = null;
           result.isMissed = true;
           if( o.throwing )
           {
-            debugger;
             throw _.err( 'File does not exist', _.strQuote( o.filePath ) );
           }
           return result;
@@ -1378,7 +1373,6 @@ function pathResolveLinkFull_body( o )
     }
     catch( err )
     {
-      debugger;
       throw _.err( `Failed to resolve ${o.filePath}\n`, err );
     }
   }
@@ -1494,9 +1488,6 @@ function pathResolveLinkTail_body( o )
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.routine.assertOptions( pathResolveLinkTail_body, arguments );
 
-  // if( _.strHas( o.filePath, 'Link' ) )
-  // debugger;
-
   let o2 = _.props.extend( null, o );
   o2.found = [];
   o2.result = [ o.filePath ];
@@ -1504,9 +1495,6 @@ function pathResolveLinkTail_body( o )
   o.stat = o2.stat;
 
   let result = Object.create( null );
-
-  // if( o2.result.length > 2 && o2.result[ 1 ] )
-  // debugger;
 
   result.filePath = o2.result[ o2.result.length-1 ];
   result.relativePath = o2.result[ o2.result.length-1 ];
@@ -1522,7 +1510,6 @@ function pathResolveLinkTail_body( o )
       result.filePath = o2.result[ o2.result.length-2 ];
       result.relativePath = o2.result[ o2.result.length-2 ];
       result.absolutePath = o2.found[ o2.found.length-2 ];
-      // debugger;
       result.isCycled = !!cycle;
     }
   }
@@ -1666,7 +1653,6 @@ function pathResolveLinkTailChain_body( o )
     // should throw error if any part of chain does not exist
     if( o.throwing && !o.allowingMissed )
     {
-      debugger;
       throw _.err( 'Does not exist file', _.strQuote( o.filePath ) );
     }
 
@@ -2579,7 +2565,6 @@ function fileExistsAct( o )
   _.assert( fileExistsAct, arguments );
   o2.throwing = 0;
   o2.resolvingSoftLink = 0;
-  debugger;
   let result = self.statReadAct( o2 );
   _.assert( result === null || _.object.isBasic( result ) );
   _.assert( arguments.length === 1 );
@@ -2780,9 +2765,7 @@ function isDir_body( o )
     throwing : 0
   }
 
-  // debugger;
   o.filePath = self.pathResolveLinkFull( o2 ).absolutePath;
-  // debugger;
 
   _.assert( o2.stat !== undefined );
 
@@ -3235,7 +3218,6 @@ function streamRead_body( o )
     }
     catch( err )
     {
-      debugger;
       handleError( err );
       return null;
     }
@@ -3247,7 +3229,6 @@ function streamRead_body( o )
   function handleError( err )
   {
 
-    debugger;
     err = _._err
     ({
       args : [ err, '\nfileRead( ', o.filePath, ' )\n' ],
@@ -3298,7 +3279,6 @@ function fileRead_head( routine, args )
 
   if( args[ 0 ].verbosity !== undefined )
   {
-    debugger
     _global_.logger.styleSet( 'negative' );
     _global_.logger.warn( 'Option verbosity will be deprecated. Please use option logger.' )
     _global_.logger.styleSet( 'default' );
@@ -3418,7 +3398,6 @@ function fileRead_body( o )
     }
     catch( err )
     {
-      debugger;
       handleError( err );
       return null;
     }
@@ -3437,8 +3416,6 @@ function fileRead_body( o )
     else
     r = o;
 
-    if( o.onEnd )
-    debugger;
     if( o.onEnd )
     _.Consequence.Take( o.onEnd, o );
 
@@ -3763,7 +3740,6 @@ function _fileInterpret_body( o )
 
   _.assert( arguments.length === 1, 'Expects single argument' );
 
-  debugger;
   if( !o.encoding )
   {
     let ext = self.path.ext( o.filePath );
@@ -3776,7 +3752,6 @@ function _fileInterpret_body( o )
       // if( encoder.forConfig !== undefined && !encoder.forConfig )
       // continue;
 
-      debugger;
       if( encoder.feature.config !== undefined && !encoder.feature.config )
       continue;
 
@@ -3966,7 +3941,6 @@ function hashRead_body( o )
       let stat = self.statResolvedRead({ filePath : o.filePath, sync : 1, throwing : 1 });
       if( stat.size > o.hashFileSizeLimit )
       {
-        debugger;
         throw _.err( `File ${ o.filePath } is too big ${ stat.size } > ${ o.hashFileSizeLimit }` );
       }
     }
@@ -3974,7 +3948,6 @@ function hashRead_body( o )
   }
   catch( err ) /* qqq : make sure catch blocks of other methods return consequence if o.sync ~ false */
   {
-    debugger;
     let error = _.err( err, '\nCant read hash of', o.filePath )
     if( o.sync )
     {
@@ -4036,7 +4009,6 @@ function hashSzRead_body( o )
 
   /* */
 
-  debugger;
   if( o.hashFileSizeLimit === null )
   o.hashFileSizeLimit = self.hashFileSizeLimit;
 
@@ -4045,7 +4017,6 @@ function hashSzRead_body( o )
     let stat = self.statResolvedRead({ filePath : o.filePath, sync : 1, throwing : 1 });
     if( o.hashFileSizeLimit && stat.size > o.hashFileSizeLimit )
     {
-      debugger;
       throw _.err( `File ${ o.filePath } is too big ${ stat.size } > ${ o.hashFileSizeLimit }` );
     }
     let read = self.fileReadSync( o.filePath, 'buffer.raw' );
@@ -4849,7 +4820,6 @@ function fileWrite_head( routine, args )
 
   if( o.verbosity !== undefined )
   {
-    debugger
     _global_.logger.styleSet( 'negative' );
     _global_.logger.warn( 'Option verbosity will be deprecated. Please use option logger.' )
     _global_.logger.styleSet( 'default' );
@@ -4892,7 +4862,6 @@ function fileWrite_body( o )
 
   if( !path.isSafe( o.filePath, self.safe ) )
   {
-    debugger;
     throw path.ErrorNotSafe( 'Writing', o.filePath, o.safe );
   }
 
@@ -5031,9 +5000,7 @@ let fileWrite = _.routine.uniteCloning_replaceByUnite( fileWrite_head, fileWrite
 
 fileWrite.having.aspect = 'entry';
 
-// debugger;
 // _.assert( _.aux.is( fileWrite.encoders ) );
-// debugger;
 
 //
 
@@ -5107,7 +5074,6 @@ function fileWriteJson_body( o )
     catch( err )
     {
 
-      // debugger;
       self.logger.log( '-' );
       self.logger.error( 'JSON:' );
       self.logger.error( _.entity.exportString( o.data, { levels : 999 } ) );
@@ -5504,7 +5470,6 @@ function fileDelete_body( o )
   _.assert( path.s.allAreAbsolute( o.filePath ) );
   if( !path.s.allAreSafe( o.filePath, o.safe ) )
   {
-    debugger;
     throw path.ErrorNotSafe( 'Deleting', o.filePath, o.safe );
   }
 
@@ -5537,8 +5502,6 @@ function fileDelete_body( o )
     }
     catch( err )
     {
-      if( o.throwing )
-      debugger;
       log( 0 );
       _.assert( o.sync );
       if( o.throwing )
@@ -5754,7 +5717,6 @@ function dirMake_body( o )
 
   function handleError( err )
   {
-    debugger;
     if( o.sync )
     throw err;
     else
@@ -6434,7 +6396,12 @@ function _fileCopySizeCheck( c )
     else
     {
       let dstPath = isSoftLink ? self.pathResolveSoftLink( o.dstPath ) : self.pathResolveTextLink( o.dstPath );
-      if( dstPath !== o.relativeSrcPath )
+      let srcPath = o.relativeSrcPath;
+      if( self.path.isGlobal( o.relativeSrcPath ) )
+      srcPath = self.path.localFromGlobal( o.relativeSrcPath );
+
+      if( dstPath !== srcPath )
+      // if( dstPath !== o.relativeSrcPath )
       throw _.err( `Destination file ${o.dstPath} should be a link to ${o.relativeSrcPath}` );
     }
   }
@@ -6541,7 +6508,6 @@ function _fileCopyDo( c )
     {
       if( srcStat.isDir() )
       {
-        debugger;
         throw _.err( 'Cant copy directory ' + _.strQuote( o.srcPath ) + ', consider method filesReflect'  );
       }
     }
@@ -6722,7 +6688,6 @@ function _hardLinkVerify2( c )
   }
   else if( !srcStat.isTerminal() )
   {
-    debugger;
     c.error( _.err( `Source file should be a terminal:\n  ${o.srcPath}` ) );
   }
   else
@@ -7097,8 +7062,6 @@ function _textLinkVerify2( c )
 {
   let self = this;
   let o = c.options;
-  // if( o.dstPath !== o.srcPath && self.areTextLinked([ o.dstPath, o.srcPath ]) )
-  // debugger;
   if( o.dstPath !== o.srcPath && self.areTextLinked([ o.dstPath, o.srcPath ]) )
   c.end( false );
 }

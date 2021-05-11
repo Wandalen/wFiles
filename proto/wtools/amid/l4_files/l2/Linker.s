@@ -157,7 +157,6 @@ function multiple( o, link )
     // if( !self.filesCanBeSame( result.src, record.src, true ) )
     // if( result.src.stat.size !== 0 || record.src.stat.size !== 0 )
     // {
-    //   debugger
     //   throw _.err
     //   (
     //     'Cant\'t rewrite destination file by source file, because they have different content and option::allowingDiscrepancy is false\n'
@@ -171,8 +170,6 @@ function multiple( o, link )
     // {
     //   if( _.files.stat.different( newestRecord.stat , record.stat ) )
     //   {
-    //     let err = _.err( 'Several files has the same date but different content', newestRecord.absolute, record.absolute );
-    //     debugger;
     //     if( o.sync )
     //     throw err;
     //     else
@@ -186,7 +183,6 @@ function multiple( o, link )
       linkOptions.allowingMissed = 0; // Vova : hardLink does not allow missing srcPath
       linkOptions.dstPath = record.absolute;
       linkOptions.srcPath = mostLinkedRecord.absolute;
-      debugger;
       return link.call( self, linkOptions );
     }
 
@@ -285,13 +281,10 @@ function verify2()
 
   if( !o.allowingMissed || c.skippingMissed )
   {
-    if( c.srcStat === undefined )
-    debugger;
     if( !c.srcStat )
     {
       if( !o.allowingMissed )
       {
-        debugger;
         let err = _.err( 'Source file', _.strQuote( o.srcPath ), 'does not exist' );
         c.error( err );
         return true;
@@ -312,15 +305,12 @@ function verify2()
   /* */
 
   /* xxx qqq : allowingDiscrepancy should be similar to !dstRewritingOnlyPreserving */
-  if( _.boolLikeFalse( o.allowingDiscrepancy ) )
-  debugger;
   if( _.boolLikeFalse( o.allowingDiscrepancy ) ) /* qqq : cover */
   if( c.srcResolvedStat )
   if( self.fileExists( c.options2.dstPath ) )
   if( !self.filesAreSameForSure( c.options2.srcPath, c.options2.dstPath, false ) ) /* qqq xxx : optimize */
   if( Number( c.srcResolvedStat.size ) !== 0 )
   {
-    debugger;
     throw _.err
     (
       'Cant\'t rewrite destination file by source file, because they have different content and option::allowingDiscrepancy is false\n'
@@ -637,7 +627,6 @@ function linksResolve()
   }
   catch( err )
   {
-    debugger;
     c.error( err );
   }
 
@@ -719,7 +708,6 @@ function linksResolveAsync()
           o.relativeSrcPath = resolved.filePath;
         }
 
-        // debugger;
         // if( resolved.filePath !== null && path.isRelative( resolved.filePath ) )
         // {
         //   o.relativeSrcPath = path.relative( o.dstPath, resolved.absolutePath );
@@ -980,7 +968,6 @@ function validateSize()
 
   if( !srcStat )
   {
-    debugger;
     srcStat = c.srcStat;
     if( srcStat )
     {

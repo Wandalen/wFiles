@@ -498,7 +498,6 @@ function filesReflectSingle_body( o )
     // if( o.extra.makingRecordsFast )
     // o.result = localProvider.dirRead({ filePath : dstPath, outputFormat : 'record' });
     // else
-    console.log( 'o.outputFormat:', o.outputFormat )
     if( o.outputFormat !== 'nothing' )
     o.result = localProvider.filesReflectEvaluate
     ({

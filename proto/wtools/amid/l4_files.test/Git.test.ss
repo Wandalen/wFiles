@@ -1961,9 +1961,11 @@ function filesReflectPerformance( test )
   let clonePathGlobal = a.fileProvider.path.globalFromPreferred( localPath );
   let start;
 
+  debugger
+
   /* - */
 
-  const times = 5;
+  const times = 1;
   const runsWithout = [];
   const runsWith = [];
   for( let i = 0 ; i < times; i++ )
@@ -1990,7 +1992,7 @@ function filesReflectPerformance( test )
     a.ready.then( () =>
     {
       start = _.time.now();
-      return system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 });
+      return system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5, outputFormat : 'nothing' });
     });
     a.ready.then( () =>
     {
@@ -2011,8 +2013,9 @@ function filesReflectPerformance( test )
     a.shell({ currentPath : a.abs( 'clone' ), execPath : 'git reset --hard' });
     a.ready.then( () =>
     {
+      console.log( '------reflect-------')
       start = _.time.now();
-      return system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 });
+      return system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5, outputFormat : 'nothing' });
     });
     a.ready.then( () =>
     {

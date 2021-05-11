@@ -3118,7 +3118,7 @@ function filesReflectSingle_body( o )
   _.assert( o.filter === undefined );
   _.assert( o.src.dst === o.dst );
   _.assert( o.dst.src === o.src );
-  _.assert( o.outputFormat === undefined );
+  // _.assert( o.outputFormat === undefined );
   _.assert( _.boolLike( o.allowingMissed ) );
 
   if( o.rebasingLink && o.visitedMap === null )
@@ -3720,6 +3720,8 @@ defaults.throwing = null;
 
 var defaults = filesReflectSingle_body.defaults = Object.create( filesReflectEvaluate.defaults );
 _.props.extend( defaults, filesReflectAdvancedDefaults );
+// defaults.outputFormat = 'record';
+defaults.outputFormat = 'nothing'; /* xxx : qqq : optimization, controls records creation in filesReflectSingle */
 
 var having = filesReflectSingle_body.having = Object.create( null );
 having.writing = 0;
@@ -3926,7 +3928,7 @@ function filesReflect_body( o )
   function end()
   {
 
-    if( o.mandatory )
+    if( o.mandatory && o.outputFormat !== 'nothing' ) /* xxx : review option mandatory */
     if( !o.result.length )
     {
       _.assert( o.src.isPaired() );

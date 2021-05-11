@@ -282,7 +282,7 @@ function filesReflectSingle_body( o )
   _.assert( _.routineIs( o.onWriteSrcUp ) && o.onWriteSrcUp.composed && o.onWriteSrcUp.composed.bodies.length === 0, 'Not supported options' );
   _.assert( _.routineIs( o.onWriteSrcDown ) && o.onWriteSrcDown.composed && o.onWriteSrcDown.composed.bodies.length === 0, 'Not supported options' );
   // _.assert( o.outputFormat === 'record' || o.outputFormat === 'nothing', 'Not supported options' );
-  _.assert( o.outputFormat === undefined );
+  // _.assert( o.outputFormat === undefined );
   _.assert( o.linking === 'fileCopy' || o.linking === 'hardLinkMaybe' || o.linking === 'softLinkMaybe', 'Not supported options' );
   _.assert( !o.src.hasFiltering(), 'Not supported options' );
   _.assert( !o.dst.hasFiltering(), 'Not supported options' );
@@ -449,6 +449,7 @@ function filesReflectSingle_body( o )
   function recordsMake()
   {
     /* qqq : fast solution to return some records instead of empty arrray. find better solution */
+    if( o.outputFormat !== 'nothing' )
     o.result = localProvider.filesReflectEvaluate
     ({
       src : { filePath : dstPath },

@@ -664,7 +664,7 @@ function hashSzFrom( o )
   if( !result )
   return result;
 
-  let size = _.sizeOf( o.src );
+  let size = _.entity.sizeOf( o.src, 0 );
   _.assert( _.numberIs( size ) );
   result = size + '-' + result;
 

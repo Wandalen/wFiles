@@ -17,12 +17,12 @@ Further commands should be entered from the directory to which you've to cloned 
 
 You need utility willbe to build the project. To installl willbe use npm:
 ```bash
-npm install -g willbe@delta
+npm install -g willbe@stable
 ```
 
 You need utility wTesting to test the project. To installl wTesting use npm:
 ```bash
-npm install -g wTesting@delta
+npm install -g wTesting@stable
 ```
 
 ### Build

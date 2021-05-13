@@ -2080,7 +2080,7 @@ function hardLinkAct( o )
 {
   let self = this;
 
-  _.routine.assertOptions( hardLinkAct, arguments ); debugger;
+  _.routine.assertOptions( hardLinkAct, arguments );
 
   let dstPath = self.path.nativize( o.dstPath );
   let srcPath = self.path.nativize( o.srcPath );

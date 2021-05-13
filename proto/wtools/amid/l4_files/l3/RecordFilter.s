@@ -2070,56 +2070,7 @@ function filePathMove( o )
 filePathMove.defaults =
 {
   ... _.accessor._moveItMake.defaults,
-  // dstInstance : null,
-  // srcInstance : null,
-  // instanceKey : null,
-  // srcContainer : null,
-  // dstContainer : null,
-  // containerKey : null,
-  // value : null,
 }
-
-// //
-//
-// function filePathGet()
-// {
-//   let filter = this;
-//   return filter[ filePathSymbol ];
-// }
-//
-// //
-//
-// function filePathSet( src )
-// {
-//   let filter = this;
-//
-//   _.assert( src === null || _.strIs( src ) || _.arrayIs( src ) || _.mapIs( src ) );
-//
-//   if( filter.src )
-//   {
-//     const fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
-//     const path = fileProvider.path;
-//     if( _.strIs( src ) || _.arrayIs( src ) || _.boolLike( src ) )
-//     src = path.mapsPair( src, null );
-//     _.assert( src === null || _.mapIs( src ), () => 'Paired filter could have only path map as file path, not ' + _.entity.strType( src ) );
-//     if( src !== filter.src.filePath )
-//     filter.src[ filePathSymbol ] = src;
-//   }
-//   else if( filter.dst )
-//   {
-//     const fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
-//     const path = fileProvider.path;
-//     if( _.strIs( src ) || _.arrayIs( src ) || _.boolLike( src ) )
-//     src = path.mapsPair( null, src );
-//     _.assert( src === null || _.mapIs( src ), () => 'Paired filter could have only path map as file path, not ' + _.entity.strType( src ) );
-//     if( src !== filter.dst.filePath )
-//     filter.dst[ filePathSymbol ] = src;
-//   }
-//
-//   filter[ filePathSymbol ] = src;
-//
-//   return src;
-// }
 
 //
 
@@ -4433,8 +4384,6 @@ let Extension =
   // file path
 
   filePathMove,
-  // filePathGet,
-  // filePathSet,
 
   filePathSelect,
   filePathNormalize,
@@ -4494,8 +4443,6 @@ let Extension =
   // iterative
 
   allPaths,
-  // isRelative,
-  // sureRelative,
   sureRelativeOrGlobal,
   sureBasePath,
   assertBasePath,

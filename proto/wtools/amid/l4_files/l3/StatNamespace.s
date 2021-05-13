@@ -194,15 +194,17 @@ let Tools =
 
 _.props.extend( _, Tools );
 
-let Stat =
+let StatExtension =
 {
+
   is : fileStatIs,
   different,
   areHardLinked,
   hashStatFrom,
+
 }
 
-_.props.extend( _.files.stat, Stat );
+_.props.extend( _.files.stat, StatExtension );
 
 // --
 // export

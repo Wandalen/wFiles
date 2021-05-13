@@ -1028,7 +1028,9 @@ function validateSize()
     let err =
     `Failed to ${c.entryMethodName} ${o.dstPath} (${dstSize}) from ${o.srcPath} (${srcSize}). `
     + `Have different size after ${c.entryMethodName} operation.`;
-    throw _.err( err );
+    err = _.err( err );
+    debugger;
+    throw err;
   }
 
 }

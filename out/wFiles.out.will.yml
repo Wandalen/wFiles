@@ -2,12 +2,9 @@ format: outwillfile-2.0
 root:
   - wFiles.out
 consistency:
-  ../.ex.will.yml: &ref_0
-    hash: 44aae3aa1e40366fe4fa1fe181dc6bc6
-    size: 3243
-  ../.im.will.yml: &ref_1
-    hash: 7564735aa2387b85a20cdcd457e282d8
-    size: 6334
+  ../will.yml: &ref_0
+    hash: 15b1709f7aaf63684f7cd62e51a3fd9d
+    size: 9429
 module:
   wFiles.out:
     about:
@@ -34,24 +31,24 @@ module:
         module to keep DRY.
       enabled: 1
       version: 0.7.0
-      interpreters: &ref_2
-        - njs >= 10.0.0
-        - chrome >= 60.0.0
-        - firefox >= 60.0.0
-      keywords: &ref_3
+      license: MIT
+      npm.name: wFiles
+      author: Kostiantyn Wandalen <wanalen@01.school>
+      keywords: &ref_1
         - wTools
         - wFiles
         - file
         - standardized abstract interface
-      license: MIT
-      author: Kostiantyn Wandalen <wanalen@01.school>
-      contributors: &ref_4
+      contributors: &ref_2
         - Kostiantyn Wandalen <wanalen@01.school>
         - Volodymyr M. <volodymyr.migdal@gmail.com>
         - Ihor O. <iostashvxi@gmail.com>
         - Dmytro Kryvoruchko <dm.vict.kr@gmail.com>
-      npm.name: wFiles
-      npm.scripts: &ref_5
+      interpreters: &ref_3
+        - njs >= 10.0.0
+        - chrome >= 60.0.0
+        - firefox >= 60.0.0
+      npm.scripts: &ref_4
         test: wtest .run proto/**
         test2: >-
           wtest .run proto/**/wtools/amid/file.test/Provider.HardDrive.test.ss
@@ -72,15 +69,11 @@ module:
       module.original.willfiles:
         criterion:
           predefined: 1
-        path:
-          - ../.ex.will.yml
-          - ../.im.will.yml
+        path: ../will.yml
       module.peer.willfiles:
         criterion:
           predefined: 1
-        path:
-          - ../.ex.will.yml
-          - ../.im.will.yml
+        path: ../will.yml
       module.peer.in:
         criterion:
           predefined: 1
@@ -284,11 +277,11 @@ module:
         path: 'npm:///wTools'
         autoExporting: 0
         enabled: 0
-      wStringer:
+      wstringer:
         path: 'npm:///wstringer'
         autoExporting: 0
         enabled: 0
-      wStringsExtra:
+      wstringsextra:
         path: 'npm:///wstringsextra'
         autoExporting: 0
         enabled: 0
@@ -300,35 +293,35 @@ module:
         path: 'npm:///wCopyable'
         autoExporting: 0
         enabled: 0
-      wGdfStrategy:
+      wgdf:
         path: 'npm:///wgdf'
         autoExporting: 0
         enabled: 0
-      wIntrospectorBasic:
+      wintrospectorbasic:
         path: 'npm:///wintrospectorbasic'
         autoExporting: 0
         enabled: 0
-      wPathBasic:
+      wpathbasic:
         path: 'npm:///wpathbasic'
         autoExporting: 0
         enabled: 0
-      wPathTools:
+      wpathtools:
         path: 'npm:///wpathtools'
         autoExporting: 0
         enabled: 0
-      wUriBasic:
+      wuribasic:
         path: 'npm:///wuribasic'
         autoExporting: 0
         enabled: 0
-      wWebUriBasic:
+      wweburibasic:
         path: 'npm:///wweburibasic'
         autoExporting: 0
         enabled: 0
-      wProcess:
+      wprocess:
         path: 'npm:///wprocess'
         autoExporting: 0
         enabled: 0
-      wFieldsStack:
+      wfieldsstack:
         path: 'npm:///wfieldsstack'
         autoExporting: 0
         enabled: 0
@@ -336,11 +329,11 @@ module:
         path: 'npm:///wRegexpObject'
         autoExporting: 0
         enabled: 0
-      wSelector:
+      wselector:
         path: 'npm:///wselector'
         autoExporting: 0
         enabled: 0
-      wVerbal:
+      wverbal:
         path: 'npm:///wverbal'
         autoExporting: 0
         enabled: 0
@@ -348,11 +341,11 @@ module:
         path: 'npm:///wLogger'
         autoExporting: 0
         enabled: 0
-      wGitTools:
+      wgittools:
         path: 'npm:///wgittools'
         autoExporting: 0
         enabled: 0
-      wNpmTools:
+      wnpmtools:
         path: 'npm:///wnpmtools'
         autoExporting: 0
         enabled: 0
@@ -379,7 +372,7 @@ module:
         autoExporting: 0
         enabled: 0
         criterion:
-          debug: 1
+          development: 1
       wait-sync:
         path: 'npm:///wait-sync#1.0.1'
         autoExporting: 0
@@ -987,8 +980,7 @@ module:
           content: proto
           export: 1
     consistency:
-      ../.ex.will.yml: *ref_0
-      ../.im.will.yml: *ref_1
+      ../will.yml: *ref_0
   ../:
     about:
       name: wFiles
@@ -1014,26 +1006,22 @@ module:
         module to keep DRY.
       enabled: 1
       version: 0.7.0
-      interpreters: *ref_2
-      keywords: *ref_3
       license: MIT
-      author: Kostiantyn Wandalen <wanalen@01.school>
-      contributors: *ref_4
       npm.name: wFiles
-      npm.scripts: *ref_5
+      author: Kostiantyn Wandalen <wanalen@01.school>
+      keywords: *ref_1
+      contributors: *ref_2
+      interpreters: *ref_3
+      npm.scripts: *ref_4
     path:
       module.willfiles:
         criterion:
           predefined: 1
-        path:
-          - .ex.will.yml
-          - .im.will.yml
+        path: will.yml
       module.original.willfiles:
         criterion:
           predefined: 1
-        path:
-          - .ex.will.yml
-          - .im.will.yml
+        path: will.yml
       module.peer.willfiles:
         criterion:
           predefined: 1
@@ -1139,11 +1127,11 @@ module:
         path: 'npm:///wTools'
         autoExporting: 0
         enabled: 0
-      wStringer:
+      wstringer:
         path: 'npm:///wstringer'
         autoExporting: 0
         enabled: 0
-      wStringsExtra:
+      wstringsextra:
         path: 'npm:///wstringsextra'
         autoExporting: 0
         enabled: 0
@@ -1155,35 +1143,35 @@ module:
         path: 'npm:///wCopyable'
         autoExporting: 0
         enabled: 0
-      wGdfStrategy:
+      wgdf:
         path: 'npm:///wgdf'
         autoExporting: 0
         enabled: 0
-      wIntrospectorBasic:
+      wintrospectorbasic:
         path: 'npm:///wintrospectorbasic'
         autoExporting: 0
         enabled: 0
-      wPathBasic:
+      wpathbasic:
         path: 'npm:///wpathbasic'
         autoExporting: 0
         enabled: 0
-      wPathTools:
+      wpathtools:
         path: 'npm:///wpathtools'
         autoExporting: 0
         enabled: 0
-      wUriBasic:
+      wuribasic:
         path: 'npm:///wuribasic'
         autoExporting: 0
         enabled: 0
-      wWebUriBasic:
+      wweburibasic:
         path: 'npm:///wweburibasic'
         autoExporting: 0
         enabled: 0
-      wProcess:
+      wprocess:
         path: 'npm:///wprocess'
         autoExporting: 0
         enabled: 0
-      wFieldsStack:
+      wfieldsstack:
         path: 'npm:///wfieldsstack'
         autoExporting: 0
         enabled: 0
@@ -1191,11 +1179,11 @@ module:
         path: 'npm:///wRegexpObject'
         autoExporting: 0
         enabled: 0
-      wSelector:
+      wselector:
         path: 'npm:///wselector'
         autoExporting: 0
         enabled: 0
-      wVerbal:
+      wverbal:
         path: 'npm:///wverbal'
         autoExporting: 0
         enabled: 0
@@ -1203,11 +1191,11 @@ module:
         path: 'npm:///wLogger'
         autoExporting: 0
         enabled: 0
-      wGitTools:
+      wgittools:
         path: 'npm:///wgittools'
         autoExporting: 0
         enabled: 0
-      wNpmTools:
+      wnpmtools:
         path: 'npm:///wnpmtools'
         autoExporting: 0
         enabled: 0
@@ -1234,7 +1222,7 @@ module:
         autoExporting: 0
         enabled: 0
         criterion:
-          debug: 1
+          development: 1
       wait-sync:
         path: 'npm:///wait-sync#1.0.1'
         autoExporting: 0
@@ -1778,9 +1766,6 @@ module:
           - 'build::release'
           - 'build::npm'
     consistency:
-      ../.ex.will.yml:
-        hash: 44aae3aa1e40366fe4fa1fe181dc6bc6
-        size: 3243
-      ../.im.will.yml:
-        hash: 7564735aa2387b85a20cdcd457e282d8
-        size: 6334
+      ../will.yml:
+        hash: 15b1709f7aaf63684f7cd62e51a3fd9d
+        size: 9429

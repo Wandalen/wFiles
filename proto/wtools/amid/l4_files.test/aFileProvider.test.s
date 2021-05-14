@@ -323,22 +323,22 @@ function readWriteOptionWriteMode( test )
   var data = 'data1';
   var filePath = a.abs( 'file1.txt' );
   var writeMode = 'append';
+  a.fileProvider.fileWrite({filePath, data, writeMode});
+  var got = a.fileProvider.fileRead( filePath )
+  test.identical( got, data);
 
-  /* qqq : for junior : implement please */
-  // test.true( false );
 
-  /* */
 
-  test.case = 'more test cases?';
+  test.case = 'tests got data includes string "a"';
   a.reflect();
   var data = 'data1';
   var filePath = a.abs( 'file1.txt' );
   var writeMode = 'append';
+  a.fileProvider.fileWrite({filePath, data, writeMode});
+  var readText = a.fileProvider.fileRead( filePath );
+  var got = readText.includes('a');
+  test.identical( got, true);
 
-  /* qqq : for junior : implement please */
-  // test.true( false );
-
-  /* */
 
 }
 

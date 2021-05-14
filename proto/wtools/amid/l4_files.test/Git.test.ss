@@ -102,16 +102,16 @@ function filesReflectTrivial( test )
       '.',
       './.ex.will.yml',
       './.im.will.yml',
-      './LICENSE',
+      './License',
       './package.json',
-      './README.md',
+      './Readme.md',
       './doc',
       './out',
       './out/wPathBasic.out.will.yml',
       './proto',
       './sample',
     ]
-
+    
     test.true( _.arraySetContainAll_( files, expected ) )
     return got;
   })
@@ -141,16 +141,16 @@ function filesReflectTrivial( test )
       '.',
       './.ex.will.yml',
       './.im.will.yml',
-      './LICENSE',
+      './License',
       './package.json',
-      './README.md',
+      './Readme.md',
       './doc',
       './out',
       './out/wPathBasic.out.will.yml',
       './proto',
       './sample',
     ]
-
+    
     test.true( _.arraySetContainAll_( files, expected ) )
     return got;
   })
@@ -180,9 +180,9 @@ function filesReflectTrivial( test )
       '.',
       './.ex.will.yml',
       './.im.will.yml',
-      './LICENSE',
+      './License',
       './package.json',
-      './README.md',
+      './Readme.md',
       './doc',
       './out',
       './out/wPathBasic.out.will.yml',
@@ -250,9 +250,9 @@ function filesReflectTrivial( test )
       '.',
       './.ex.will.yml',
       './.im.will.yml',
-      './LICENSE',
+      './License',
       './package.json',
-      './README.md',
+      './Readme.md',
       './doc',
       './out',
       './out/wPathBasic.out.will.yml',
@@ -299,9 +299,9 @@ function filesReflectTrivial( test )
       '.',
       './.ex.will.yml',
       './.im.will.yml',
-      './LICENSE',
+      './License',
       './package.json',
-      './README.md',
+      './Readme.md',
       './doc',
       './out',
       './out/wPathBasic.out.will.yml',
@@ -345,7 +345,7 @@ function filesReflectTrivial( test )
       './proto',
       './sample'
     ]
-
+    
     test.true( _.arraySetContainAll_( files, expected ) )
     let packagePath = providerDst.path.join( localPath, 'package.json' );
     let packageRead = providerDst.fileRead
@@ -592,7 +592,7 @@ function filesReflectTrivial( test )
 
     ready.then( ( got ) =>
     {
-      providerDst.fileWrite( providerDst.path.join( localPath, 'README.md' ), 'test' );
+      providerDst.fileWrite( providerDst.path.join( localPath, 'Readme.md' ), 'test' );
       return null;
     })
 
@@ -607,7 +607,7 @@ function filesReflectTrivial( test )
     ready.then( ( got ) =>
     {
       test.identical( got.exitCode, 0 );
-      test.true( _.strHas( got.output, `modified:   README.md` ) )
+      test.true( _.strHas( got.output, `modified:   Readme.md` ) )
       return null;
     })
 
@@ -628,7 +628,7 @@ function filesReflectTrivial( test )
     ready.then( ( got ) =>
     {
       test.identical( got.exitCode, 0 );
-      test.true( _.strHas( got.output, `modified:   README.md` ) )
+      test.true( _.strHas( got.output, `modified:   Readme.md` ) )
       return null;
     })
 
@@ -802,7 +802,7 @@ function filesReflectNoStashing( test )
 
     ready.then( () =>
     {
-      _.fileProvider.fileWrite( _.path.join( localPath, 'README.md' ), '' );
+      _.fileProvider.fileWrite( _.path.join( localPath, 'Readme.md' ), '' );
       return null;
     })
 
@@ -828,7 +828,7 @@ function filesReflectNoStashing( test )
     ready.then( ( got ) =>
     {
       test.identical( got.exitCode, 0 );
-      test.true( _.strHas( got.output, `modified:   README.md` ) )
+      test.true( _.strHas( got.output, `modified:   Readme.md` ) )
       return null;
     })
 

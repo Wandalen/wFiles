@@ -30,7 +30,7 @@
 // }
 //
 // // --
-// // relationship
+// // relations
 // // --
 //
 // var Composes =

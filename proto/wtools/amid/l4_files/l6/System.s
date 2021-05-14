@@ -13,7 +13,7 @@
 const _global = _global_;
 const _ = _global_.wTools;
 let Routines = Object.create( null );
-const FileRecord = _.FileRecord;
+const FileRecord = _.files.FileRecord;
 const Parent = _.FileProvider.Partial;
 const Self = wFileSystem;
 function wFileSystem( o )
@@ -297,7 +297,7 @@ function _recordFactoryFormEnd( recordFactory )
 {
   let self = this;
 
-  _.assert( recordFactory instanceof _.FileRecordFactory );
+  _.assert( recordFactory instanceof _.files.FileRecordFactory );
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( recordFactory.effectiveProvider instanceof _.FileProvider.Abstract, 'No provider for base path', recordFactory.basePath, 'found' );
   // _.assert( !_.path.isGlobal( recordFactory.basePath ) );
@@ -312,7 +312,7 @@ function _recordFormBegin( record )
 {
   let self = this;
 
-  _.assert( record instanceof _.FileRecord );
+  _.assert( record instanceof _.files.FileRecord );
   _.assert( arguments.length === 1, 'Expects single argument' );
 
   return record;
@@ -323,7 +323,7 @@ function _recordFormBegin( record )
 // function _recordPathForm( record )
 // {
 //   let self = this;
-//   _.assert( record instanceof _.FileRecord );
+//   _.assert( record instanceof _.files.FileRecord );
 //   _.assert( arguments.length === 1, 'Expects single argument' );
 //
 //   return record;
@@ -334,7 +334,7 @@ function _recordFormBegin( record )
 function _recordFormEnd( record )
 {
   let self = this;
-  _.assert( record instanceof _.FileRecord );
+  _.assert( record instanceof _.files.FileRecord );
   _.assert( arguments.length === 1, 'Expects single argument' );
 
   return record;
@@ -345,7 +345,7 @@ function _recordFormEnd( record )
 function _recordAbsoluteGlobalMaybeGet( record )
 {
   let self = this;
-  _.assert( record instanceof _.FileRecord );
+  _.assert( record instanceof _.files.FileRecord );
   _.assert( arguments.length === 1, 'Expects single argument' );
   return record.absoluteGlobal;
 }
@@ -355,7 +355,7 @@ function _recordAbsoluteGlobalMaybeGet( record )
 function _recordRealGlobalMaybeGet( record )
 {
   let self = this;
-  _.assert( record instanceof _.FileRecord );
+  _.assert( record instanceof _.files.FileRecord );
   _.assert( arguments.length === 1, 'Expects single argument' );
   return record.realGlobal;
 }
@@ -1304,7 +1304,7 @@ function _Setup1()
         }
         else
         {
-          if( o[ p ] instanceof _.FileRecord )
+          if( o[ p ] instanceof _.files.FileRecord )
           continue;
 
           o[ p ] = self.path.preferredFromGlobal( o[ p ] );
@@ -1444,7 +1444,7 @@ let Path = _.uri.CloneExtending({ fileProvider : Self });
 _.assert( _.prototype.has( Path, _.uri ) );
 
 // --
-// relationship
+// relations
 // --
 
 let defaultProviderSymbol = Symbol.for( 'defaultProvider' );

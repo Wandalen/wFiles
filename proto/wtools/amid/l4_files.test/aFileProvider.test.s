@@ -20401,7 +20401,7 @@ function dirReadSyncOutputFormats( test )
     outputFormat : 'record'
   })
   test.identical( got.length, 1 );
-  test.true( got[ 0 ] instanceof _.FileRecord );
+  test.true( got[ 0 ] instanceof _.files.FileRecord );
   test.identical( got[ 0 ].absolute, filePath );
 
   test.case = 'directory';
@@ -20412,7 +20412,7 @@ function dirReadSyncOutputFormats( test )
     outputFormat : 'record'
   })
   test.identical( got.length, 1 );
-  test.true( got[ 0 ] instanceof _.FileRecord );
+  test.true( got[ 0 ] instanceof _.files.FileRecord );
   test.identical( got[ 0 ].absolute, filePath );
 
   /* relative */
@@ -42218,8 +42218,8 @@ function fileStatIs( test )
     test.true( !_.fileStatIs( provider ) );
     test.case = 'null'
     test.true( !_.fileStatIs( null ) );
-    test.case = 'instance of _.FileStat'
-    test.true( _.fileStatIs( new _.FileStat  ) );
+    test.case = 'instance of _.files.FileStat'
+    test.true( _.fileStatIs( new _.files.FileStat  ) );
 
     test.case = 'stats without bigint'
     provider.UsingBigIntForStat = false;

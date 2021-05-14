@@ -45,8 +45,8 @@ function fileStatIs( src )
   if( File )
   if( src instanceof File.Stats )
   return true;
-  if( _.FileStat )
-  if( src instanceof _.FileStat )
+  if( _.files.FileStat )
+  if( src instanceof _.files.FileStat )
   return true;
   let proto = Object.getPrototypeOf( File.Stats );
   if( proto.name && src instanceof proto )
@@ -194,6 +194,8 @@ let Tools =
 
 _.props.extend( _, Tools );
 
+//
+
 let StatExtension =
 {
 
@@ -205,12 +207,5 @@ let StatExtension =
 }
 
 _.props.extend( _.files.stat, StatExtension );
-
-// --
-// export
-// --
-
-if( typeof module !== 'undefined' )
-module[ 'exports' ] = Self;
 
 })();

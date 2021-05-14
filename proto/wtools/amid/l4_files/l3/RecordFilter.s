@@ -13,7 +13,7 @@
 
 const _global = _global_;
 const _ = _global_.wTools;
-const Parent = _.FileRecordContext;
+const Parent = _.files.FileRecordContext;
 const Self = wFileRecordFilter;
 function wFileRecordFilter( o )
 {
@@ -22,7 +22,7 @@ function wFileRecordFilter( o )
 
 Self.shortName = 'FileRecordFilter';
 
-_.assert( !_.FileRecordFilter );
+_.assert( !_.files.FileRecordFilter );
 _.assert( !!_.regexpsEscape );
 
 // --
@@ -113,92 +113,6 @@ function _formAssociations()
   let filter = this;
 
   let result = Parent.prototype._formAssociations.apply( filter, arguments );
-
-  // /* find file system */
-  //
-  // if( !filter.system )
-  // if( filter.effectiveProvider && filter.effectiveProvider instanceof _.FileProvider.System )
-  // {
-  //   filter.system = filter.effectiveProvider;
-  //   filter.effectiveProvider = null;
-  // }
-  //
-  // if( !filter.system )
-  // if( filter.effectiveProvider && filter.effectiveProvider.system && filter.effectiveProvider.system instanceof _.FileProvider.System )
-  // {
-  //   filter.system = filter.effectiveProvider.system;
-  // }
-  //
-  // if( !filter.system )
-  // if( filter.defaultProvider && filter.defaultProvider instanceof _.FileProvider.System )
-  // {
-  //   filter.system = filter.defaultProvider;
-  // }
-  //
-  // if( !filter.system )
-  // if( filter.defaultProvider && filter.defaultProvider.system && filter.defaultProvider.system instanceof _.FileProvider.System )
-  // {
-  //   filter.system = filter.defaultProvider.system;
-  // }
-  //
-  // if( filter.system )
-  // if( filter.system.system && filter.system.system !== filter.system )
-  // {
-  //   _.assert( !( filter.system instanceof _.FileProvider.System ) );
-  //   if( !filter.effectiveProvider )
-  //   filter.effectiveProvider = filter.system;
-  //   filter.system = filter.system.system;
-  // }
-  //
-  // /* find effective provider */
-  //
-  // if( filter.effectiveProvider && filter.effectiveProvider instanceof _.FileProvider.System )
-  // {
-  //   _.assert( filter.system === null || filter.system === filter.effectiveProvider );
-  //   filter.system = filter.effectiveProvider;
-  //   filter.effectiveProvider = null;
-  // }
-  //
-  // /* reset system */
-  //
-  // if( filter.effectiveProvider && filter.effectiveProvider.system )
-  // {
-  //   _.assert( filter.system === null || filter.system === filter.effectiveProvider.system );
-  //   filter.system = filter.effectiveProvider.system;
-  // }
-  //
-  // /* find default provider */
-  //
-  // if( !filter.defaultProvider )
-  // {
-  //   filter.defaultProvider = filter.defaultProvider || filter.effectiveProvider || filter.system;
-  // }
-  //
-  // /* reset system */
-  //
-  // if( filter.system && !( filter.system instanceof _.FileProvider.System ) )
-  // {
-  //   _.assert( filter.system === filter.defaultProvider || filter.system === filter.effectiveProvider )
-  //   filter.system = null;
-  // }
-  //
-  // /* */
-  //
-  // _.assert
-  // (
-  //   !filter.system || filter.system instanceof _.FileProvider.System,
-  //   () => '{- filter.system -} should be instance of {- _.FileProvider.System -}, but it is ' + _.entity.exportStringDiagnosticShallow( filter.system )
-  // );
-  // _.assert
-  // (
-  //   !filter.effectiveProvider || !( filter.effectiveProvider instanceof _.FileProvider.System ),
-  //   () => '{- filter.effectiveProvider -} cant be instance of {- _.FileProvider.System -}, but it is'
-  // );
-  // _.assert
-  // (
-  //   filter.defaultProvider instanceof _.FileProvider.Abstract,
-  //   () => '{- filter.system -} should be instance of {- _.FileProvider.Abstract -}, but it is ' + _.entity.exportStringDiagnosticShallow( filter.defaultProvider )
-  // );
 
   /* */
 
@@ -451,19 +365,15 @@ function and( src )
     return filter;
   }
 
-  // if( Config.debug )
-  // if( src && !( src instanceof filter.Self ) )
-  // _.map.assertHasOnly( src, filter.fieldsOfCopyableGroups );
-
   if( src === null )
   return filter;
 
   const fileProvider = filter.effectiveProvider || filter.system || filter.defaultProvider;
-  if( !( src instanceof _.FileRecordFilter ) )
+  if( !( src instanceof _.files.FileRecordFilter ) )
   src = fileProvider.recordFilter( src );
 
-  _.assert( filter instanceof _.FileRecordFilter );
-  _.assert( src instanceof _.FileRecordFilter );
+  _.assert( filter instanceof _.files.FileRecordFilter );
+  _.assert( src instanceof _.files.FileRecordFilter );
   _.assert( !filter.formed || filter.formed <= 1 );
   _.assert( !src.formed || src.formed <= 1 );
   _.assert( arguments.length === 1, 'Expects single argument' );
@@ -1001,8 +911,6 @@ function prefixesApply( o )
   _.assert( filter.prefixPath === null || _.strIs( filter.prefixPath ) || _.strsAreAll( filter.prefixPath ) );
   _.assert( filter.postfixPath === null || _.strIs( filter.postfixPath ) || _.strsAreAll( filter.postfixPath ) );
   _.assert( filter.postfixPath === null, 'not implemented' );
-  // if( filter.basePath && filter.filePath )
-  // filter.assertBasePath();
 
   let dstArray = filter.filePathDstArrayGet();
   let regularPathHaving = dstArray.filter( ( e ) => !_.boolLike( e ) ).length;
@@ -1120,7 +1028,6 @@ function prefixesApply( o )
       {
         if( o.applyingToTrue && _.boolLike( it.value ) && it.value )
         {
-          // debugger;
           return '';
         }
         return it.value;
@@ -1139,7 +1046,6 @@ function prefixesApply( o )
       {
         let currentValue = it.value;
 
-        // debugger;
         if( _.boolLike( it.value ) && it.side === 'dst' )
         if( !it.value || !o.applyingToTrue )
         {
@@ -1328,7 +1234,6 @@ function prefixesRelative( prefixPath )
 
       if( !side || it.side === side || it.side === undefined )
       {
-        // if( !_.strIs( filePath ) )
         if( !_.strIs( filePath ) || filePath === '' )
         return filePath;
 
@@ -1568,8 +1473,6 @@ function basePathForStemPath( filePath )
   _.assert( _.mapIs( filter.basePath ) );
 
   result = filter.basePath[ filePath ];
-
-  // _.assert( result !== undefined, 'No base path for ' + filePath );
 
   return result;
 }
@@ -2409,28 +2312,6 @@ function filePathGlobSimplify( filePath, basePath )
 
   /**/
 
-  // filePath = path.filterPairsInplace( filePath, ( it ) =>
-  // {
-  //   if( filter.src )
-  //   {
-  //   }
-  //   else
-  //   {
-  //     let normalized = path.globNormalize( it.src );
-  //     if( it.src !== normalized )
-  //     if( _.mapIs( basePath ) && basePath[ it.src ] )
-  //     {
-  //       let base = basePath[ it.src ];
-  //       delete basePath[ it.src ];
-  //       basePath[ normalized ] = base;
-  //     }
-  //     it.src = normalized;
-  //   }
-  //   return { [ it.src ] : it.dst }
-  // });
-
-  /**/
-
   let dst = filter.filePathDstArrayGet();
 
   if( _.any( dst, ( e ) => _.boolLike( e ) ) )
@@ -2494,7 +2375,6 @@ function filePathSimplest( filePath )
   let filter = this;
 
   filePath = filePath || filter.filePathArrayNonBoolGet();
-  // filePath = filePath || filter.filePathNormalizedGet();
 
   _.assert( !_.mapIs( filePath ) );
   _.assert( arguments.length === 0 || arguments.length === 1 );
@@ -2951,14 +2831,6 @@ function filePathSrcArrayBoolGet( filePath )
   else
   {
     filePath = [];
-    // if( filter.src )
-    // {
-    //   filePath = path.mapSrcFromDst( filePath );
-    // }
-    // else
-    // {
-    //   filePath = path.mapSrcFromSrc( filePath );
-    // }
   }
 
   _.assert( _.arrayIs( filePath ) );
@@ -3247,10 +3119,12 @@ function providerForPath( filePath )
   return filter.effectiveProvider;
 }
 
+//
+
 /**
  * @summary Converts global path into local.
  * @param {String} filePath Input file path.
- * @function prefixesRelative
+ * @function pathLocalize
  * @class wFileRecordFilter
  * @namespace wTools.FileProvider
  * @module Tools/mid/Files
@@ -3512,7 +3386,6 @@ function sureBasePath( filePath, basePath )
   basePath = path.s.join( filter.prefixPath || '', basePath );
   basePath = path.s.fromGlob( basePath );
 
-  // let filePathWithFallback = filter.filePathArrayNonBoolGet( filePath, 1 );
   let originalFilePath = _.entity.make( filePath );
   filePath = filter.filePathArrayNonBoolGet( filePath, 0 );
   filePath = filePath.filter( ( e ) => _.strIs( e ) && e );
@@ -3524,13 +3397,6 @@ function sureBasePath( filePath, basePath )
   {
     filePath = filePathFromPrefix();
   }
-
-  // if( !filePath.length && basePath.length )
-  // {
-  //   filePath = filter.filePathArrayNonBoolGet( originalFilePath, 1 );
-  //   filePath = filePath.filter( ( e ) => _.strIs( e ) && e );
-  //   filePath = path.s.join( filter.prefixPath || '', filePath );
-  // }
 
   filePath = path.s.fromGlob( filePath );
 
@@ -3921,11 +3787,6 @@ function masksGenerate()
   _.assert( !filter.src );
   let filePath2 = _.props.extend( null, filePath );
   let basePath2 = _.props.extend( null, basePath );
-  // debugger;
-  /* xxx */
-  // filter.filePathGlobSimplify( filePath2, basePath2 );
-  // if( !_.entityIdentical( filePath2, filePath ) )
-  // if( !_.entity.identicalShallow( filePath2, filePath ) )
   if( !_.path.map.identical( filePath2, filePath ) )
   {
     globFound = filter.filePathIsComplex( filePath2 );
@@ -4002,13 +3863,6 @@ function masksGenerate()
       if( certainly )
       subfilter.maskTransientDirectory.excludeAny.push( certainly );
     });
-
-    // regexps.actualAll.forEach( ( none ) =>
-    // {
-    //   let certainly = regexps.certainlyHash.get( none );
-    //   if( certainly )
-    //   subfilter.maskTransientDirectory.excludeAny.push( certainly );
-    // });
 
     _.assert( subfilter.maskAll !== filter.maskAll );
 
@@ -4281,13 +4135,8 @@ let Medials =
 
 let Statics =
 {
-  // TolerantFrom,
   And,
   MaskNames,
-}
-
-let Globals =
-{
 }
 
 let Forbids =
@@ -4496,14 +4345,6 @@ _.classDeclare
   extend : Extension,
 });
 
-_.props.extend( _, Globals );
-
-// --
-// export
-// --
-
-_[ Self.shortName ] = Self;
-if( typeof module !== 'undefined' )
-module[ 'exports' ] = Self;
+_.files[ Self.shortName ] = Self;
 
 })();

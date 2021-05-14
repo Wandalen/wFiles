@@ -201,13 +201,6 @@ _.classDeclare
 
 if( _global_.wCopyable )
 _.Copyable.mixin( Self );
-_[ Self.shortName ] = Self;
-
-// --
-// export
-// --
-
-if( typeof module !== 'undefined' )
-module[ 'exports' ] = Self;
+_.files[ Self.shortName ] = Self;
 
 })();

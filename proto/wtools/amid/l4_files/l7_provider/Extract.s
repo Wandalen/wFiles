@@ -7,10 +7,10 @@ const _global = _global_;
 const _ = _global_.wTools;
 const Abstract = _.FileProvider.Abstract;
 const Partial = _.FileProvider.Partial;
-const FileRecord = _.FileRecord;
+const FileRecord = _.files.FileRecord;
 const Find = _.FileProvider.FindMixin;
 
-_.assert( _.routineIs( _.FileRecord ) );
+_.assert( _.routineIs( _.files.FileRecord ) );
 _.assert( _.routineIs( Abstract ) );
 _.assert( _.routineIs( Partial ) );
 _.assert( !!Find );
@@ -326,7 +326,7 @@ function fileReadAct( o )
   ({
     filePath : o.filePath,
     resolvingSoftLink : o.resolvingSoftLink,
-    // resolvingTextLink : o.resolvingTextLink, 
+    // resolvingTextLink : o.resolvingTextLink,
   }).absolutePath;
 
   if( self.system && _.path.isGlobal( o.filePath ) )
@@ -551,7 +551,7 @@ function statReadAct( o )
       return result;
     }
 
-    result = new _.FileStat();
+    result = new _.files.FileStat();
 
     if( self.extraStats && self.extraStats[ filePath ] )
     {
@@ -2730,7 +2730,7 @@ writeEncoders[ 'original.type' ] =
 }
 
 // --
-// relationship
+// relations
 // --
 
 /**

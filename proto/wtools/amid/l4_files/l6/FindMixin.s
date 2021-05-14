@@ -5,13 +5,13 @@
 
 const _global = _global_;
 const _ = _global_.wTools;
-const FileRecord = _.FileRecord;
+const FileRecord = _.files.FileRecord;
 const Abstract = _.FileProvider.Abstract;
 const Partial = _.FileProvider.Partial;
 const fileRead = Partial.prototype.fileRead;
 
 _.assert( _.entity.lengthOf( _.files.ReadEncoders ) > 0 );
-_.assert( _.routineIs( _.FileRecord ) );
+_.assert( _.routineIs( _.files.FileRecord ) );
 _.assert( _.routineIs( Abstract ) );
 _.assert( _.routineIs( Partial ) );
 _.assert( _.routineIs( fileRead ) );
@@ -33,8 +33,6 @@ function wFileProviderFindMixin( o )
 }
 
 Self.shortName = 'FindMixin';
-
-// let debugPath = '/dstNew';
 
 // --
 // etc
@@ -88,7 +86,7 @@ function _filesFindPrepare0( routine, args ) /* qqq : cover each case */
   _.assert( arguments.length === 2 );
   _.assert( args.length === 1 || args.length === 2, 'Expects one or two arguments' );
 
-  if( args[ 0 ] && args[ 0 ] instanceof _.FileRecordFilter )
+  if( args[ 0 ] && args[ 0 ] instanceof _.files.FileRecordFilter )
   {
     o = o || Object.create( null );
     o.filter = args[ 0 ];
@@ -111,7 +109,7 @@ function _filesFindPrepare0( routine, args ) /* qqq : cover each case */
 
   if( args.length === 2 )
   {
-    if( args[ 1 ] && args[ 1 ] instanceof _.FileRecordFilter )
+    if( args[ 1 ] && args[ 1 ] instanceof _.files.FileRecordFilter )
     {
       _.assert( !o.filter )
       o.filter = args[ 1 ];
@@ -174,11 +172,10 @@ function _filesFindPrepare1( routine, args )
 
   /* */
 
-  _.assert( o.filter instanceof _.FileRecordFilter );
+  _.assert( o.filter instanceof _.files.FileRecordFilter );
   if( o.filter.formed < 5 )
   o.filter._formAssociations();
 
-  // _.assert( !path.isEmpty( o.filter.filePath ) || !path.isEmpty( o.filter.prefixPath ), 'Please, define filePath for file filter' );
   let hasGlob = o.filter.filePathHasGlob();
 
   if( o.filter.recursive === null )
@@ -212,7 +209,6 @@ function _filesFindPrepare2( routine, args )
 
   /* */
 
-  // _.assert( !path.isEmpty( o.filter.filePath ) || !path.isEmpty( o.filter.prefixPath ), 'Please, define filePath for file filter' );
   let hasGlob = o.filter.filePathHasGlob();
 
   if( o.withDefunct === null )
@@ -264,7 +260,7 @@ function _filesFindFilterAbsorb( routine, args )
   if( o.filter.formed < 5 )
   if( o.filePath )
   {
-    if( o.filePath instanceof _.FileRecordFilter )
+    if( o.filePath instanceof _.files.FileRecordFilter )
     {
       o.filter.pathsExtend( o.filePath ).and( o.filePath );
       o.filePath = null;
@@ -312,7 +308,7 @@ function filesFindNominal_head( routine, args )
       basePath : o.filter.formedBasePath[ o.filePath ],
     };
     _.assert( _.strDefined( o2.basePath ), 'No base path for', o.filePath );
-    o.factory = _.FileRecordFactory.TolerantFrom( o, o2 ).form();
+    o.factory = _.files.FileRecordFactory.TolerantFrom( o, o2 ).form();
   }
 
   if( Config.debug )
@@ -469,12 +465,6 @@ function filesFindNominal_body( o )
   function forTerminal( r, op )
   {
 
-    // debugger;
-    // if( _.strEnds( r.absolute, '/Cycled.txt' ) )
-    // debugger;
-    // if( _.strEnds( r.absolute, '/Missed.txt' ) )
-    // debugger;
-
     if( r.isDir )
     return;
     if( !r.isTransient && !r.isActual )
@@ -542,7 +532,6 @@ function filesFindSingle_head( routine, args )
 
   if( Config.debug )
   {
-    // _.routine.assertOptions( filesFindSingle_body, o );
     _.routine.assertOptions( routine, o );
     _.assert( !self.system || o.filter.system === self.system );
     _.assert( !!o.filter.effectiveProvider );
@@ -647,11 +636,12 @@ var defaults = filesFindSingle_body.defaults = _.props.extend( null, filesFindSi
 
 defaults.withTerminals = true;
 defaults.withDirs = null;
-defaults.withActual = true;
-defaults.withTransient = false;
 defaults.withStem = true;
 defaults.withDefunct = null;
-defaults.visitingCertain = true;
+
+defaults.withActual = true; /* xxx */
+defaults.withTransient = false; /* xxx */
+defaults.visitingCertain = true; /* xxx */
 
 let filesFindSingle = _.routine.uniteCloning_replaceByUnite( filesFindSingle_head, filesFindSingle_body );
 
@@ -724,7 +714,6 @@ function filesFind_head( routine, args )
 
   }
 
-  // _.assert( !path.isEmpty( o.filter.filePath ) || !path.isEmpty( o.filter.prefixPath ), 'Please, define filePath for file filter' );
   let hasGlob = o.filter.filePathHasGlob();
 
   if( o.mandatory === null )
@@ -764,7 +753,6 @@ function filesFind_head( routine, args )
     + `\nBut file provider ${self.constructor.name} does not support ino of file.`
   );
 
-  // if( o.revisiting === 0 || o.revisitingHardLinked === 0 ) /* yyy */
   if( o.revisiting === 0 )
   if( o.visitedMap === null )
   o.visitedMap = Object.create( null );
@@ -912,7 +900,7 @@ function filesFind_body( o )
       safe : o.safe,
     };
     _.assert( _.strDefined( o4.basePath ), 'No base path for', stemPath );
-    o3.factory = _.FileRecordFactory.TolerantFrom( o3, o4 ).form();
+    o3.factory = _.files.FileRecordFactory.TolerantFrom( o3, o4 ).form();
 
     _.assert( o3.factory.basePath === o3.filter.formedBasePath[ stemPath ] );
     _.assert( o3.factory.dirPath === null );
@@ -951,7 +939,6 @@ function filesFind_body( o )
     .catch( ( err ) =>
     {
       debugger;
-      // _.errAttend( err ); // yyy : no!
       throw _.err( err );
     });
 
@@ -969,9 +956,6 @@ function filesFind_body( o )
 
     let visited = false;
 
-    // if( _global_.debugger )
-    // debugger;
-    // if( o.revisitingHardLinked === 0 && record.stat )
     if( o.visitedInosSet && record.stat )
     {
       _.assert( record.stat && self.isIno({ ino : record.stat.ino }) );
@@ -1214,7 +1198,7 @@ defaults.safe = null;
 defaults.maskPreset = 'default.exclude';
 defaults.outputFormat = 'record';
 defaults.result = null;
-defaults.mode = 'legacy'; /* xxx : change to distincy */
+defaults.mode = 'legacy'; /* xxx : change to distinct */
 defaults.revisiting = null;
 defaults.revisitingHardLinked = 1;
 defaults.visitedMap = null;
@@ -1451,13 +1435,7 @@ let filesGlober = filesFinder_functor( filesGlob );
 function filesFindGroups_head( routine, args )
 {
   let self = this;
-
-  // debugger;
-
   let o = self._preFileFilterWithoutProviderDefaults.apply( self, arguments );
-
-  // debugger;
-
   return o;
 }
 
@@ -1891,7 +1869,7 @@ function filesReflectEvaluate_body( o )
     dstOp.stemPath = dstOp.stemPath[ 0 ];
 
     _.assert( !!dstOp.basePath, () => 'No base path for ' + _.strQuote( dstPath ) );
-    let dstRecordFactory = _.FileRecordFactory.TolerantFrom( o, dstOp ).form();
+    let dstRecordFactory = _.files.FileRecordFactory.TolerantFrom( o, dstOp ).form();
 
     _.assert( _.strIs( dstOp.basePath ) );
     _.assert
@@ -3758,12 +3736,9 @@ function filesReflect_head( routine, args )
     _.assert( o.reflectMap === null || srcFilePath === null || srcFilePath === '' );
     _.assert( o.reflectMap === null || dstFilePath === null || dstFilePath === '' );
     _.assert( o.src.isPaired( o.dst ) );
-    // debugger; /* xxx */
     _.assert
     (
       o.filter === null || o.filter.filePath === null || o.filter.filePath === undefined
-      // || _.entityIdentical( o.filter.filePath, o.src.filePath ),
-      // || _.entity.identicalShallow( o.filter.filePath, o.src.filePath ),
       || _.path.map.identical( o.filter.filePath, o.src.filePath ),
     );
 
@@ -3785,9 +3760,7 @@ function filesReflect_head( routine, args )
       let filePath1 = path.mapExtend( null, o.src.filePath );
       let filePath2 = path.mapExtend( null, o.reflectMap );
       debugger; /* xxx */
-      // _.assert( _.entity.identicalShallow( filePath1, filePath2 ) );
       _.assert( _.path.map.identical( filePath1, filePath2 ) );
-      // _.assert( _.entityIdentical( filePath1, filePath2 ) );
     }
     o.src.filePath = o.reflectMap;
     o.reflectMap = null;
@@ -5407,16 +5380,12 @@ function filesResolve( o )
 _.routineExtend( filesResolve, filesGlob );
 
 var defaults = filesResolve.defaults;
-// defaults.recursive = 2;
 defaults.globPath = null;
 defaults.translator = null;
 defaults.outputFormat = 'record';
 
-// var paths = filesResolve.paths;
-// paths.globPath = null;
-
 // --
-// relationship
+// relations
 // --
 
 let Composes =

@@ -301,7 +301,7 @@ const Proto =
 
   name : 'Tools.files.Graph',
   silencing : 1,
-  enabled : 1,
+  enabled : 0,
   routineTimeOut : 15000,
 
   context :

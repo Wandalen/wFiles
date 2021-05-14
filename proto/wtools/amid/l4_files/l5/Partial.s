@@ -1902,7 +1902,7 @@ pathResolveLinkHeadReverse.having.aspect = 'entry';
 function _recordFactoryFormEnd( recordFactory )
 {
   let self = this;
-  _.assert( recordFactory instanceof _.FileRecordFactory );
+  _.assert( recordFactory instanceof _.files.FileRecordFactory );
   _.assert( arguments.length === 1, 'Expects single argument' );
   return recordFactory;
 }
@@ -1928,7 +1928,7 @@ function _recordFormEnd( record )
 function _recordAbsoluteGlobalMaybeGet( record )
 {
   let self = this;
-  _.assert( record instanceof _.FileRecord );
+  _.assert( record instanceof _.files.FileRecord );
   _.assert( arguments.length === 1, 'Expects single argument' );
   return record.absolute;
 }
@@ -1938,7 +1938,7 @@ function _recordAbsoluteGlobalMaybeGet( record )
 function _recordRealGlobalMaybeGet( record )
 {
   let self = this;
-  _.assert( record instanceof _.FileRecord );
+  _.assert( record instanceof _.files.FileRecord );
   _.assert( arguments.length === 1, 'Expects single argument' );
   return record.real;
 }
@@ -1951,7 +1951,7 @@ function record( filePath )
 
   _.assert( arguments.length === 1 );
 
-  if( filePath instanceof _.FileRecord )
+  if( filePath instanceof _.files.FileRecord )
   {
     return filePath;
   }
@@ -2006,7 +2006,7 @@ function _recordsSort( o )
 
   for( let i = 0; i < o.src.length; i++ )
   {
-    if( !( o.src[ i ] instanceof _.FileRecord ) )
+    if( !( o.src[ i ] instanceof _.files.FileRecord ) )
     throw _.err( '_recordsSort : expects FileRecord instances in src, got:', _.entity.strType( o.src[ i ] ) );
   }
 
@@ -2059,7 +2059,7 @@ function recordFactory( factory )
 
   factory = factory || Object.create( null );
 
-  if( factory instanceof _.FileRecordFactory )
+  if( factory instanceof _.files.FileRecordFactory )
   {
 
     if( !factory.system && self.system )
@@ -2076,7 +2076,7 @@ function recordFactory( factory )
   if( !factory.defaultProvider )
   factory.defaultProvider = self;
 
-  return _.FileRecordFactory( factory );
+  return _.files.FileRecordFactory( factory );
 }
 
 var having = recordFactory.having = Object.create( null );
@@ -2093,7 +2093,7 @@ function recordFilter( filter )
 
   filter = filter || Object.create( null );
 
-  if( filter instanceof _.FileRecordFilter )
+  if( filter instanceof _.files.FileRecordFilter )
   {
 
     if( !filter.system && self.system )
@@ -2117,7 +2117,7 @@ function recordFilter( filter )
   if( !filter.defaultProvider )
   filter.defaultProvider = self;
 
-  let result = _.FileRecordFilter( filter );
+  let result = _.files.FileRecordFilter( filter );
 
   if( filePath )
   result.copy( filePath );
@@ -4470,7 +4470,7 @@ function filesFingerprints( files )
 {
   let self = this;
 
-  if( _.strIs( files ) || files instanceof _.FileRecord )
+  if( _.strIs( files ) || files instanceof _.files.FileRecord )
   files = [ files ];
 
   _.assert( _.arrayIs( files ) || _.mapIs( files ) );
@@ -7857,7 +7857,7 @@ let ProviderDefaults =
  */
 
 // --
-// relationship
+// relations
 // --
 
 let Composes =

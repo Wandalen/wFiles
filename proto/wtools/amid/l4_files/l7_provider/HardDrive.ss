@@ -27,7 +27,7 @@ if( typeof module !== 'undefined' )
 
 const _global = _global_;
 const _ = _global_.wTools;
-const FileRecord = _.FileRecord;
+const FileRecord = _.files.FileRecord;
 const Parent = _.FileProvider.Partial;
 const Self = wFileProviderHardDrive;
 function wFileProviderHardDrive( o )
@@ -913,7 +913,7 @@ function statReadAct( o )
       isTextLink,
       isSoftLink,
       isHardLink,
-      isLink : _.FileStat.prototype.isLink,
+      isLink : _.files.FileStat.prototype.isLink,
     }
     _.props.extend( stat, extend );
     return stat;
@@ -921,7 +921,7 @@ function statReadAct( o )
 
 }
 
-_.assert( _.routineIs( _.FileStat.prototype.isLink ) );
+_.assert( _.routineIs( _.files.FileStat.prototype.isLink ) );
 _.routineExtend( statReadAct, Parent.prototype.statReadAct );
 
 //
@@ -2449,7 +2449,7 @@ writeEncoders[ 'original.type' ] =
 fileWriteAct.encoders = writeEncoders;
 
 // --
-// relationship
+// relations
 // --
 
 let KnownNativeEncodings = [ undefined, 'ascii', 'base64', 'binary', 'hex', 'ucs2', 'ucs-2', 'utf16le', 'utf-16le', 'utf8', 'latin1' ]

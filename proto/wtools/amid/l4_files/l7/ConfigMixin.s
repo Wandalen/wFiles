@@ -5,14 +5,14 @@
 
 const _global = _global_;
 const _ = _global_.wTools;
-const FileRecord = _.FileRecord;
+const FileRecord = _.files.FileRecord;
 const Abstract = _.FileProvider.Abstract;
 const Partial = _.FileProvider.Partial;
 const Find = _.FileProvider.FindMixin;
 const fileRead = Partial.prototype.fileRead;
 
 _.assert( _.entity.lengthOf( _.files.ReadEncoders ) > 0 );
-_.assert( _.routineIs( _.FileRecord ) );
+_.assert( _.routineIs( _.files.FileRecord ) );
 _.assert( _.routineIs( Abstract ) );
 _.assert( _.routineIs( Partial ) );
 _.assert( _.routineIs( Find ) );
@@ -1098,7 +1098,7 @@ storageTerminalDel.defaults =
 }
 
 // --
-// relationship
+// relations
 // --
 
 let Composes =

@@ -626,7 +626,7 @@ WriteEncoders[ 'buffer.bytes' ] =
 fileReadAct.encoders = WriteEncoders;
 
 // --
-// relationship
+// relations
 // --
 
 /**

@@ -59,7 +59,7 @@ function pathNativizeAct( filePath )
 }
 
 // --
-// relationship
+// relations
 // --
 
 var Composes =

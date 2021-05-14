@@ -39,6 +39,12 @@ _.files.ReadEncoders = _.files.ReadEncoders || Object.create( null );
 _.files.WriteEncoders = _.files.WriteEncoders || Object.create( null );
 _.files._ = _.files._ || Object.create( null );
 
+_.assert( !!_.FieldsStack );
+_.assert( !_.files.FileRecord );
+_.assert( !_.files.FileRecordFactory );
+_.assert( !_.files.FileRecordFilter );
+_.assert( !_.files.FileStat );
+
 // --
 // meta
 // --
@@ -48,113 +54,6 @@ let vectorizeAll = _.routineDefaults( null, _.vectorizeAll, { vectorizingContain
 let vectorizeAny = _.routineDefaults( null, _.vectorizeAny, { vectorizingContainerAdapter : 1, unwrapingContainerAdapter : 0 } );
 let vectorizeNone =
 _.routineDefaults( null, _.vectorizeNone, { vectorizingContainerAdapter : 1, unwrapingContainerAdapter : 0 } );
-
-// //
-//
-// function vectorize( routine, select )
-// {
-//   select = select || 1;
-//
-//   let routineName = routine.name;
-//
-//   _.assert( _.routineIs( routine ) );
-//   _.assert( _.strDefined( routineName ) );
-//   _.assert( arguments.length === 1 || arguments.length === 2 );
-//
-//   let routine2 = _.routineVectorize_functor
-//   ({
-//     routine : [ routineName ],
-//     vectorizingArray : 1,
-//     vectorizingMapVals : 0,
-//     vectorizingMapKeys : 0,
-//     select : select,
-//   });
-//
-//   _.routineExtend( routine2, routine );
-//
-//   return routine2;
-// }
-//
-// //
-//
-// function vectorizeAll( routine, select )
-// {
-//   _.assert( arguments.length === 1 || arguments.length === 2 );
-//   let routine2 = _vectorize( routine, select );
-//   _.routineExtend( all, routine );
-//   return all;
-//
-//   /* */
-//
-//   function all()
-//   {
-//     let result = routine2.apply( this, arguments );
-//     return _.all( result );
-//   }
-//
-// }
-//
-// //
-//
-// function vectorizeAny( routine, select )
-// {
-//   _.assert( arguments.length === 1 || arguments.length === 2 );
-//   let routine2 = _vectorize( routine, select );
-//   _.routineExtend( any, routine );
-//   return any;
-//
-//   /* */
-//
-//   function any()
-//   {
-//     let result = routine2.apply( this, arguments );
-//     return _.any( result );
-//   }
-//
-// }
-//
-// //
-//
-// function vectorizeNone( routine, select )
-// {
-//   _.assert( arguments.length === 1 || arguments.length === 2 );
-//   let routine2 = _vectorize( routine, select );
-//   _.routineExtend( none, routine );
-//   return none;
-//
-//   /* */
-//
-//   function none()
-//   {
-//     let result = routine2.apply( this, arguments );
-//     return _.none( result );
-//   }
-//
-// }
-//
-// function vectorizeKeysAndVals( routine, select )
-// {
-//   select = select || 1;
-//
-//   let routineName = routine.name;
-//
-//   _.assert( _.routineIs( routine ) );
-//   _.assert( _.strDefined( routineName ) );
-//   _.assert( arguments.length === 1 || arguments.length === 2 );
-//
-//   let routine2 = _.routineVectorize_functor
-//   ({
-//     routine : [ routineName ],
-//     vectorizingArray : 1,
-//     vectorizingMapVals : 1,
-//     vectorizingMapKeys : 1,
-//     select : select,
-//   });
-//
-//   _.routineExtend( routine2, routine );
-//
-//   return routine2;
-// }
 
 //
 
@@ -296,7 +195,7 @@ function regexpDirSafe( mask )
 
 function filterSafer( filter )
 {
-  _.assert( filter === null || _.mapIs( filter ) || filter instanceof _.FileRecordFilter );
+  _.assert( filter === null || _.mapIs( filter ) || filter instanceof _.files.FileRecordFilter );
 
   filter = filter || Object.create( null );
 
@@ -606,7 +505,7 @@ function fileReport( file ) /* xxx : rename */
 {
   let report = '';
 
-  file = _.FileRecord( file );
+  file = _.files.FileRecord( file );
 
   let fileTypes = {};
 
@@ -787,7 +686,9 @@ let Restricts =
 
 _.props.supplement( _.files._, Restricts );
 
-let Files =
+//
+
+let FilesExtension =
 {
 
   // regexp
@@ -823,13 +724,6 @@ let Files =
 
 }
 
-_.props.supplement( _.files, Files );
-
-// --
-// export
-// --
-
-if( typeof module !== 'undefined' )
-module[ 'exports' ] = _;
+_.props.supplement( _.files, FilesExtension );
 
 })();

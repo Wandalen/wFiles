@@ -5,12 +5,12 @@
 
 const _global = _global_;
 const _ = _global_.wTools;
-var FileRecord = _.FileRecord;
-var FileRecordFilter = _.FileRecordFilter;
-var FileRecordFactory = _.FileRecordFactory;
+var FileRecord = _.files.FileRecord;
+var FileRecordFilter = _.files.FileRecordFilter;
+var FileRecordFactory = _.files.FileRecordFactory;
 
 _.assert( !_.FileProvider.Abstract );
-_.assert( _.routineIs( _.FileRecord ) );
+_.assert( _.routineIs( _.files.FileRecord ) );
 _.assert( _.routineIs( FileRecordFilter ) );
 _.assert( _.routineIs( FileRecordFactory ) );
 
@@ -36,7 +36,7 @@ function init( o )
 }
 
 // --
-// relationship
+// relations
 // --
 
 var Composes =

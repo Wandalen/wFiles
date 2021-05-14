@@ -91,7 +91,7 @@ function pathCurrentAct()
 function statReadAct( o )
 {
   let self = this;
-  let result = new _.FileStat();
+  let result = new _.files.FileStat();
   let con;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
@@ -509,7 +509,7 @@ encoders[ 'document' ] =
 fileReadAct.encoders = encoders;
 
 // --
-// relationship
+// relations
 // --
 
 /**

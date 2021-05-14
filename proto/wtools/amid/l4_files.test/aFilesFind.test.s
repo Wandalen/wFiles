@@ -1633,7 +1633,7 @@ function filesFind( test )
           var areRecords = true;
           files.forEach( ( record ) =>
           {
-            if( !( record instanceof _.FileRecord ) )
+            if( !( record instanceof _.files.FileRecord ) )
             areRecords = false;
             got.push( record.absolute );
           });
@@ -2140,7 +2140,7 @@ function filesFind2( test )
     allowingMissed : 1,
   });
   test.identical( got.length, 1 );
-  test.true( got[ 0 ] instanceof _.FileRecord );
+  test.true( got[ 0 ] instanceof _.files.FileRecord );
   test.identical( got[ 0 ].fullName, 'terminal' );
 
   /* */

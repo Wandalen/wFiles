@@ -16,7 +16,7 @@ const Abstract = _.FileProvider.Abstract;
 const Partial = _.FileProvider.Partial;
 const Find = _.FileProvider.FindMixin;
 
-_.assert( _.routineIs( _.FileRecord ) );
+_.assert( _.routineIs( _.files.FileRecord ) );
 _.assert( _.routineIs( Abstract ) );
 _.assert( _.routineIs( Partial ) );
 _.assert( !!Find );
@@ -816,7 +816,7 @@ function statReadAct( o )
 
   function statMake()
   {
-    let result = new _.FileStat();
+    let result = new _.files.FileStat();
 
     // if( self.extraStats && self.extraStats[ filePath ] )
     // {
@@ -1388,7 +1388,7 @@ function pathUnmock( path, global )
 }
 
 // --
-// relationship
+// relations
 // --
 
 let Composes =

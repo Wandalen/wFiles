@@ -1239,8 +1239,10 @@ function functor( fop )
     let self = this;
     let path = self.system ? self.system.path : self.path;
     let o2;
-
     let c = Self.contextMake({ provider : self, options : o, fop });
+
+    // if( o.dstPath === '/pro/builder/proto/wtools/atop/will.test/_asset/exportMultipleExported/super.out/supermodule.out.tgs' )
+    // debugger;
 
     c.entryMethodName = entryMethodName;
     c.linkBody = link_body;
@@ -1437,7 +1439,7 @@ textLink
 //
 // --
 
-let Proto =
+let LinkerExtension =
 {
   multiple,
 
@@ -1483,6 +1485,8 @@ let Proto =
 
 }
 
-_.props.extend( Self, Proto )
+_.props.extend( _.files.linker, LinkerExtension )
+
+//
 
 })()

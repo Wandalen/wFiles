@@ -3,15 +3,6 @@
 
 'use strict';
 
-// if( typeof module !== 'undefined' )
-// {
-//
-//   require( '../UseBase.s' );
-//
-// }
-
-//
-
 /**
  * @class wFileRecordContext
  * @namespace wTools
@@ -25,22 +16,11 @@ const Self = wFileRecordContext;
 function wFileRecordContext( o )
 {
   return _.workpiece.construct( Self, this, arguments );
-  // if( !( this instanceof Self ) )
-  // if( o instanceof Self && arguments.length === 1 )
-  // {
-  //   _.assert( arguments.length === 1, 'Expects single argument' );
-  //   return o;
-  // }
-  // else
-  // {
-  //   return new( _.constructorJoin( Self, arguments ) );
-  // }
-  // return Self.prototype.init.apply( this,arguments );
 }
 
 Self.shortName = 'FileRecordContext';
 
-_.assert( !_.FileRecordContext );
+_.assert( !_.files.FileRecordContext );
 
 // --
 // routine
@@ -297,13 +277,6 @@ _.classDeclare
 });
 
 _.Copyable.mixin( Self );
-_[ Self.shortName ] = Self;
-
-// --
-// export
-// --
-
-if( typeof module !== 'undefined' )
-module[ 'exports' ] = Self;
+_.files[ Self.shortName ] = Self;
 
 })();

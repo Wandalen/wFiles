@@ -5,14 +5,14 @@
 
 const _global = _global_;
 const _ = _global_.wTools;
-const FileRecord = _.FileRecord;
+const FileRecord = _.files.FileRecord;
 const Abstract = _.FileProvider.Abstract;
 const Partial = _.FileProvider.Partial;
 const Find = _.FileProvider.FindMixin;
 const fileRead = Partial.prototype.fileRead;
 
 _.assert( _.entity.lengthOf( _.files.ReadEncoders ) > 0 );
-_.assert( _.routineIs( _.FileRecord ) );
+_.assert( _.routineIs( _.files.FileRecord ) );
 _.assert( _.routineIs( Abstract ) );
 _.assert( _.routineIs( Partial ) );
 _.assert( _.routineIs( Find ) );
@@ -125,7 +125,7 @@ Self.shortName = 'SecondaryMixin';
 //
 //     if( _.object.isBasic( src ) )
 //     {
-//       if( _.FileRecord && src instanceof _.FileRecord )
+//       if( _.files.FileRecord && src instanceof _.files.FileRecord )
 //       readOptions.filePath = src.absolute;
 //       else
 //       _.props.extend( readOptions, _.mapOnly_( null, src, self.fileRead.defaults ) );
@@ -843,7 +843,7 @@ var fileCodeRead = _.routine.uniteCloning_replaceByUnite( fileRead.head, fileCod
 fileCodeRead.having.aspect = 'entry';
 
 // --
-// relationship
+// relations
 // --
 
 let Composes =

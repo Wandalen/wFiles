@@ -209,6 +209,7 @@ module:
           - ../proto/wtools/amid/l4_files/include/MixinFind.s
           - ../proto/wtools/amid/l4_files/include/MixinSecondary.s
           - ../proto/wtools/amid/l4_files/include/Npm.ss
+          - ../proto/wtools/amid/l4_files/include/Operator.s
           - ../proto/wtools/amid/l4_files/include/Reroot.s
           - ../proto/wtools/amid/l4_files/include/Top.s
           - ../proto/wtools/amid/l4_files/l1
@@ -238,6 +239,11 @@ module:
           - ../proto/wtools/amid/l4_files/l7
           - ../proto/wtools/amid/l4_files/l7/ConfigMixin.s
           - ../proto/wtools/amid/l4_files/l7/SecondaryMixin.s
+          - ../proto/wtools/amid/l4_files/l7_operator
+          - ../proto/wtools/amid/l4_files/l7_operator/Mission.s
+          - ../proto/wtools/amid/l4_files/l7_operator/Namespace.s
+          - ../proto/wtools/amid/l4_files/l7_operator/Operation.s
+          - ../proto/wtools/amid/l4_files/l7_operator/Operator.s
           - ../proto/wtools/amid/l4_files/l7_provider
           - ../proto/wtools/amid/l4_files/l7_provider/Extract.s
           - ../proto/wtools/amid/l4_files/l7_provider/Git.ss

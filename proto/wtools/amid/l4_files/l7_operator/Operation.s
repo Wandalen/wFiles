@@ -18,6 +18,15 @@ Self.shortName = 'Operation';
 //
 // --
 
+function finit()
+{
+  let operation = this;
+  operation.unform();
+  return _.Copyable.prototype.finit.call( this );
+}
+
+//
+
 function init( o )
 {
   let operation = this;
@@ -38,13 +47,37 @@ function init( o )
 
 //
 
-function form()
+function unform()
 {
   let operation = this;
 
-  _.assert( operation.mission instanceof _.files.Mission );
+  if( !operation.mission )
+  return;
 
+  let mission = operation.mission;
+  let operator = mission.operator;
 
+  _.assert( mission instanceof _.files.Mission );
+  _.assert( operator instanceof _.files.Operator );
+
+  _.arrayRemoveOnceStrictly( operator.operationsArray, operation );
+  _.arrayRemoveOnceStrictly( mission.operationsArray, operation );
+
+}
+
+//
+
+function form()
+{
+  let operation = this;
+  let mission = operation.mission;
+  let operator = mission.operator;
+
+  _.assert( mission instanceof _.files.Mission );
+  _.assert( operator instanceof _.files.Operator );
+
+  _.arrayAppendOnceStrictly( operator.operationsArray, operation );
+  _.arrayAppendOnceStrictly( mission.operationsArray, operation );
 
 }
 
@@ -85,7 +118,9 @@ var Statics =
 var Extension =
 {
 
+  finit,
   init,
+  unform,
   form,
 
   // relations

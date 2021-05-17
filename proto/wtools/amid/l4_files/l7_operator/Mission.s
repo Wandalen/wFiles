@@ -45,6 +45,9 @@ function form()
   if( !mission.operator )
   mission.operator = new _.files.Operator();
 
+  if( !mission.operationArray )
+  mission.operationArray = [];
+
   return mission;
 }
 
@@ -84,6 +87,25 @@ filesReflect.defaults =
   ... _.FileProvider.FindMixin.prototype.filesReflect.defaults,
 }
 
+//
+
+function redo( o )
+{
+  let ready = _.take( null );
+  o = _.routine.options( arguments );
+
+  mission.operationArray.forEach( ( operation ) =>
+  {
+    ready.then( () => operation.redo( o ) );
+  });
+
+  return ready;
+}
+
+redo.defaults =
+{
+}
+
 // --
 // relations
 // --
@@ -95,6 +117,7 @@ var Composes =
 
 var Aggregates =
 {
+  operationArray : null,
 }
 
 var Associates =
@@ -121,6 +144,8 @@ var Extension =
   form,
 
   filesReflect,
+
+  redo,
 
   // relations
 

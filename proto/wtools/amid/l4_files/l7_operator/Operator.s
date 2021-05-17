@@ -20,42 +20,44 @@ Self.shortName = 'Operator';
 
 function init( o )
 {
-  var self = this;
+  var operator = this;
 
   _.assert( arguments.length === 0 || arguments.length === 1 );
-  _.workpiece.initFields( self );
+  _.workpiece.initFields( operator );
 
-  if( self.Self === Self )
-  Object.preventExtensions( self );
+  if( operator.Self === Self )
+  Object.preventExtensions( operator );
 
   if( o )
-  self.copy( o );
+  operator.copy( o );
 
-  self.form();
+  operator.form();
 
-  return self;
+  return operator;
 }
 
 //
 
 function form()
 {
-  let self = this;
+  let operator = this;
 
-  if( !self.filesSystem )
+  if( !operator.filesSystem )
   {
     let filesSystem = _.FileProvider.System({ providers : [] });
-
     _.FileProvider.Git().providerRegisterTo( filesSystem );
     _.FileProvider.Npm().providerRegisterTo( filesSystem );
     _.FileProvider.Http().providerRegisterTo( filesSystem );
     let defaultProvider = _.FileProvider.Default();
     defaultProvider.providerRegisterTo( filesSystem );
     filesSystem.defaultProvider = defaultProvider;
-    self.filesSystem = filesSystem;
+    operator.filesSystem = filesSystem;
   }
 
-  return self;
+  if( !operator.operationArray )
+  operator.operationArray = [];
+
+  return operator;
 }
 
 // --
@@ -72,7 +74,7 @@ var Aggregates =
 
 var Associates =
 {
-  operationsArray : null,
+  operationArray : null,
 }
 
 var Restricts =

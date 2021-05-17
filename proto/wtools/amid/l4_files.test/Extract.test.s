@@ -147,6 +147,7 @@ const Proto =
     provider : _.FileProvider.Extract( { usingExtraStat : 1 } ),
     globalFromPreferred : null,
     testFile : '/file1',
+    storingEncoding : true,
 
   },
 

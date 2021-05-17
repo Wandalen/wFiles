@@ -268,27 +268,30 @@ function filesReflectSingle_body( o )
   let path = self.path;
 
   o.extra = _.routine.options_( { defaults : filesReflectSingle_body.extra }, o.extra || null );
-  // o.extra = o.extra || Object.create( null );
-  // _.routine.options_( filesReflectSingle_body, o.extra, filesReflectSingle_body.extra );
 
   _.routine.assertOptions( filesReflectSingle_body, o );
-  // _.assert( o.mandatory === undefined )
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( _.routineIs( o.onUp ) && o.onUp.composed && o.onUp.composed.bodies.length === 0, 'Not supported options' );
-  _.assert( _.routineIs( o.onDown ) && o.onDown.composed && o.onDown.composed.bodies.length === 0, 'Not supported options' );
-  _.assert( _.routineIs( o.onWriteDstUp ) && o.onWriteDstUp.composed && o.onWriteDstUp.composed.bodies.length === 0, 'Not supported options' );
-  _.assert( _.routineIs( o.onWriteDstDown ) && o.onWriteDstDown.composed && o.onWriteDstDown.composed.bodies.length === 0, 'Not supported options' );
-  _.assert( _.routineIs( o.onWriteSrcUp ) && o.onWriteSrcUp.composed && o.onWriteSrcUp.composed.bodies.length === 0, 'Not supported options' );
-  _.assert( _.routineIs( o.onWriteSrcDown ) && o.onWriteSrcDown.composed && o.onWriteSrcDown.composed.bodies.length === 0, 'Not supported options' );
-  // _.assert( o.outputFormat === 'record' || o.outputFormat === 'nothing', 'Not supported options' );
-  // _.assert( o.outputFormat === undefined );
+  // _.assert( _.routineIs( o.onUp ) && o.onUp.composed && o.onUp.composed.bodies.length === 0, 'Not supported options' );
+  // _.assert( _.routineIs( o.onDown ) && o.onDown.composed && o.onDown.composed.bodies.length === 0, 'Not supported options' );
+  // _.assert( _.routineIs( o.onWriteDstUp ) && o.onWriteDstUp.composed && o.onWriteDstUp.composed.bodies.length === 0, 'Not supported options' );
+  // _.assert( _.routineIs( o.onWriteDstDown ) && o.onWriteDstDown.composed && o.onWriteDstDown.composed.bodies.length === 0, 'Not supported options' );
+  // _.assert( _.routineIs( o.onWriteSrcUp ) && o.onWriteSrcUp.composed && o.onWriteSrcUp.composed.bodies.length === 0, 'Not supported options' );
+  // _.assert( _.routineIs( o.onWriteSrcDown ) && o.onWriteSrcDown.composed && o.onWriteSrcDown.composed.bodies.length === 0, 'Not supported options' );
+
+  _.assert( o.onUp === null, 'Not supported options' );
+  _.assert( o.onDown === null, 'Not supported options' );
+  _.assert( o.onWriteDstUp === null, 'Not supported options' );
+  _.assert( o.onWriteDstDown === null, 'Not supported options' );
+  _.assert( o.onWriteSrcUp === null, 'Not supported options' );
+  _.assert( o.onWriteSrcDown === null, 'Not supported options' );
+
+  _.assert( o.outputFormat === 'record' || o.outputFormat === 'nothing', 'Not supported options' );
   _.assert( o.linking === 'fileCopy' || o.linking === 'hardLinkMaybe' || o.linking === 'softLinkMaybe', 'Not supported options' );
   _.assert( !o.src.hasFiltering(), 'Not supported options' );
   _.assert( !o.dst.hasFiltering(), 'Not supported options' );
   _.assert( o.src.formed === 3 );
   _.assert( o.dst.formed === 3 );
   _.assert( o.srcPath === undefined );
-  // _.assert( o.filter === null || !o.filter.hasFiltering(), 'Not supported options' );
   _.assert( o.filter === undefined );
 
   /* */

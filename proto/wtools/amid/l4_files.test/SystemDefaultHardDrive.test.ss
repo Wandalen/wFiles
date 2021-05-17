@@ -119,6 +119,7 @@ const Proto =
     providerEffective : null,
     suiteTempPath : null,
     globalFromPreferred : null,
+    storingEncoding : false,
   },
 
   tests :

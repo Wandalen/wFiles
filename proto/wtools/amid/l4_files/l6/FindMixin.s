@@ -152,23 +152,23 @@ function _filesFindPrepare1( routine, args )
 
   /* */
 
-  if( o.onUp === null )
-  o.onUp = [];
+  // if( o.onUp === null )
+  // o.onUp = [];
   if( _.arrayIs( o.onUp ) )
   if( o.onUp.length === 0 )
   o.onUp = function( record, op ){ return record };
   else
   o.onUp = _.routinesComposeAllReturningLast( o.onUp );
-  _.assert( _.routineIs( o.onUp ) );
+  _.assert( _.routineIs( o.onUp ) || o.onUp === null );
 
-  if( o.onDown === null )
-  o.onDown = [];
+  // if( o.onDown === null )
+  // o.onDown = [];
   if( _.arrayIs( o.onDown ) )
   if( o.onDown.length === 0 )
   o.onDown = function( record, op ){};
   else
   o.onDown = _.routinesComposeReturningLast( o.onDown );
-  _.assert( _.routineIs( o.onDown ) );
+  _.assert( _.routineIs( o.onDown ) || o.onDown === null );
 
   /* */
 
@@ -322,8 +322,8 @@ function filesFindNominal_head( routine, args )
     );
     _.assert( !self.system || o.filter.system === self.system );
     _.assert( !!o.filter.effectiveProvider );
-    _.assert( _.routineIs( o.onUp ) );
-    _.assert( _.routineIs( o.onDown ) );
+    _.assert( _.routineIs( o.onUp ) || o.onUp === null );
+    _.assert( _.routineIs( o.onDown ) || o.onDown === null );
     _.assert( o.filter.formed === 5, 'Expects formed filter' );
     _.assert( _.object.isBasic( o.filter.effectiveProvider ) );
     _.assert( _.mapIs( o.filter.formedBasePath ), 'Expects base path' );
@@ -361,8 +361,8 @@ function filesFindNominal_body( o )
   o.filter.effectiveProvider.assertProviderDefaults( o );
   _.routine.assertOptions( filesFindNominal_body, arguments );
   _.assert( !!o.factory );
-  _.assert( _.routineIs( o.onUp ) );
-  _.assert( _.routineIs( o.onDown ) );
+  _.assert( _.routineIs( o.onUp ) || o.onUp === null );
+  _.assert( _.routineIs( o.onDown ) || o.onDown === null );
 
   /* */
 
@@ -480,9 +480,17 @@ function filesFindNominal_body( o )
   function handleUp( record, op )
   {
     _.assert( arguments.length === 2 );
-    let r = op.onUp.call( self, record, op );
-    _.assert( r === _.dont || r === record, 'Callback onUp should return original record or _.dont, but returned', _.entity.exportStringDiagnosticShallow( r ) );
-    return r;
+    if( op.onUp )
+    {
+      let r = op.onUp.call( self, record, op );
+      _.assert
+      (
+        r === _.dont || r === record,
+        () => `Callback onUp should return original record or _.dont, but returned ${_.entity.exportStringDiagnosticShallow( r )}`
+      );
+      return r;
+    }
+    return record;
   }
 
   /* - */
@@ -490,9 +498,20 @@ function filesFindNominal_body( o )
   function handleDown( record, op )
   {
     _.assert( arguments.length === 2 );
-    let r = op.onDown.call( self, record, op );
-    _.assert( r === undefined, 'Callback onDown should return nothing( undefined ), but returned', _.entity.exportStringDiagnosticShallow( r ) );
+    if( op.onDown )
+    {
+      let r = op.onDown.call( self, record, op );
+      _.assert
+      (
+        r === undefined,
+        () => 'Callback onDown should return nothing( undefined ), but returned' + _.entity.exportStringDiagnosticShallow( r )
+        // () => `Callback onDown should return nothing( undefined ), but returned ${_.entity.exportStringDiagnosticShallow( r )}`
+        /* qqq : make global replacement by string-templates where it is appropriate */
+      );
+    }
   }
+
+  /* - */
 
 }
 
@@ -535,8 +554,8 @@ function filesFindSingle_head( routine, args )
     _.routine.assertOptions( routine, o );
     _.assert( !self.system || o.filter.system === self.system );
     _.assert( !!o.filter.effectiveProvider );
-    _.assert( _.routineIs( o.onUp ) );
-    _.assert( _.routineIs( o.onDown ) );
+    _.assert( _.routineIs( o.onUp ) || o.onUp === null );
+    _.assert( _.routineIs( o.onDown ) || o.onDown === null );
     _.assert( path.isNormalized( o.filePath ), 'Expects normalized path {-o.filePath-}' );
     _.assert( path.isAbsolute( o.filePath ), 'Expects absolute path {-o.filePath-}' );
     _.assert( o.filter.formed === 5, 'Expects formed filter' );
@@ -611,10 +630,17 @@ function filesFindSingle_body( o )
     record.included = included;
 
     _.assert( arguments.length === 2 );
-    let r = o.onUp.call( self, record, o );
-    _.assert( r === _.dont || r === record, 'Callback onUp should return original record or _.dont, but returned', _.entity.exportStringDiagnosticShallow( r ) );
-
-    return r;
+    if( o.onUp )
+    {
+      let r = o.onUp.call( self, record, o );
+      _.assert
+      (
+        r === _.dont || r === record,
+        () => 'Callback onUp should return original record or _.dont, but returned' + _.entity.exportStringDiagnosticShallow( r )
+      );
+      return r;
+    }
+    return record;
   }
 
   /* - */
@@ -622,8 +648,15 @@ function filesFindSingle_body( o )
   function handleDown( record, op )
   {
     _.assert( arguments.length === 2 );
-    let r = o.onDown.call( self, record, o );
-    _.assert( r === undefined, 'Callback onDown should return nothing( undefined ), but returned', _.entity.exportStringDiagnosticShallow( r ) );
+    if( o.onDown )
+    {
+      let r = o.onDown.call( self, record, o );
+      _.assert
+      (
+        r === undefined,
+        () => 'Callback onDown should return nothing( undefined ), but returned' + _.entity.exportStringDiagnosticShallow( r )
+      );
+    }
   }
 
 }
@@ -703,12 +736,13 @@ function filesFind_head( routine, args )
 
     if( 'outputFormat' in o )
     {
-      let knownFormats = [ 'absolute', 'relative', 'real', 'record', 'nothing' ];
+      // let knownFormats = [ 'absolute', 'relative', 'real', 'record', 'nothing' ]; /* xxx2 */
       _.assert
       (
-        _.longHas( knownFormats, o.outputFormat ),
-        'Unknown output format ' + _.entity.exportStringDiagnosticShallow( o.outputFormat )
-        + '\nKnown output formats : ' + _.entity.exportString( knownFormats )
+        // _.longHas( knownFormats, o.outputFormat ),
+        !!self.FindOutputFormat[ o.outputFormat ],
+        () => 'Unknown output format ' + _.entity.exportStringDiagnosticShallow( o.outputFormat )
+        + '\nKnown output formats : ' + _.entity.exportString( _.props.keys( self.FindOutputFormat ) )
       );
     }
 
@@ -792,8 +826,8 @@ function filesFind_body( o )
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( o.filePath === null );
   _.assert( o.filter.formed === 5 );
-  _.assert( _.routineIs( o.onUp ) );
-  _.assert( _.routineIs( o.onDown ) );
+  _.assert( _.routineIs( o.onUp ) || o.onUp === null );
+  _.assert( _.routineIs( o.onDown ) || o.onDown === null );
 
   let time;
   if( o.verbosity >= 1 )
@@ -988,10 +1022,17 @@ function filesFind_body( o )
       return _.dont;
     }
 
-    let r = o.onUp.call( self, record, o );
-    _.assert( r === _.dont || r === record, 'Callback onUp should return original record or _.dont, but returned', _.entity.exportStringDiagnosticShallow( r ) );
-    if( r === _.dont )
-    return _.dont;
+    if( o.onUp )
+    {
+      let r = o.onUp.call( self, record, o );
+      _.assert
+      (
+        r === _.dont || r === record,
+        () => 'Callback onUp should return original record or _.dont, but returned' + _.entity.exportStringDiagnosticShallow( r )
+      );
+      if( r === _.dont )
+      return _.dont;
+    }
 
     if( o.visitedMap )
     o.visitedMap[ record.real ] = record;
@@ -1037,8 +1078,15 @@ function filesFind_body( o )
       return;
     }
 
-    let r = o.onDown.call( self, record, o );
-    _.assert( r === undefined, 'Callback onDown should return undefined', _.entity.exportStringDiagnosticShallow( r ) );
+    if( o.onDown )
+    {
+      let r = o.onDown.call( self, record, o );
+      _.assert
+      (
+        r === undefined,
+        () => 'Callback onDown should return undefined' + _.entity.exportStringDiagnosticShallow( r )
+      );
+    }
 
   }
 
@@ -1198,7 +1246,7 @@ defaults.safe = null;
 defaults.maskPreset = 'default.exclude';
 defaults.outputFormat = 'record';
 defaults.result = null;
-defaults.mode = 'legacy'; /* xxx : change to distinct */
+defaults.mode = 'legacy'; /* qqq2 : xxx : change to distinct */
 defaults.revisiting = null;
 defaults.revisitingHardLinked = 1;
 defaults.visitedMap = null;
@@ -1698,7 +1746,9 @@ function _filesReflectPrepare( routine, args )
   _.routine.options_( routine, o );
   self._providerDefaultsApply( o );
 
+  if( o.onUp )
   o.onUp = _.routinesComposeAll( o.onUp );
+  if( o.onDown )
   o.onDown = _.routinesComposeReturningLast( o.onDown );
 
   if( o.result === null )
@@ -1717,9 +1767,10 @@ function _filesReflectPrepare( routine, args )
   _.assert( _.boolLike( o.includingDst ) );
   _.assert( _.boolLike( o.dstDeleting ) );
   _.assert( _.arrayIs( o.result ) );
-  _.assert( _.routineIs( o.onUp ) );
-  _.assert( _.routineIs( o.onDown ) );
-  _.assert( _.longHas( [ 'fileCopy', 'hardLink', 'hardLinkMaybe', 'softLink', 'softLinkMaybe', 'textLink', 'nop' ], o.linking ), 'unknown kind of linking', o.linking );
+  _.assert( _.routineIs( o.onUp ) || o.onUp === null );
+  _.assert( _.routineIs( o.onDown ) || o.onDown === null );
+  // _.assert( _.longHas( [ 'fileCopy', 'hardLink', 'hardLinkMaybe', 'softLink', 'softLinkMaybe', 'textLink', 'nop' ], o.linking ), 'unknown kind of linking', o.linking );
+  _.assert( !!self.ReflectAction[ o.linking ], () => 'Unknown kind of linking' + o.linking );
 
   return o;
 }
@@ -1965,13 +2016,16 @@ function filesReflectEvaluate_body( o )
     if( !o.withTerminals && !record.effective.isDir )
     return end( record );
 
-    _.assert( _.routineIs( o.onUp ) );
+    _.assert( _.routineIs( o.onUp ) || o.onUp === null );
     _.assert( arguments.length === 2 );
 
     let result = true;
-    let r = o.onUp.call( self, record, o );
-    if( r === _.dont )
-    return end( false );
+    if( o.onUp )
+    {
+      let r = o.onUp.call( self, record, o );
+      if( r === _.dont )
+      return end( false );
+    }
 
     handleUp2.call( self, record, o );
 
@@ -2196,8 +2250,15 @@ function filesReflectEvaluate_body( o )
     return end( record );
 
     handleDown2.call( self, record, o );
-    let r = o.onDown.call( self, record, o );
-    _.assert( r === undefined, () => 'Callback onDown should return nothing( undefined ), but returned ' + _.entity.exportStringDiagnosticShallow( r ) );
+    if( o.onDown )
+    {
+      let r = o.onDown.call( self, record, o );
+      _.assert
+      (
+        r === undefined,
+        () => 'Callback onDown should return nothing( undefined ), but returned ' + _.entity.exportStringDiagnosticShallow( r )
+      );
+    }
 
     _.assert( record.action !== 'exclude' || record.touch === false, () => 'Attempt to exclude touched ' + record.dst.absolute );
 
@@ -3074,9 +3135,13 @@ function filesReflectSingle_head( routine, args )
   _.assert( _.longHas( [ 0, 1, 2 ], o.rebasingLink ) );
   _.assert( _.boolLike( o.throwing ) );
 
+  if( o.onWriteDstUp )
   o.onWriteDstUp = _.routinesCompose( o.onWriteDstUp );
+  if( o.onWriteDstDown )
   o.onWriteDstDown = _.routinesCompose( o.onWriteDstDown );
+  if( o.onWriteSrcUp )
   o.onWriteSrcUp = _.routinesCompose( o.onWriteSrcUp );
+  if( o.onWriteSrcDown )
   o.onWriteSrcDown = _.routinesCompose( o.onWriteSrcDown );
 
   return o;
@@ -3189,17 +3254,16 @@ function filesReflectSingle_body( o )
   function writeDstUp1( record )
   {
 
-    let onr = o.onWriteDstUp.call( self, record, o );
-    _.assert( _.boolsAllAre( onr ) );
-    onr = _.all( onr, ( e ) => e === _.dont ? false : e );
-    _.assert( _.boolIs( onr ) );
+    if( o.onWriteDstUp )
+    {
+      let onr = o.onWriteDstUp.call( self, record, o );
+      _.assert( _.boolsAllAre( onr ) );
+      onr = _.all( onr, ( e ) => e === _.dont ? false : e );
+      _.assert( _.boolIs( onr ) );
+      return onr;
+    }
 
-    /* */
-
-    if( !onr )
-    return onr;
-
-    return onr;
+    return true;
   }
 
   /* */
@@ -3219,7 +3283,8 @@ function filesReflectSingle_body( o )
   function writeDstUp2( record )
   {
 
-    let linking = _.longHas( [ 'fileCopy', 'hardLink', 'softLink', 'textLink', 'nop' ], record.action );
+    // let linking = _.longHas( [ 'fileCopy', 'hardLink', 'softLink', 'textLink', 'nop' ], record.action );
+    let linking = !!self.ReflectMandatoryAction[ record.action ];
     if( linking && record.allow && !path.isRoot( record.dst.absolute ) )
     {
 
@@ -3263,11 +3328,16 @@ function filesReflectSingle_body( o )
   function writeDstDown2( record )
   {
 
-    let onr = o.onWriteDstDown.call( self, record, o );
-    _.assert( _.boolsAllAre( onr ) );
-    onr = _.all( onr, ( e ) => e === _.dont ? false : e );
-    _.assert( _.boolIs( onr ) );
-    return onr;
+    if( o.onWriteDstDown )
+    {
+      let onr = o.onWriteDstDown.call( self, record, o );
+      _.assert( _.boolsAllAre( onr ) );
+      onr = _.all( onr, ( e ) => e === _.dont ? false : e );
+      _.assert( _.boolIs( onr ) );
+      return onr;
+    }
+
+    return true;
   }
 
   /* */
@@ -3275,17 +3345,22 @@ function filesReflectSingle_body( o )
   function writeSrcUp( record )
   {
 
-    let onr = o.onWriteDstUp.call( self, record, o );
-    _.assert( _.boolsAllAre( onr ) );
-    onr = _.all( onr, ( e ) => e === _.dont ? false : e );
-    _.assert( _.boolIs( onr ) );
+    debugger;
+    if( o.onWriteSrcUp )
+    {
+      let onr = o.onWriteSrcUp.call( self, record, o );
+      _.assert( _.boolsAllAre( onr ) );
+      onr = _.all( onr, ( e ) => e === _.dont ? false : e );
+      _.assert( _.boolIs( onr ) );
+      return onr
+    }
 
     /* */
 
-    if( !onr )
-    return onr;
-
-    return onr;
+    return true;
+    // if( !onr )
+    // return onr;
+    // return onr;
   }
 
   /* */
@@ -3295,11 +3370,16 @@ function filesReflectSingle_body( o )
 
     srcDeleteMaybe( record );
 
-    let onr = o.onWriteSrcDown.call( self, record, o );
-    _.assert( _.boolsAllAre( onr ) );
-    onr = _.all( onr, ( e ) => e === _.dont ? false : e );
-    _.assert( _.boolIs( onr ) );
-    return onr;
+    if( o.onWriteSrcDown )
+    {
+      let onr = o.onWriteSrcDown.call( self, record, o );
+      _.assert( _.boolsAllAre( onr ) );
+      onr = _.all( onr, ( e ) => e === _.dont ? false : e );
+      _.assert( _.boolIs( onr ) );
+      return onr;
+    }
+
+    return true;
   }
 
   /* */
@@ -3746,7 +3826,7 @@ function filesReflect_head( routine, args )
     _.assert
     (
       _.longHas( knownFormats, o.outputFormat ),
-      'Unknown output format ' + _.entity.exportStringDiagnosticShallow( o.outputFormat )
+      () => 'Unknown output format ' + _.entity.exportStringDiagnosticShallow( o.outputFormat )
       + '\nKnown output formats : ' + _.entity.exportString( knownFormats )
     );
 
@@ -5388,6 +5468,35 @@ defaults.outputFormat = 'record';
 // relations
 // --
 
+let ReflectAction =
+{
+  'fileCopy' : 'fileCopy',
+  'hardLink' : 'hardLink',
+  'hardLinkMaybe' : 'hardLinkMaybe',
+  'softLink' : 'softLink',
+  'softLinkMaybe' : 'softLinkMaybe',
+  'textLink' : 'textLink',
+  'nop' : 'nop',
+}
+
+let ReflectMandatoryAction =
+{
+  'fileCopy' : 'fileCopy',
+  'hardLink' : 'hardLink',
+  'softLink' : 'softLink',
+  'textLink' : 'textLink',
+  'nop' : 'nop',
+}
+
+let FindOutputFormat =
+{
+  'absolute' : 'absolute',
+  'relative' : 'relative',
+  'real' : 'real',
+  'record' : 'record',
+  'nothing' : 'nothing',
+}
+
 let Composes =
 {
 }
@@ -5402,6 +5511,13 @@ let Associates =
 
 let Restricts =
 {
+}
+
+let Statics =
+{
+  ReflectAction,
+  ReflectMandatoryAction,
+  FindOutputFormat,
 }
 
 // --
@@ -5481,6 +5597,7 @@ let Supplement =
   Aggregates,
   Associates,
   Restricts,
+  Statics,
 
 }
 

@@ -67,7 +67,8 @@ const Proto =
     providerMake,
     provider : _.FileProvider.HardDrive(),
     suiteTempPath : null,
-    globalFromPreferred : null
+    globalFromPreferred : null,
+    storingEncoding : false,
   },
 
   tests :

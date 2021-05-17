@@ -3268,6 +3268,26 @@ streamRead.having.aspect = 'entry';
 
 //
 
+let fileReadAct = Object.create( null );
+fileReadAct.name = 'fileReadAct';
+
+var defaults = fileReadAct.defaults = Object.create( null );
+defaults.sync = null;
+defaults.filePath = null;
+defaults.encoding = null;
+defaults.advanced = null;
+defaults.resolvingSoftLink = null;
+
+var having = fileReadAct.having = Object.create( null );
+having.writing = 0;
+having.reading = 1;
+having.driving = 1;
+
+var operates = fileReadAct.operates = Object.create( null );
+operates.filePath = { pathToRead : 1 };
+
+//
+
 function fileRead_head( routine, args )
 {
   let self = this;
@@ -3297,39 +3317,27 @@ function fileRead_head( routine, args )
 
 //
 
-let fileReadAct = Object.create( null );
-fileReadAct.name = 'fileReadAct';
-
-var defaults = fileReadAct.defaults = Object.create( null );
-defaults.sync = null;
-defaults.filePath = null;
-defaults.encoding = null;
-defaults.advanced = null;
-defaults.resolvingSoftLink = null;
-
-var having = fileReadAct.having = Object.create( null );
-having.writing = 0;
-having.reading = 1;
-having.driving = 1;
-
-var operates = fileReadAct.operates = Object.create( null );
-operates.filePath = { pathToRead : 1 };
-
-//
-
 function fileRead_body( o )
 {
   let self = this;
   let result = null;
 
-  if( o.encoding === _.unknown ) /* qqq : cover */
-  o.encoding = _.files.encoder.deduce({ filePath : o.filePath, returning : 'name', feature : { reader : true } });
+  // if( o.encoding === _.unknown ) /* qqq : cover */
+  // o.encoding = _.files.encoder.deduce({ filePath : o.filePath, returning : 'name', feature : { reader : true } });
+  let encoderOp = _.files.encoder.for
+  ({
+    encoding : o.encoding,
+    filePath : o.filePath,
+    fileProvider : self,
+    feature : { reader : true },
+  });
+  let encoder = encoderOp.encoder;
+  o.encoding = encoderOp.encoding;
+  // let encoder = _.files.ReadEncoders[ o.encoding ];
 
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.strIs( o.encoding ) );
   _.assert( _.longHas( [ 'data', 'o' ], o.outputFormat ) );
-
-  let encoder = _.files.ReadEncoders[ o.encoding ];
 
   if( o.resolvingTextLink && self.usingTextLink )
   o.filePath = self.pathResolveTextLink( o.filePath );
@@ -3402,7 +3410,6 @@ function fileRead_body( o )
       return null;
     }
 
-
     // if( o.verbosity >= 1 )
     // self.logger.log( ' . Read .', _.color.strFormat( o.filePath, 'path' ) );
     if( o.logger && o.logger.verbosity >= 1 )
@@ -3467,12 +3474,11 @@ _.routineExtend( fileRead_body, fileReadAct );
 var defaults = fileRead_body.defaults;
 defaults.outputFormat = 'data';
 defaults.throwing = null;
-defaults.onBegin = null;
-defaults.onEnd = null;
-defaults.onError = null;
-defaults.resolvingSoftLink = 1; /* yyy */
+defaults.onBegin = null; /* xxx : remove */
+defaults.onEnd = null; /* xxx : remove */
+defaults.onError = null; /* xxx : remove */
+defaults.resolvingSoftLink = 1;
 defaults.resolvingTextLink = null;
-// defaults.verbosity = null;
 defaults.logger = 0;
 
 var having = fileRead_body.having;
@@ -3733,6 +3739,7 @@ function _fileInterpret_head( routine, args )
 
 //
 
+/* xxx : deprecated */
 function _fileInterpret_body( o )
 {
   let self = this;
@@ -4788,7 +4795,7 @@ defaults.filePath = null;
 defaults.sync = null;
 defaults.data = '';
 defaults.advanced = null;
-defaults.encoding = 'original.type';
+defaults.encoding = 'meta.original';
 defaults.writeMode = 'rewrite';
 
 var having = fileWriteAct.having = Object.create( null );
@@ -4874,25 +4881,38 @@ function fileWrite_body( o )
     self.dirMakeForFile( o.filePath );
   }
 
-  let terminateLink = !self.resolvingSoftLink && self.isSoftLink( o.filePath );
+  let terminatingLink = !self.resolvingSoftLink && self.isSoftLink( o.filePath );
 
-  if( terminateLink && o.writeMode !== 'rewrite' )
+  /* xxx : qqq : optimize */
+  if( terminatingLink && o.writeMode !== 'rewrite' )
   {
-    self.fieldPush( 'resolvingSoftLink', 1 );
-    let readData = self.fileRead({ filePath :  o.filePath, encoding : 'original.type' });
-    self.fieldPop( 'resolvingSoftLink', 1 );
+    // self.fieldPush( 'resolvingSoftLink', 1 );
+    // let readData = self.fileRead({ filePath :  o.filePath, encoding : 'meta.original' });
+    // let readData = self.fileRead({ filePath :  o.filePath, encoding : 'meta.original', resolvingSoftLink : 1 });
+    // self.fieldPop( 'resolvingSoftLink', 1 );
 
     let writeData = o.data;
+    let readData;
 
-    if( _.bufferBytesIs( readData ) )
-    writeData = _.bufferBytesFrom( writeData );
-    else if( _.bufferRawIs( readData ) )
-    writeData = _.bufferRawFrom( writeData );
+    if( _.strIs( writeData ) )
+    readData = self.fileRead({ filePath :  o.filePath, encoding : 'utf8', resolvingSoftLink : 1 });
+    else if( _.bufferBytesIs( o.data ) )
+    readData = self.fileRead({ filePath :  o.filePath, encoding : 'buffer.bytes', resolvingSoftLink : 1 });
+    else if( _.bufferNodeIs( o.data ) )
+    readData = self.fileRead({ filePath :  o.filePath, encoding : 'buffer.node', resolvingSoftLink : 1 });
     else
-    _.assert( _.strIs( readData ), 'not implemented for:', _.entity.strType( readData ) );
+    readData = self.fileRead({ filePath :  o.filePath, encoding : 'buffer.raw', resolvingSoftLink : 1 });
+
+    // if( _.bufferBytesIs( readData ) )
+    // writeData = _.bufferBytesFrom( writeData );
+    // else if( _.bufferRawIs( readData ) )
+    // writeData = _.bufferRawFrom( writeData );
+    // else
+    // _.assert( _.strIs( readData ), 'not implemented for:', _.entity.strType( readData ) );
 
     if( o.writeMode === 'append' )
     {
+      /* xxx : add and use routine from module::wTools */
       if( _.strIs( writeData ) )
       o2.data = _.strJoin([ readData, writeData ]);
       else
@@ -4903,7 +4923,7 @@ function fileWrite_body( o )
       if( _.strIs( writeData ) )
       o2.data = _.strJoin([ writeData, readData ]);
       else
-      o2.data = _.bufferJoin( writeData, readData )
+      o2.data = _.bufferJoin( writeData, readData );
     }
     else
     throw _.err( 'not implemented writeMode :', o.writeMode )
@@ -4913,7 +4933,7 @@ function fileWrite_body( o )
 
   /* purging */
 
-  if( o.purging || terminateLink )
+  if( o.purging || terminatingLink )
   {
     self.filesDelete({ filePath : o2.filePath, throwing : 0 });
   }
@@ -5212,14 +5232,14 @@ function fileTouch_body( o )
       throw _.err( o.filePath, 'is not terminal' );
       return null;
     }
-    o.data = self.fileRead({ filePath : o.filePath, encoding : 'original.type' });
+    o.data = self.fileRead({ filePath : o.filePath, encoding : 'meta.original' });
   }
   else
   {
     o.data = '';
   }
 
-  // o.data = stat ? self.fileRead({ filePath : o.filePath, encoding : 'original.type' }) : '';
+  // o.data = stat ? self.fileRead({ filePath : o.filePath, encoding : 'meta.original' }) : '';
   self.fileWrite( o );
 
   return self;
@@ -6313,9 +6333,8 @@ defaults.dstPath = null;
 defaults.srcPath = null;
 defaults.relativeDstPath = null;
 defaults.relativeSrcPath = null;
-// defaults.breakingDstHardLink = 0; /* qqq2 : remove the option from Act method? aaa:done */
 defaults.sync = null;
-defaults.context = null;
+defaults.context = null; /* xxx : investigate */
 
 var having = fileCopyAct.having = Object.create( null );
 having.writing = 1;
@@ -6401,11 +6420,12 @@ function _fileCopySizeCheck( c )
       srcPath = self.path.localFromGlobal( o.relativeSrcPath );
 
       if( dstPath !== srcPath )
-      // if( dstPath !== o.relativeSrcPath )
       throw _.err( `Destination file ${o.dstPath} should be a link to ${o.relativeSrcPath}` );
     }
   }
 }
+
+//
 
 function _fileCopyVerify2( c )
 {
@@ -6425,6 +6445,8 @@ function _fileCopyVerify2( c )
     c.end( false );
   }
 }
+
+//
 
 function _fileCopyDo( c )
 {
@@ -6564,7 +6586,6 @@ defaults.allowingCycled = 0;
 defaults.throwing = null;
 defaults.verbosity = null;
 
-// defaults.breakingSrcHardLink = 0;
 defaults.resolvingSrcSoftLink = 1;
 defaults.resolvingSrcTextLink = 0;
 
@@ -7815,7 +7836,7 @@ let protocolsSymbol = Symbol.for( 'protocols' );
 let protocolSymbol = Symbol.for( 'protocol' );
 let originPathSymbol = Symbol.for( 'originPath' );
 
-let WriteMode = [ 'rewrite', 'prepend', 'append' ];
+let WriteMode = [ 'rewrite', 'prepend', 'append' ]; /* xxx : map or set */
 
 let ProviderDefaults =
 {

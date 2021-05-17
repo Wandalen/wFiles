@@ -12,6 +12,8 @@ if( typeof module !== 'undefined' )
   require( '../l4_files/entry/Files.s' );
 }
 
+/* qqq : ues test modules instead of real modules */
+
 //
 
 const _ = _global_.wTools;
@@ -111,7 +113,7 @@ function filesReflectTrivial( test )
       './proto',
       './sample',
     ]
-    
+
     test.true( _.arraySetContainAll_( files, expected ) )
     return got;
   })
@@ -150,7 +152,7 @@ function filesReflectTrivial( test )
       './proto',
       './sample',
     ]
-    
+
     test.true( _.arraySetContainAll_( files, expected ) )
     return got;
   })
@@ -345,7 +347,7 @@ function filesReflectTrivial( test )
       './proto',
       './sample'
     ]
-    
+
     test.true( _.arraySetContainAll_( files, expected ) )
     let packagePath = providerDst.path.join( localPath, 'package.json' );
     let packageRead = providerDst.fileRead

@@ -32,8 +32,7 @@ function multiple( o, link )
   let records = factory.records( o.dstPath );
   // Vova : should allow missing files?
   // Kos : test routine?
-  let newestRecord,
-    mostLinkedRecord;
+  let newestRecord, mostLinkedRecord;
 
   if( o.srcPath )
   {
@@ -71,7 +70,7 @@ function multiple( o, link )
 
   if( mostLinkedRecord.absolute !== newestRecord.absolute )
   {
-    let read = self.fileRead({ filePath : newestRecord.absolute, encoding : 'original.type' });
+    let read = self.fileRead({ filePath : newestRecord.absolute, encoding : 'meta.original' });
     self.fileWrite( mostLinkedRecord.absolute, read );
     /*
       fileCopy cant be used here
@@ -180,7 +179,7 @@ function multiple( o, link )
     if( !record.stat || !_.files.stat.areHardLinked( mostLinkedRecord.stat, record.stat ) )
     {
       let linkOptions = _.props.extend( null, o );
-      linkOptions.allowingMissed = 0; // Vova : hardLink does not allow missing srcPath
+      linkOptions.allowingMissed = 0; /* Vova : hardLink does not allow missing srcPath */
       linkOptions.dstPath = record.absolute;
       linkOptions.srcPath = mostLinkedRecord.absolute;
       return link.call( self, linkOptions );
@@ -999,7 +998,6 @@ function validateSize()
     throw _.err( err );
   }
 
-  // if( c.actMethodName === 'softLinkAct' ||  c.actMethodName === 'textLinkAct' || c.actMethodName === 'fileCopyAct' ) /* aaa : fix temp workaround */ /* Dmytro : added option `linkMaybe`, when functor creates routine it should be 1 for link routines */
   if( c.linkMaybe )
   {
     let updateStat =  _.strBegins( dstPath, srcPath );
@@ -1083,6 +1081,7 @@ function end( r )
 
 //
 
+/* xxx : qqq : not optimal. optimize */
 function contextMake( o )
 {
   _.assert( arguments.length === 1 );
@@ -1097,10 +1096,11 @@ function contextMake( o )
   c.provider = provider;
   c.linkBody = undefined;
 
+  _.assert( !!fop );
+
   if( fop )
   {
     c.actMethodName = fop.actMethodName;
-
     c.onVerify1 = fop.onVerify1;
     c.onVerify2 = fop.onVerify2;
     c.onIsLink2 = fop.onIsLink;
@@ -1109,15 +1109,11 @@ function contextMake( o )
     c.renaming = fop.renaming;
     c.skippingSamePath = fop.skippingSamePath;
     c.skippingMissed = fop.skippingMissed;
-
     c.linkDo = fop.onDo;
-
     c.options2 = _.mapOnly_( null, options, c.linkDo.defaults );
   }
-  else debugger;
 
   c.entryMethodName = undefined;
-
   c.onIsLink = onIsLink;
   c.onStat = onStat;
   c.ended = false;
@@ -1155,7 +1151,6 @@ function contextMake( o )
   }
 
   Object.preventExtensions( c );
-
   return c;
 }
 
@@ -1171,7 +1166,6 @@ contextMake.defaults =
 function functor_head( routine, args )
 {
   let self = this;
-  // let o = self._preSrcDstPathWithProviderDefaults.apply( self, arguments );
 
   let o = self._preSrcDstPathWithoutProviderDefaults.apply( self, arguments );
   self._providerDefaultsApply( o );
@@ -1241,9 +1235,6 @@ function functor( fop )
     let o2;
     let c = Self.contextMake({ provider : self, options : o, fop });
 
-    // if( o.dstPath === '/pro/builder/proto/wtools/atop/will.test/_asset/exportMultipleExported/super.out/supermodule.out.tgs' )
-    // debugger;
-
     c.entryMethodName = entryMethodName;
     c.linkBody = link_body;
 
@@ -1258,10 +1249,8 @@ function functor( fop )
 
       /*
       zzz : multiple should work not only for hardlinks
-      Vova : low priority
       */
 
-      // if( _.longIs( o.dstPath ) && c.linkDo.having.hardLinking ) /* aaa : functor cant use fields of c.linkDo! check code */
       if( _.longIs( o.dstPath ) && hardLinking )
       return multiple.call( self, o, link_body );
       _.assert( _.strIs( o.srcPath ) && _.strIs( o.dstPath ) );
@@ -1325,7 +1314,6 @@ function functor( fop )
 
       c.con.then( () =>
       {
-        // if( _.longIs( o.dstPath ) && c.linkDo.having.hardLinking )
         if( _.longIs( o.dstPath ) && hardLinking )
         {
           c.result = multiple.call( self, o, link_body );
@@ -1441,6 +1429,7 @@ textLink
 
 let LinkerExtension =
 {
+
   multiple,
 
   onIsLink,

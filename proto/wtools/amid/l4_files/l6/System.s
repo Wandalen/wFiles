@@ -975,7 +975,7 @@ function _fileCopyActDifferent( op )
     filePath : op.src.localPath,
     resolvingTextLink : 1,
     resolvingSoftLink : 1,
-    encoding : 'original.type',
+    encoding : 'meta.original',
     sync : o.sync,
   });
 
@@ -985,7 +985,7 @@ function _fileCopyActDifferent( op )
     ({
       filePath : op.dst.localPath,
       data : read,
-      encoding : 'original.type',
+      encoding : 'meta.original',
     });
 
     dstPathValidate();
@@ -999,7 +999,7 @@ function _fileCopyActDifferent( op )
         filePath : op.dst.localPath,
         data : read,
         sync : 0,
-        encoding : 'original.type',
+        encoding : 'meta.original',
       });
     })
     .then( ( arg ) =>

@@ -346,7 +346,7 @@ function fileReadAct( o )
     {
       result = _.bufferBytesFrom( result ).buffer;
     }
-    else if( !( o.encoding === 'utf8' ) && !( o.encoding === 'original.type' ) )
+    else if( !( o.encoding === 'utf8' ) && !( o.encoding === 'meta.original' ) )
     {
       try
       {

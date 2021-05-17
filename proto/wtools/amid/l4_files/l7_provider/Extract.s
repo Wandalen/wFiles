@@ -309,13 +309,19 @@ function fileReadAct( o )
   let result = null;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.routine.assertOptions( fileReadAct, o );
+  _.map.assertHasAll( o, fileReadAct.defaults );
+  // _.routine.assertOptions( fileReadAct, o );
   _.assert( _.strIs( o.encoding ) );
+  // _.assert( o.fileProvider === self );
 
-  let encoder = fileReadAct.encoders[ o.encoding ];
+  // let encoder = fileReadAct.encoders[ o.encoding ];
+  o.fileProvider = self;
+  o.encoder = fileReadAct.encoders[ o.encoding ];
+  if( o.encoder && o.encoder.onSelect)
+  o.encoder.onSelect.call( self, o );
 
   if( o.encoding )
-  if( !encoder )
+  if( !o.encoder )
   return handleError( _.err( 'Encoding: ' + o.encoding + ' is not supported!' ) )
 
   /* exec */
@@ -367,8 +373,8 @@ function fileReadAct( o )
   function handleBegin()
   {
 
-    if( encoder && encoder.onBegin )
-    _.sure( encoder.onBegin.call( self, { operation : o, encoder }) === undefined );
+    if( o.encoder && o.encoder.onBegin )
+    _.sure( o.encoder.onBegin.call( self, { operation : o, encoder : o.encoder }) === undefined );
 
   }
 
@@ -377,9 +383,9 @@ function fileReadAct( o )
   function handleEnd( data )
   {
 
-    let context = { data, operation : o, encoder };
-    if( encoder && encoder.onEnd )
-    _.sure( encoder.onEnd.call( self, context ) === undefined );
+    let context = { data, operation : o, encoder : o.encoder };
+    if( o.encoder && o.encoder.onEnd )
+    _.sure( o.encoder.onEnd.call( self, context ) === undefined );
     data = context.data;
 
     if( o.sync )
@@ -407,10 +413,10 @@ function fileReadAct( o )
       level : 0,
     });
 
-    if( encoder && encoder.onError )
+    if( o.encoder && o.encoder.onError )
     try
     {
-      err = encoder.onError.call( self, { error : err, operation : o, encoder })
+      err = o.encoder.onError.call( self, { error : err, operation : o, encoder : o.encoder })
     }
     catch( err2 )
     {
@@ -682,9 +688,12 @@ function fileWriteAct( o )
   _.assert( self.path.isNormalized( o.filePath ) );
   _.assert( self.WriteMode.indexOf( o.writeMode ) !== -1 );
 
-  let encoder = fileWriteAct.encoders[ o.encoding ];
+  o.fileProvider = self;
+  o.encoder = fileWriteAct.encoders[ o.encoding ];
+  if( o.encoder && o.encoder.onSelect)
+  o.encoder.onSelect.call( self, o );
 
-  _.assert( self._DescriptorIsTerminal( o.data ), 'Expects string or BufferNode, but got', _.entity.strType( o.data ) );
+  _.assert( self._DescriptorIsTerminal( o.data ), `Expects string or BufferNode, but got ${_.entity.strType( o.data )}` );
 
   /* */
 
@@ -711,12 +720,12 @@ function fileWriteAct( o )
 
   function handleBegin( read )
   {
-    if( !encoder )
+    if( !o.encoder )
     return o.data;
 
-    _.assert( _.routineIs( encoder.onBegin ) )
-    let context = { data : o.data, read, operation : o, encoder };
-    _.sure( encoder.onBegin.call( self, context ) === undefined );
+    _.assert( _.routineIs( o.encoder.onBegin ) )
+    let context = { data : o.data, read, operation : o, encoder : o.encoder };
+    _.sure( o.encoder.onBegin.call( self, context ) === undefined );
 
     return context.data;
   }
@@ -789,9 +798,10 @@ function fileWriteAct( o )
 
     _.assert( self._DescriptorIsTerminal( read ) );
 
+    /* qqq : xxx : rewrite using extending module::Tools */
     if( writeMode === 'append' || writeMode === 'prepend' )
     {
-      if( !encoder )
+      if( !o.encoder )
       {
         //converts data from file to the type of o.data
         if( _.strIs( data ) )
@@ -1371,7 +1381,7 @@ function fileCopyAct( o )
     // }
     // self.fileWriteAct({ filePath : o.dstPath, data : srcFile, sync : 1 });
 
-    let data = self.fileRead({ filePath : o.srcPath, encoding : 'original.type', sync : 1, resolvingTextLink : 0 });
+    let data = self.fileRead({ filePath : o.srcPath, encoding : 'meta.original', sync : 1, resolvingTextLink : 0 });
     _.assert( data !== null && data !== undefined );
 
     if( dstStat )
@@ -1418,7 +1428,7 @@ function fileCopyAct( o )
       return self.fileRead
       ({
         filePath : o.srcPath,
-        encoding : 'original.type',
+        encoding : 'meta.original',
         sync : 0,
         resolvingTextLink : 0
       })
@@ -1693,7 +1703,7 @@ function hardLinkAct( o )
           ({
             filePath : o.dstPath,
             data : srcData,
-            encoding : 'original.type',
+            encoding : 'meta.original',
             writeMode : 'rewrite',
             sync : o.sync,
             advanced : null,
@@ -2293,7 +2303,17 @@ function _DescriptorIsDir( file )
 
 function _DescriptorIsTerminal( file )
 {
-  return _.strIs( file ) || _.numberIs( file ) || _.bufferRawIs( file ) || _.bufferTypedIs( file );
+  if( _.strIs( file ) )
+  return true;
+  if( _.numberIs( file ) )
+  return true;
+  if( _.bufferRawIs( file ) )
+  return true;
+  if( _.bufferTypedIs( file ) )
+  return true;
+  if( _.bufferNodeIs( file ) )
+  return true;
+  return false;
 }
 
 //
@@ -2659,12 +2679,14 @@ readEncoders[ 'buffer.bytes' ] =
 
 }
 
-readEncoders[ 'original.type' ] =
+//
+
+readEncoders[ 'meta.original' ] =
 {
 
   onBegin : function( e )
   {
-    _.assert( e.operation.encoding === 'original.type' );
+    _.assert( e.operation.encoding === 'meta.original' );
   },
 
   onEnd : function( e )
@@ -2699,11 +2721,11 @@ readEncoders[ 'buffer.node' ] =
 
 //
 
-writeEncoders[ 'original.type' ] =
+writeEncoders[ 'meta.original' ] =
 {
   onBegin : function( e )
   {
-    _.assert( e.operation.encoding === 'original.type' );
+    _.assert( e.operation.encoding === 'meta.original' );
 
     if( e.read === undefined || e.operation.writeMode === 'rewrite' )
     return;

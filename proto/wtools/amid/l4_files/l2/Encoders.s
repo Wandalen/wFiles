@@ -90,13 +90,62 @@ let readBufferBytes =
 
   onEnd : function( e )
   {
+    if( e.stream ) /* xxx */
+    debugger;
     if( e.stream )
     return;
-    e.data = e.data;
     _.assert( _.bufferBytesIs( e.data ) );
   },
 
 }
+
+//
+
+let readBufferRaw =
+{
+
+  name : 'buffer.raw',
+  feature : { reader : true },
+
+  onBegin : function( e )
+  {
+    _.assert( e.operation.encoding === 'buffer.raw' );
+  },
+
+  onEnd : function( e )
+  {
+    _.assert( _.bufferRawIs( e.data ) );
+  },
+
+}
+
+//
+
+// let readOriginalType =
+// {
+//
+//   name : 'meta.original',
+//   feature : { reader : true },
+//
+//   onBegin : function( e )
+//   {
+//   },
+//
+//   onEnd : function( e )
+//   {
+//   },
+//
+//   onSelect : function( e )
+//   {
+//     let encoding = 'buffer.bytes';
+//     if( e.fileProvider.encoding !== 'meta.original' )
+//     encoding = e.encoding;
+//     let e2 = e;
+//     e2.encoding = e.fileProvider.encoding;
+//     return _.files.encoder.for( e2 );
+//   },
+//
+// }
 
 // --
 // declare
@@ -108,7 +157,9 @@ _.files.WriteEncoders = _.files.WriteEncoders || Object.create( null );
 _.files.encoder.register( readJsSmart );
 _.files.encoder.register( readJsNode );
 _.files.encoder.register( readBufferBytes );
-_.files.encoder.fromGdfs(); /* xxx2 : review and probably remove! */
+_.files.encoder.register( readBufferRaw );
+// _.files.encoder.register( readOriginalType );
+_.files.encoder.fromGdfs(); /* xxx : review and probably remove! */
 
 // --
 // export

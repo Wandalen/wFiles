@@ -16143,6 +16143,7 @@ function filesReflectTrivial( test )
 
   function onWriteDstUp1( record )
   {
+    debugger;
     if( !record.dst.isDir )
     record.dst.factory.system.fileWrite( record.dst.absolute, 'onWriteDstUp' );
     return record;

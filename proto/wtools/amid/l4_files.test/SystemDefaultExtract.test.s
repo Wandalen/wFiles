@@ -123,7 +123,8 @@ const Proto =
     // filesTree,
     provider : null,
     providerEffective : null,
-    globalFromPreferred : null
+    globalFromPreferred : null,
+    storingEncoding : true,
   },
 
   tests :

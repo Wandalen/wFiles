@@ -531,7 +531,7 @@ function readWriteSync( test )
   // ({
   //   filePath,
   //   sync : 1,
-  //   encoding : 'original.type',
+  //   encoding : 'meta.original',
   //   throwing : 1,
   // });
   /* - */
@@ -1183,7 +1183,7 @@ function readWriteSync( test )
     ({
       filePath : linkPath1,
       writeMode : 'append',
-      encoding : 'original.type',
+      encoding : 'meta.original',
       data : data1
     });
     var got1 = provider.fileRead( filePath );
@@ -1193,12 +1193,13 @@ function readWriteSync( test )
     provider.fieldPop( 'resolvingSoftLink', 0 );
 
     test.case = 'write using link, resolvingSoftLink off';
-    var data1 = _.bufferBytesFrom( 'abc' );
+    // var data1 = _.bufferBytesFrom( 'abc' );
+    var data1 = 'abc';
     provider.fieldPush( 'resolvingSoftLink', 0 );
     provider.fileWrite
     ({
       filePath,
-      encoding : 'original.type',
+      encoding : 'meta.original',
       data : data1,
     });
     var linkPath1 = a.abs( 'written/readWriteSync/link' );
@@ -1208,14 +1209,15 @@ function readWriteSync( test )
     ({
       filePath : linkPath1,
       writeMode : 'append',
-      encoding : 'original.type',
+      encoding : 'meta.original',
       data : appendData
     });
-    var got1 = provider.fileRead({ filePath, encoding : 'original.type' });
+    var got1 = provider.fileRead({ filePath, encoding : 'meta.original' });
     test.identical( got1, data1 );
-    var got1 = provider.fileRead({ filePath : linkPath1, encoding : 'original.type' });
-    test.true( _.bufferBytesIs( got1 ) );
-    test.identical( got1, _.bufferBytesFrom( appendData + appendData ) );
+    var got1 = provider.fileRead({ filePath : linkPath1, encoding : 'meta.original' });
+    test.true( !_.bufferBytesIs( got1 ) );
+    test.true( _.strIs( got1 ) );
+    test.identical( got1, appendData + appendData );
     provider.fieldPop( 'resolvingSoftLink', 0 );
 
     test.case = 'write using link, resolvingSoftLink off';
@@ -1246,7 +1248,7 @@ function readWriteSync( test )
     ({
       filePath : linkPath1,
       writeMode : 'prepend',
-      encoding : 'original.type',
+      encoding : 'meta.original',
       data : '1'
     });
     var got1 = provider.fileRead( filePath );
@@ -1256,12 +1258,13 @@ function readWriteSync( test )
     provider.fieldPop( 'resolvingSoftLink', 0 );
 
     test.case = 'write using link, resolvingSoftLink off';
-    var data1 = _.bufferBytesFrom( 'abc' );
+    // var data1 = _.bufferBytesFrom( 'abc' );
+    var data1 = 'abc';
     provider.fieldPush( 'resolvingSoftLink', 0 );
     provider.fileWrite
     ({
       filePath,
-      encoding : 'original.type',
+      encoding : 'meta.original',
       data : data1,
     });
     var linkPath1 = a.abs( 'written/readWriteSync/link' );
@@ -1271,14 +1274,15 @@ function readWriteSync( test )
     ({
       filePath : linkPath1,
       writeMode : 'prepend',
-      encoding : 'original.type',
+      encoding : 'meta.original',
       data : appendData
     });
-    var got1 = provider.fileRead({ filePath, encoding : 'original.type' });
+    var got1 = provider.fileRead({ filePath, encoding : 'meta.original' });
     test.identical( got1, data1 );
-    var got1 = provider.fileRead({ filePath : linkPath1, encoding : 'original.type' });
-    test.true( _.bufferBytesIs( got1 ) );
-    test.identical( got1, _.bufferBytesFrom( appendData + appendData ) );
+    var got1 = provider.fileRead({ filePath : linkPath1, encoding : 'meta.original' });
+    test.true( !_.bufferBytesIs( got1 ) );
+    test.true( _.strIs( got1 ) );
+    test.identical( got1, appendData + appendData );
     provider.fieldPop( 'resolvingSoftLink', 0 );
 
   }
@@ -1358,7 +1362,7 @@ function readWriteSync( test )
           filePath : linkPath2,
           writeMode : 'prepend',
           data : BufferNode.from( data2 ),
-          encoding : 'original.type'
+          encoding : 'meta.original'
         });
         var got2 = provider.fileRead( filePath );
         test.identical( got2, data2 );
@@ -1963,7 +1967,7 @@ function readWriteAsync( test )
     ({
       filePath,
       sync : 0,
-      encoding : 'original.type',
+      encoding : 'meta.original',
       throwing : 1,
     });
     return test.mustNotThrowError( con )
@@ -1971,8 +1975,9 @@ function readWriteAsync( test )
     {
       if( context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
       {
-        test.true( _.bufferBytesIs( got ) )
-        test.identical( got, _.bufferBytesFrom( BufferNode.from( testData ) ) );
+        test.true( !_.bufferBytesIs( got ) );
+        test.true( _.strIs( got ) );
+        test.identical( got, testData );
       }
       else
       {
@@ -3053,13 +3058,13 @@ function fileReadJson( test )
 
 //
 
-function fileReadWithEncoding( test )
+function fileReadOptionEncoding( test )
 {
   let context = this;
   let a = context.assetFor( test, false );
   let provider = context.provider;
 
-  let filePath = a.abs( 'written/fileReadWithEncoding/dstFile' );
+  let filePath = a.abs( 'written/fileReadOptionEncoding/dstFile' );
   let isHd = context.providerIsInstanceOf( _.FileProvider.HardDrive );
 
   /* - */
@@ -3290,7 +3295,7 @@ function fileReadWithEncoding( test )
 
   test.case = 'data - string with imitation of structure, call with map';
   var data = '{a : b}';
-  var filePath2 = a.abs( 'written/fileReadWithEncoding/dstFile2' );
+  var filePath2 = a.abs( 'written/fileReadOptionEncoding/dstFile2' );
   provider.filesDelete( filePath2 );
   provider.fileWrite({ filePath : filePath2, data });
   test.shouldThrowErrorOfAnyKind( () =>
@@ -3314,7 +3319,7 @@ function fileReadWithEncoding( test )
 
   test.case = 'data - string with imitation of structure, call with 2 arguments';
   var data = '{a : b}';
-  var filePath2 = a.abs( 'written/fileReadWithEncoding/dstFile2' );
+  var filePath2 = a.abs( 'written/fileReadOptionEncoding/dstFile2' );
   provider.filesDelete( filePath2 );
   provider.fileWrite({ filePath : filePath2, data });
   test.shouldThrowErrorOfAnyKind( () =>
@@ -3337,7 +3342,7 @@ function fileReadWithEncoding( test )
 
     test.case = 'data - code with mistake, encoding - js.node, call with map';
     var data3 = 'module.exports = { data : 1';
-    var filePath3 = a.abs( 'written/fileReadWithEncoding/dstFile2' );
+    var filePath3 = a.abs( 'written/fileReadOptionEncoding/dstFile2' );
     provider.filesDelete( filePath3 );
     provider.fileWrite({ filePath : filePath3, data : data3 });
     test.shouldThrowErrorOfAnyKind( () =>
@@ -3356,7 +3361,7 @@ function fileReadWithEncoding( test )
 
     test.case = 'data - code with mistake, encoding - js.node, call with 2 arguments';
     var data3 = 'module.exports = { data : 1';
-    var filePath3 = a.abs( 'written/fileReadWithEncoding/dstFile2' );
+    var filePath3 = a.abs( 'written/fileReadOptionEncoding/dstFile2' );
     provider.filesDelete( filePath3 );
     provider.fileWrite({ filePath : filePath3, data : data3 });
     test.shouldThrowErrorOfAnyKind( () =>
@@ -3368,14 +3373,102 @@ function fileReadWithEncoding( test )
 
 //
 
-function fileWriteWithEncoding( test )
+function fileReadOptionEncodingOriginalType( test )
+{
+  let context = this;
+  let a = context.assetFor( test, false );
+
+  test.true( _.bool.is( context.storingEncoding ) );
+
+  /* */
+
+  test.case = 'default';
+  var encoding = 'utf8';
+  var data = 'f1.txt';
+  test.identical( a.fileProvider.encoding, encoding );
+  a.fileProvider.fileWrite({ filePath : a.abs( 'f1.txt' ), data });
+  var got = a.fileProvider.fileRead({ filePath : a.abs( 'f1.txt' ), encoding : 'meta.original' });
+  var exp = data;
+  test.identical( got, exp );
+  var got = a.fileProvider.fileRead({ filePath : a.abs( 'f1.txt' ) });
+  test.identical( got, data );
+
+  /* */
+
+  test.case = 'utf8';
+  var encoding = 'utf8';
+  var data = 'f1.txt';
+  a.fileProvider.encoding = encoding
+  test.identical( a.fileProvider.encoding, encoding );
+  a.fileProvider.fileWrite({ filePath : a.abs( 'f1.txt' ), data });
+  var got = a.fileProvider.fileRead({ filePath : a.abs( 'f1.txt' ), encoding : 'meta.original' });
+  var exp = data;
+  test.identical( got, exp );
+  var got = a.fileProvider.fileRead({ filePath : a.abs( 'f1.txt' ) });
+  test.identical( got, data );
+
+  /* */
+
+
+  test.case = 'buffer.bytes';
+  var encoding = 'buffer.bytes';
+  var data = _.bufferBytesFrom( 'f1.txt' );
+  a.fileProvider.encoding = encoding;
+  test.identical( a.fileProvider.encoding, encoding );
+  a.fileProvider.fileWrite({ filePath : a.abs( 'f1.txt' ), data });
+  var got = a.fileProvider.fileRead({ filePath : a.abs( 'f1.txt' ), encoding : 'meta.original' });
+  var exp = 'f1.txt';
+  if( context.storingEncoding )
+  exp = _.bufferBytesFrom( data );
+  test.identical( got, exp );
+  var got = a.fileProvider.fileRead({ filePath : a.abs( 'f1.txt' ) });
+  test.identical( got, data );
+
+  /* */
+
+  test.case = 'buffer.node';
+  var encoding = 'buffer.node';
+  var data = _.bufferNodeFrom( 'f1.txt' );
+  a.fileProvider.encoding = encoding;
+  test.identical( a.fileProvider.encoding, encoding );
+  a.fileProvider.fileWrite({ filePath : a.abs( 'f1.txt' ), data });
+  var got = a.fileProvider.fileRead({ filePath : a.abs( 'f1.txt' ), encoding : 'meta.original' });
+  var exp = 'f1.txt';
+  if( context.storingEncoding )
+  exp = _.bufferNodeFrom( 'f1.txt' );
+  test.identical( got, exp );
+  var got = a.fileProvider.fileRead({ filePath : a.abs( 'f1.txt' ) });
+  test.identical( got, data );
+
+  /* */
+
+  test.case = 'buffer.raw';
+  var encoding = 'buffer.raw';
+  var data = _.bufferRawFrom( 'f1.txt' );
+  a.fileProvider.encoding = encoding;
+  test.identical( a.fileProvider.encoding, encoding );
+  a.fileProvider.fileWrite({ filePath : a.abs( 'f1.txt' ), data });
+  var got = a.fileProvider.fileRead({ filePath : a.abs( 'f1.txt' ), encoding : 'meta.original' });
+  var exp = 'f1.txt';
+  if( context.storingEncoding )
+  exp = _.bufferRawFrom( 'f1.txt' );
+  test.identical( got, exp );
+  var got = a.fileProvider.fileRead({ filePath : a.abs( 'f1.txt' ) });
+  test.identical( got, data );
+
+  /* */
+
+}
+
+//
+
+function fileWriteOptionEncoding( test )
 {
   let context = this;
   let a = context.assetFor( test, false );
   let provider = context.provider;
-
-  let filePath = a.abs( 'written/fileWriteWithEncoding/dstFile' );
-  let isHd = context.providerIsInstanceOf( _.FileProvider.HardDrive );
+  let filePath = a.abs( 'written/fileWriteOptionEncoding/dstFile' );
+  let isHd = context.providerIsInstanceOf( _.FileProvider.HardDrive ); /* qqq : xxx : remove such things */
 
   /* js */
 
@@ -3476,13 +3569,13 @@ function fileWriteWithEncoding( test )
 
   var src = 'string';
   provider.filesDelete( filePath );
-  provider.fileWrite({ filePath, data : src, encoding : 'original.type' })
+  provider.fileWrite({ filePath, data : src, encoding : 'meta.original' })
   var got = provider.fileRead( filePath );
   test.identical( got, src );
 
   var src = new U8x([ 99, 100, 101 ]);
   provider.filesDelete( filePath );
-  provider.fileWrite({ filePath, data : src, encoding : 'original.type' })
+  provider.fileWrite({ filePath, data : src, encoding : 'meta.original' })
   var got = provider.fileRead({ filePath, encoding : 'buffer.bytes' });
   test.identical( got, src );
 
@@ -3490,72 +3583,72 @@ function fileWriteWithEncoding( test )
   {
     var src1 = _.bufferNodeFrom( [ 99, 100, 101 ] )
     provider.filesDelete( filePath );
-    provider.fileWrite({ filePath, data : src1, encoding : 'original.type' })
+    provider.fileWrite({ filePath, data : src1, encoding : 'meta.original' })
     var got1 = provider.fileRead({ filePath, encoding : 'buffer.node' });
     test.identical( got1, src1 );
   }
 
   var src = new BufferRaw( 3 );
   provider.filesDelete( filePath );
-  provider.fileWrite({ filePath, data : src, encoding : 'original.type' })
+  provider.fileWrite({ filePath, data : src, encoding : 'meta.original' })
   var got = provider.fileRead({ filePath, encoding : 'buffer.raw' });
   test.identical( got, src );
 
-  /* original.type append to existing file */
+  /* meta.original append to existing file */
 
   var src = 'string';
   provider.filesDelete( filePath );
   provider.fileWrite({ filePath, data : src });
-  provider.fileWrite({ filePath, data : src, writeMode : 'append', encoding : 'original.type' })
+  provider.fileWrite({ filePath, data : src, writeMode : 'append', encoding : 'meta.original' })
   var got = provider.fileRead( filePath );
   test.identical( got, src + src );
 
-  var src = new U8x([ 99, 100, 101 ]);
+  var src = 'cde';
   provider.filesDelete( filePath );
   provider.fileWrite({ filePath, data : src });
-  provider.fileWrite({ filePath, data : src, writeMode : 'append', encoding : 'original.type' })
-  var got = provider.fileRead({ filePath, encoding : 'original.type' });
-  test.identical( got, _.bufferJoin( src, src ) );
+  provider.fileWrite({ filePath, data : src, writeMode : 'append', encoding : 'meta.original' })
+  var got = provider.fileRead({ filePath, encoding : 'meta.original' });
+  test.identical( got, src + src );
 
-  if( isHd )
-  {
-    var src2 = _.bufferNodeFrom( [ 99, 100, 101 ] )
+  // if( isHd )
+  // {
+    var src = 'cde';
     provider.filesDelete( filePath );
-    provider.fileWrite({ filePath, data : src2 });
-    provider.fileWrite({ filePath, data : src2, writeMode : 'append', encoding : 'original.type' })
-    var got2 = provider.fileRead({ filePath, encoding : 'buffer.node' });
-    test.identical( got2, _.bufferJoin( src2, src2 ) );
-  }
+    provider.fileWrite({ filePath, data : src });
+    provider.fileWrite({ filePath, data : src, writeMode : 'append', encoding : 'meta.original' })
+    var got = provider.fileRead({ filePath, encoding : 'buffer.node' });
+    test.identical( got, _.bufferNodeFrom( src + src ) );
+  // }
 
   var src = new BufferRaw( 3 );
   provider.filesDelete( filePath );
   provider.fileWrite({ filePath, data : src });
-  provider.fileWrite({ filePath, data : src, writeMode : 'append', encoding : 'original.type' })
+  provider.fileWrite({ filePath, data : src, writeMode : 'append', encoding : 'meta.original' })
   var got = provider.fileRead({ filePath, encoding : 'buffer.raw' });
   test.identical( got, _.bufferJoin( src, src ) );
 
-  /* original.type prepend to existing file */
+  /* meta.original prepend to existing file */
 
   var src = 'string';
   provider.filesDelete( filePath );
   provider.fileWrite({ filePath, data : src });
-  provider.fileWrite({ filePath, data : src, writeMode : 'prepend', encoding : 'original.type' })
+  provider.fileWrite({ filePath, data : src, writeMode : 'prepend', encoding : 'meta.original' })
   var got = provider.fileRead( filePath );
   test.identical( got, src + src );
 
-  var src = new U8x([ 99, 100, 101 ]);
+  var src = 'cde';
   provider.filesDelete( filePath );
   provider.fileWrite({ filePath, data : src });
-  provider.fileWrite({ filePath, data : src, writeMode : 'prepend', encoding : 'original.type' })
-  var got = provider.fileRead({ filePath, encoding : 'original.type' });
-  test.identical( got, _.bufferJoin( src, src ) );
+  provider.fileWrite({ filePath, data : src, writeMode : 'prepend', encoding : 'meta.original' })
+  var got = provider.fileRead({ filePath, encoding : 'meta.original' });
+  test.identical( got, src + src );
 
   if( isHd )
   {
     var src3 = _.bufferNodeFrom( [ 99, 100, 101 ] )
     provider.filesDelete( filePath );
     provider.fileWrite({ filePath, data : src3 });
-    provider.fileWrite({ filePath, data : src3, writeMode : 'prepend', encoding : 'original.type' })
+    provider.fileWrite({ filePath, data : src3, writeMode : 'prepend', encoding : 'meta.original' })
     var got3 = provider.fileRead({ filePath, encoding : 'buffer.node' });
     test.identical( got3, _.bufferJoin( src3, src3 ) );
   }
@@ -3563,7 +3656,7 @@ function fileWriteWithEncoding( test )
   var src = new BufferRaw( 3 );
   provider.filesDelete( filePath );
   provider.fileWrite({ filePath, data : src });
-  provider.fileWrite({ filePath, data : src, writeMode : 'prepend', encoding : 'original.type' })
+  provider.fileWrite({ filePath, data : src, writeMode : 'prepend', encoding : 'meta.original' })
   var got = provider.fileRead({ filePath, encoding : 'buffer.raw' });
   test.identical( got, _.bufferJoin( src, src ) );
 
@@ -20703,84 +20796,86 @@ function fileWriteSync( test )
   var expected = data;
   test.identical( got, expected );
 
-  test.case = 'encoding : original.type, data: string';
+  test.case = 'encoding : meta.original, data: string';
   data = 'LOREM LOREM';
   provider.fileWrite
   ({
     filePath : test.context.pathFor( 'write_test/dst.txt' ),
     data,
     sync : 1,
-    encoding : 'original.type'
+    encoding : 'meta.original'
   });
   var got = provider.fileRead
   ({
     filePath : test.context.pathFor( 'write_test/dst.txt' ),
-    encoding : 'original.type',
+    encoding : 'meta.original',
     sync : 1
   });
   var expected = data;
-  if( isHd )
-  expected = _.bufferBytesFrom( data );
+  // if( isHd )
+  // expected = _.bufferBytesFrom( data );
+  expected = data;
   test.identical( got, expected );
 
-  test.case = 'encoding : original.type, data: bytes buffer';
+  test.case = 'encoding : meta.original, data: bytes buffer';
   data = new U8x( [ 97, 98, 99 ] );
   provider.fileWrite
   ({
     filePath : test.context.pathFor( 'write_test/dst.txt' ),
     data,
     sync : 1,
-    encoding : 'original.type'
+    encoding : 'meta.original'
   });
   var got = provider.fileRead
   ({
     filePath : test.context.pathFor( 'write_test/dst.txt' ),
-    encoding : 'original.type',
+    encoding : 'meta.original',
     sync : 1
   });
   var expected = data;
   if( isHd )
-  expected = _.bufferBytesFrom( data );
+  expected = 'abc';
   test.identical( got, expected );
 
-  test.case = 'encoding : original.type, data: array buffer';
+  test.case = 'encoding : meta.original, data: array buffer';
   data = new U8x( [ 97, 98, 99 ] ).buffer;
   provider.fileWrite
   ({
     filePath : test.context.pathFor( 'write_test/dst.txt' ),
     data,
     sync : 1,
-    encoding : 'original.type'
+    encoding : 'meta.original'
   });
   var got = provider.fileRead
   ({
     filePath : test.context.pathFor( 'write_test/dst.txt' ),
-    encoding : 'original.type',
+    encoding : 'meta.original',
     sync : 1
   });
   var expected = data;
   if( isHd )
-  expected = _.bufferBytesFrom( data );
+  expected = 'abc';
   test.identical( got, expected );
 
   if( isHd )
   {
-    test.case = 'encoding : original.type, data: node buffer';
+    test.case = 'encoding : meta.original, data: node buffer';
     data = BufferNode.from( [ 97, 98, 99 ] );
     provider.fileWrite
     ({
       filePath : test.context.pathFor( 'write_test/dst.txt' ),
       data,
       sync : 1,
-      encoding : 'original.type'
+      encoding : 'meta.original'
     });
     var got1 = provider.fileRead
     ({
       filePath : test.context.pathFor( 'write_test/dst.txt' ),
-      encoding : 'original.type',
+      encoding : 'meta.original',
       sync : 1
     });
-    expected = _.bufferBytesFrom( data );
+    // expected = _.bufferBytesFrom( data );
+    expected = 'abc';
     test.identical( got1, expected );
   }
 
@@ -51394,8 +51489,9 @@ const Proto =
     fileReadJson,
     fileWriteJson,
 
-    fileReadWithEncoding,
-    fileWriteWithEncoding,
+    fileReadOptionEncoding,
+    fileReadOptionEncodingOriginalType,
+    fileWriteOptionEncoding,
 
     fileTouch,
     timeWrite,

@@ -500,16 +500,21 @@ function fileReadAct( o )
   let stack = null;
   let result = null;
 
-  _.routine.assertOptions( fileReadAct, arguments );
+  // _.routine.assertOptions( fileReadAct, arguments );
+  _.map.assertHasAll( o, fileReadAct.defaults );
   _.assert( self.path.isNormalized( o.filePath ) );
+  // _.assert( o.fileProvider === self );
 
   let filePath = self.path.nativize( o.filePath );
 
-  if( Config.debug )
-  if( !o.sync )
-  stack = _.introspector.stack([ 1, Infinity ]);
+  // if( Config.debug )
+  // if( !o.sync )
+  // stack = _.introspector.stack([ 1, Infinity ]);
 
-  let encoder = fileReadAct.encoders[ o.encoding ];
+  o.fileProvider = self;
+  o.encoder = fileReadAct.encoders[ o.encoding ];
+  if( o.encoder && o.encoder.onSelect )
+  o.encoder.onSelect.call( self, o );
 
   /* exec */
 
@@ -554,8 +559,8 @@ function fileReadAct( o )
   function handleBegin()
   {
 
-    if( encoder && encoder.onBegin )
-    encoder.onBegin.call( self, { transaction : o, encoder })
+    if( o.encoder && o.encoder.onBegin )
+    o.encoder.onBegin.call( self, { operation : o, encoder : o.encoder })
 
   }
 
@@ -564,8 +569,8 @@ function fileReadAct( o )
   function handleEnd( data )
   {
 
-    if( encoder && encoder.onEnd )
-    data = encoder.onEnd.call( self, { data, transaction : o, encoder })
+    if( o.encoder && o.encoder.onEnd )
+    data = o.encoder.onEnd.call( self, { data, operation : o, encoder : o.encoder })
 
     if( o.sync )
     return data;
@@ -587,11 +592,11 @@ function fileReadAct( o )
       // stack : stack,
     });
 
-    if( encoder && encoder.onError )
+    if( o.encoder && o.encoder.onError )
     try
     {
       debugger;
-      err = encoder.onError.call( self, { error : err, transaction : o, encoder })
+      err = o.encoder.onError.call( self, { error : err, operation : o, encoder : o.encoder })
     }
     catch( err2 )
     {
@@ -618,9 +623,15 @@ function streamReadAct( o )
 {
   let self = this;
   let result;
-  let encoder = fileReadAct.encoders[ o.encoding ];
+
+  // _.assert( o.fileProvider === self );
 
   _.routine.assertOptions( streamReadAct, arguments );
+
+  o.fileProvider = self;
+  o.encoder = fileReadAct.encoders[ o.encoding ];
+  if( o.encoder && o.encoder.onSelect)
+  o.encoder.onSelect.call( self, o );
 
   let filePath = self.path.nativize( o.filePath );
 
@@ -645,8 +656,8 @@ function streamReadAct( o )
   function handleBegin()
   {
 
-    if( encoder && encoder.onBegin )
-    encoder.onBegin.call( self, { transaction : o, encoder });
+    if( o.encoder && o.encoder.onBegin )
+    o.encoder.onBegin.call( self, { operation : o, encoder : o.encoder });
 
   }
 
@@ -655,8 +666,8 @@ function streamReadAct( o )
   function handleEnd()
   {
 
-    if( encoder && encoder.onEnd )
-    encoder.onEnd.call( self, { stream : result, transaction : o, encoder })
+    if( o.encoder && o.encoder.onEnd )
+    o.encoder.onEnd.call( self, { stream : result, operation : o, encoder : o.encoder })
 
   }
 
@@ -674,11 +685,11 @@ function streamReadAct( o )
       // stack : stack,
     });
 
-    if( encoder && encoder.onError )
+    if( o.encoder && o.encoder.onError )
     try
     {
       debugger;
-      err = encoder.onError.call( self, { error : err, transaction : o, encoder });
+      err = o.encoder.onError.call( self, { error : err, operation : o, encoder : o.encoder });
     }
     catch( err2 )
     {
@@ -786,7 +797,7 @@ _.routineExtend( dirReadAct, Parent.prototype.dirReadAct );
 // --
 
 /*
-!!! return maybe undefined if error, but exists?
+xxx : return maybe undefined if error, but exists?
 */
 
 function statReadAct( o )
@@ -818,7 +829,6 @@ function statReadAct( o )
     }
     catch( err )
     {
-      // debugger;
       if( o.throwing )
       throw _.err( 'Error getting stat of', o.filePath, '\n', err );
     }
@@ -939,13 +949,12 @@ function fileExistsAct( o )
     if( err.code === 'ENOENT' )
     { /*
         Used to check if symlink is present on Unix when referenced file doesn't exist.
-        qqq: Check if same behavior can be obtained by using combination of File.constants in accessSync
+        qqq : Check if same behavior can be obtained by using combination of File.constants in accessSync
         aaa : possible solution is to use faccessat, it accepts flag that disables resolving of the soft links.
         But we need to implement own c++ addon for faccessat. https://linux.die.net/man/2/faccessat.
       */
       if( process.platform !== 'win32' )
       return !!self.statReadAct({ filePath : o.filePath, sync : 1, throwing : 0, resolvingSoftLink : 0 });
-
       return false;
     }
     if( err.code === 'ENOTDIR' )
@@ -956,26 +965,6 @@ function fileExistsAct( o )
 }
 
 _.routineExtend( fileExistsAct, Parent.prototype.fileExistsAct );
-
-// //
-//
-// function rightsReadAct( o )
-// {
-//   let self = this;
-//   let nativizedFilePath = self.path.nativize( o.filePath );
-//
-//   _.routine.assertOptions( rightsReadAct, o );
-//
-//   debugger;
-//   let result = File.accessSync( nativizedFilePath );
-//   debugger;
-//   // let d = File.openSync( './files/file.txt', 'r' );
-//   // File.fchmodSync(fd, 0o777);
-//
-//   return result;
-// }
-//
-// _.routineExtend( rightsReadAct, Parent.prototype.rightsReadAct );
 
 // --
 // write
@@ -1030,21 +1019,22 @@ function fileWriteAct( o )
   let self = this;
 
   _.routine.assertOptions( fileWriteAct, arguments );
-  // _.assert( _.strIs( o.filePath ) );
   _.assert( self.path.isNormalized( o.filePath ) );
   _.assert( self.WriteMode.indexOf( o.writeMode ) !== -1 );
+  // _.assert( o.fileProvider === self );
 
-  let encoder = fileWriteAct.encoders[ o.encoding ];
+  o.fileProvider = self;
+  o.encoder = fileWriteAct.encoders[ o.encoding ];
+  if( o.encoder && o.encoder.onSelect)
+  o.encoder.onSelect.call( self, o );
 
-  if( encoder && encoder.onBegin )
-  _.sure( encoder.onBegin.call( self, { operation : o, encoder, data : o.data } ) === undefined );
+  if( o.encoder && o.encoder.onBegin )
+  _.sure( o.encoder.onBegin.call( self, { operation : o, encoder : o.encoder, data : o.data } ) === undefined );
 
   /* data conversion */
 
   if( _.bufferTypedIs( o.data ) && !_.bufferBytesIs( o.data ) || _.bufferRawIs( o.data ) )
   o.data = _.bufferNodeFrom( o.data );
-
-  // /* qqq : is it possible to do it without conversion from raw buffer? */
 
   _.assert
   (
@@ -2183,7 +2173,7 @@ function hardLinkAct( o )
           ({
             filePath : o.dstPath,
             data : srcData,
-            encoding : 'original.type',
+            encoding : 'meta.original',
             writeMode : 'rewrite',
             sync : o.sync,
             advanced : null,
@@ -2327,16 +2317,12 @@ function _encodingFor( encoding )
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.strIs( encoding ) );
 
-  if( encoding === 'buffer.node' || encoding === 'buffer.bytes' )
-  // result = 'binary';
+  if( encoding === 'buffer.node' || encoding === 'buffer.bytes' || encoding === 'buffer.raw' )
   result = undefined;
   else
   result = encoding;
 
-  // if( result === 'binary' )
-  // throw _.err( 'not tested' );
-
-  _.assert( _.longHas( self.KnownNativeEncodings, result ), 'Unknown encoding:', result );
+  _.assert( self.KnownNativeEncodings.has( result ), () => `Unknown encoding: ${result}` );
 
   return result;
 }
@@ -2352,12 +2338,14 @@ encoders[ 'buffer.raw' ] =
 
   onBegin : function( e )
   {
-    _.assert( e.transaction.encoding === 'buffer.raw' );
-    e.transaction.encoding = 'buffer.node';
+    debugger;
+    _.assert( e.operation.encoding === 'buffer.raw' );
+    e.operation.encoding = 'buffer.node';
   },
 
   onEnd : function( e )
   {
+    debugger;
     if( e.stream )
     return;
     _.assert( _.bufferNodeIs( e.data ) || _.bufferTypedIs( e.data ) || _.bufferRawIs( e.data ) );
@@ -2379,12 +2367,12 @@ encoders[ 'buffer.raw' ] =
 //
 //   onBegin : function( e )
 //   {
-//     e.transaction.encoding = 'utf8';
+//     e.operation.encoding = 'utf8';
 //   },
 //
 //   onEnd : function( e )
 //   {
-//     return require( _.fileProvider.path.nativize( e.transaction.filePath ) );
+//     return require( _.fileProvider.path.nativize( e.operation.filePath ) );
 //   },
 // }
 
@@ -2393,7 +2381,7 @@ encoders[ 'buffer.bytes' ] =
 
   onBegin : function( e )
   {
-    _.assert( e.transaction.encoding === 'buffer.bytes' );
+    _.assert( e.operation.encoding === 'buffer.bytes' );
   },
 
   onEnd : function( e )
@@ -2406,18 +2394,29 @@ encoders[ 'buffer.bytes' ] =
 
 //
 
-encoders[ 'original.type' ] =
+encoders[ 'meta.original' ] =
 {
 
   onBegin : function( e )
   {
-    _.assert( e.transaction.encoding === 'original.type' );
-    e.transaction.encoding = 'buffer.bytes';
+    _.assert( 0 );
   },
 
   onEnd : function( e )
   {
-    return _.bufferBytesFrom( e.data );
+    _.assert( 0 );
+  },
+
+  onSelect : function( operation )
+  {
+    _.assert( operation.encoding === 'meta.original' );
+    if( this.fileReadAct.encoders[ operation.encoding ] )
+    operation.encoding = this.encoding;
+    else if( this.ExtraNativeEncodings.has( this.encoding ) )
+    operation.encoding = this.encoding;
+    else
+    operation.encoding = 'buffer.bytes';
+    operation.encoder = this.fileReadAct.encoders[ operation.encoding ];
   },
 
 }
@@ -2426,19 +2425,21 @@ fileReadAct.encoders = encoders;
 
 //
 
-let writeEncoders = Object.create( null );
+var encoders = Object.create( null );
 
-writeEncoders[ 'original.type' ] =
+encoders[ 'meta.original' ] =
 {
 
   onBegin : function( e )
   {
-    _.assert( e.operation.encoding === 'original.type' );
+    _.assert( e.operation.encoding === 'meta.original' );
 
     if( _.strIs( e.data ) )
     e.operation.encoding = 'utf8';
     else if( _.bufferBytesIs( e.data ) )
     e.operation.encoding = 'buffer.bytes';
+    else if( _.bufferRawIs( e.data ) )
+    e.operation.encoding = 'buffer.raw';
     else
     e.operation.encoding = 'buffer.node';
 
@@ -2446,13 +2447,14 @@ writeEncoders[ 'original.type' ] =
 
 }
 
-fileWriteAct.encoders = writeEncoders;
+fileWriteAct.encoders = encoders;
 
 // --
 // relations
 // --
 
-let KnownNativeEncodings = [ undefined, 'ascii', 'base64', 'binary', 'hex', 'ucs2', 'ucs-2', 'utf16le', 'utf-16le', 'utf8', 'latin1' ]
+let KnownNativeEncodings = new Set([ undefined, 'ascii', 'base64', 'binary', 'hex', 'ucs2', 'ucs-2', 'utf16le', 'utf-16le', 'utf8', 'latin1' ]);
+let ExtraNativeEncodings = new Set([ ... KnownNativeEncodings, 'buffer.node', 'buffer.bytes' ]);
 let UsingBigIntForStat = _.files.nodeJsIsSameOrNewer( [ 10, 5, 0 ] ); /* xxx : remove */
 
 let Composes =
@@ -2477,6 +2479,7 @@ let Statics =
 
   pathNativizeAct,
   KnownNativeEncodings,
+  ExtraNativeEncodings,
   UsingBigIntForStat,
   Path : _.path.CloneExtending({ fileProvider : Self }),
 

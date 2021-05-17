@@ -332,11 +332,13 @@ function readWriteOptionWriteMode( test )
 
   /* */
 
-  test.case = 'more test cases?';
-  a.reflect();
-  var data = 'data1';
-  var filePath = a.abs( 'file1.txt' );
-  var writeMode = 'append';
+  test.case = 'writeMode:prepend';
+  var data = 'data0';
+  var expected = 'data0data1data2';
+  var writeMode = 'prepend';
+  a.fileProvider.fileWrite({ filePath, data, writeMode });
+  var got = a.fileProvider.fileRead( filePath );
+  test.identical( got, expected );
 
   /* qqq : for junior : implement please */
   // test.true( false );

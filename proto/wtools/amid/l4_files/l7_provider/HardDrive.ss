@@ -2409,11 +2409,13 @@ encoders[ 'meta.original' ] =
 
   onSelect : function( operation )
   {
+    // let system = this.system || this;
+    let system = this;
     _.assert( operation.encoding === 'meta.original' );
-    if( this.fileReadAct.encoders[ operation.encoding ] )
-    operation.encoding = this.encoding;
-    else if( this.ExtraNativeEncodings.has( this.encoding ) )
-    operation.encoding = this.encoding;
+    if( this.fileReadAct.encoders[ system.encoding ] && system.encoding !== 'meta.original' )
+    operation.encoding = system.encoding;
+    else if( this.ExtraNativeEncodings.has( system.encoding ) )
+    operation.encoding = system.encoding;
     else
     operation.encoding = 'buffer.bytes';
     operation.encoder = this.fileReadAct.encoders[ operation.encoding ];

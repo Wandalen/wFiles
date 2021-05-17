@@ -3373,6 +3373,7 @@ function fileReadOptionEncoding( test )
 
 //
 
+/* xxx : review field fileProvider.encoding */
 function fileReadOptionEncodingOriginalType( test )
 {
   let context = this;
@@ -3398,7 +3399,8 @@ function fileReadOptionEncodingOriginalType( test )
   test.case = 'utf8';
   var encoding = 'utf8';
   var data = 'f1.txt';
-  a.fileProvider.encoding = encoding
+  a.fileProvider.encoding = encoding;
+  a.effectiveProvider.encoding = encoding;
   test.identical( a.fileProvider.encoding, encoding );
   a.fileProvider.fileWrite({ filePath : a.abs( 'f1.txt' ), data });
   var got = a.fileProvider.fileRead({ filePath : a.abs( 'f1.txt' ), encoding : 'meta.original' });
@@ -3409,16 +3411,16 @@ function fileReadOptionEncodingOriginalType( test )
 
   /* */
 
-
   test.case = 'buffer.bytes';
   var encoding = 'buffer.bytes';
   var data = _.bufferBytesFrom( 'f1.txt' );
   a.fileProvider.encoding = encoding;
+  a.effectiveProvider.encoding = encoding;
   test.identical( a.fileProvider.encoding, encoding );
   a.fileProvider.fileWrite({ filePath : a.abs( 'f1.txt' ), data });
   var got = a.fileProvider.fileRead({ filePath : a.abs( 'f1.txt' ), encoding : 'meta.original' });
   var exp = 'f1.txt';
-  if( context.storingEncoding )
+  // if( context.storingEncoding )
   exp = _.bufferBytesFrom( data );
   test.identical( got, exp );
   var got = a.fileProvider.fileRead({ filePath : a.abs( 'f1.txt' ) });
@@ -3430,11 +3432,12 @@ function fileReadOptionEncodingOriginalType( test )
   var encoding = 'buffer.node';
   var data = _.bufferNodeFrom( 'f1.txt' );
   a.fileProvider.encoding = encoding;
+  a.effectiveProvider.encoding = encoding;
   test.identical( a.fileProvider.encoding, encoding );
   a.fileProvider.fileWrite({ filePath : a.abs( 'f1.txt' ), data });
   var got = a.fileProvider.fileRead({ filePath : a.abs( 'f1.txt' ), encoding : 'meta.original' });
   var exp = 'f1.txt';
-  if( context.storingEncoding )
+  // if( context.storingEncoding )
   exp = _.bufferNodeFrom( 'f1.txt' );
   test.identical( got, exp );
   var got = a.fileProvider.fileRead({ filePath : a.abs( 'f1.txt' ) });
@@ -3446,11 +3449,12 @@ function fileReadOptionEncodingOriginalType( test )
   var encoding = 'buffer.raw';
   var data = _.bufferRawFrom( 'f1.txt' );
   a.fileProvider.encoding = encoding;
+  a.effectiveProvider.encoding = encoding;
   test.identical( a.fileProvider.encoding, encoding );
   a.fileProvider.fileWrite({ filePath : a.abs( 'f1.txt' ), data });
   var got = a.fileProvider.fileRead({ filePath : a.abs( 'f1.txt' ), encoding : 'meta.original' });
   var exp = 'f1.txt';
-  if( context.storingEncoding )
+  // if( context.storingEncoding )
   exp = _.bufferRawFrom( 'f1.txt' );
   test.identical( got, exp );
   var got = a.fileProvider.fileRead({ filePath : a.abs( 'f1.txt' ) });

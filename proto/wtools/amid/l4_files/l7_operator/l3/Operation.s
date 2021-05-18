@@ -211,6 +211,7 @@ let Composes =
 
 let Aggregates =
 {
+  deedsArray : _.define.own( [] ),
 }
 
 let Associates =

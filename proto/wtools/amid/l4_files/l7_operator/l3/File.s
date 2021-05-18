@@ -53,6 +53,9 @@ function unform()
   if( !file.operation )
   return;
 
+  _.assert( operator.filesMap[ file.globalPath ] === file );
+  delete operator.filesMap[ file.globalPath ];
+
 }
 
 //
@@ -63,7 +66,10 @@ function form()
   let operator = file.operator;
 
   _.assert( operator instanceof _.files.operator.Operator );
+  _.assert( _.strDefined( file.globalPath ) );
+  _.assert( operator.filesMap[ file.globalPath ] === undefined || operator.filesMap[ file.globalPath ] === file ); debugger;
 
+  operator.filesMap[ file.globalPath ] = file;
 }
 
 // --

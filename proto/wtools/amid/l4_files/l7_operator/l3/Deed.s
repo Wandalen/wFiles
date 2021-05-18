@@ -22,7 +22,7 @@ function finit()
 {
   let deed = this;
   deed.unform();
-  return _.Copyable.prototype.finit.call( this );
+  return _.Copyable.prototype.finit.call( deed );
 }
 
 //
@@ -37,11 +37,11 @@ function init( o )
   if( deed.Self === Self )
   Object.preventExtensions( deed );
 
-  if( o )
-  deed.copy( o );
-
   deed.src = _.set.as( deed.src );
   deed.dst = _.set.as( deed.dst );
+
+  if( o )
+  deed.copy( o );
 
   return deed;
 }
@@ -54,6 +54,11 @@ function unform()
 
   if( !deed.operation )
   return;
+
+  if( !deed.formed )
+  return
+
+  _.arrayRemoveOnceStrictly( operation.deedsArray, deed );
 
 }
 
@@ -70,6 +75,9 @@ function form()
   _.assert( mission instanceof _.files.operator.Mission );
   _.assert( operator instanceof _.files.operator.Operator );
 
+  _.arrayAppendOnceStrictly( operation.deedsArray, deed );
+
+  deed.formed = 1;
 }
 
 // --

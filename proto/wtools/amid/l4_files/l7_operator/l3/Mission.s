@@ -18,6 +18,15 @@ Self.shortName = 'Mission';
 //
 // --
 
+function finit()
+{
+  let mission = this;
+  mission.unform();
+  return _.Copyable.prototype.finit.call( mission );
+}
+
+//
+
 function init( o )
 {
   let mission = this;
@@ -38,12 +47,29 @@ function init( o )
 
 //
 
+function unform()
+{
+  let mission = this;
+
+  if( !mission.operator )
+  return;
+
+  debugger;
+  _.assert( mission.operator.missionSet.has( mission ) );
+  mission.operator.missionSet.delete( mission );
+
+  return mission;
+}
+
+//
+
 function form()
 {
   let mission = this;
 
   if( !mission.operator )
-  mission.operator = new _.files.operator.Operator({ mission });
+  mission.operator = new _.files.operator.Operator();
+  mission.operator.missionSet.add( mission );
 
   return mission;
 }
@@ -138,7 +164,9 @@ let Statics =
 let Extension =
 {
 
+  finit,
   init,
+  unform,
   form,
 
   filesReflect,

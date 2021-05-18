@@ -69,12 +69,13 @@ function fileFor( globalPath, localPath )
   let file = operator.filesMap[ globalPath ];
   if( !file )
   {
-    file = operator.filesMap[ globalPath ] = _.files.operator.File
+    file = _.files.operator.File
     ({
       globalPath : globalPath,
       localPath : localPath || null,
       operator : operator,
     });
+    file.form();
   }
 
   return file;
@@ -95,6 +96,7 @@ let Aggregates =
 
 let Associates =
 {
+  missionSet : _.define.own( new Set ),
   operationArray : _.define.own([]),
   filesMap : _.define.own({}),
 }

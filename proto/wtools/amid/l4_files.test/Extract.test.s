@@ -38,7 +38,7 @@ function onSuiteEnd()
 {
   let context = this;
   let path = this.provider.path;
-  // _.assert( _.mapKeys( context.provider.filesTree ).length === 1 ); // qqq : uncomment it, please
+  // _.assert( _.props.keys( context.provider.filesTree ).length === 1 ); // qqq : uncomment it, please
   return Parent.onSuiteEnd.apply( this, arguments );
 }
 
@@ -147,6 +147,7 @@ const Proto =
     provider : _.FileProvider.Extract( { usingExtraStat : 1 } ),
     globalFromPreferred : null,
     testFile : '/file1',
+    storingEncoding : true,
 
   },
 

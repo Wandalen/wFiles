@@ -19,6 +19,8 @@ if( typeof module !== 'undefined' )
   if( Config.interpreter === 'njs' )
   require( './Git.ss' );
 
+  require( './Operator.s' );
+
   /* l8_filter */
 
   require( '../l8_filter/Image.s' );

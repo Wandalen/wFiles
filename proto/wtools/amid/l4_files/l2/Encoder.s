@@ -20,7 +20,7 @@ const Self = _.files.encoder = _.files.encoder || Object.create( null );
 function normalize( o )
 {
 
-  o = _.routineOptions( normalize, o );
+  o = _.routine.options_( normalize, o );
   if( _.strIs( o.exts ) )
   o.exts = [ o.exts ];
   else if( o.exts === null )
@@ -37,7 +37,7 @@ function normalize( o )
   o.name = nameGenerate();
 
   _.assert( _.strDefined( o.name ) );
-  // _.assert( _.routineIs( o.onData ) ); /* zzz : implement */
+  // _.assert( _.routineIs( o.onData ) ); /* xxx : implement */
 
   return o;
 
@@ -64,12 +64,12 @@ normalize.defaults =
   exts : null,
   feature : null,
   gdf : null,
-  // forConfig : null, /* zzz : remove */
 
   onBegin : null,
   onEnd : null,
-  onError : null, /* zzz : remove */
+  onError : null, /* xxx : remove */
   onData : null,
+  onSelect : null,
 
 }
 
@@ -287,7 +287,7 @@ function deduce( o )
 {
   let result = [];
 
-  o = _.routineOptions( deduce, arguments );
+  o = _.routine.options_( deduce, arguments );
 
   if( o.filePath && !o.ext )
   o.ext = _.path.ext( o.filePath );
@@ -309,7 +309,7 @@ function deduce( o )
   if( encodersMap[ o.ext ] )
   {
     let encoder = encodersMap[ o.ext ];
-    _.assert( _.objectIs( encoder ), `Write encoder ${o.ext} is missing` );
+    _.assert( _.object.isBasic( encoder ), `Write encoder ${o.ext} is missing` );
     _.assert( _.longHas( encoder.exts, o.ext ) );
     _.arrayAppendOnce( result, encoder );
   }
@@ -325,14 +325,11 @@ function deduce( o )
     for( let i2 = 0 ; i2 < typeMap[ type ].length ; i2++ )
     {
       let gdf = typeMap[ type ][ i2 ];
-      // let o2 = _.mapBut_( null, o, [ 'single', 'returning', 'feature' ] );
       let o2 = _.mapBut_( null, o, [ 'single', 'returning', 'feature', 'format' ] );
       if( o.feature.reader )
       o2.inFormat = o.format;
       else
       o2.outFormat = o.format;
-      // let methodName = o.feature.reader ? 'supportsInput' : 'supportsOutput';
-      // let supports = gdf[ methodName ]( o2 );
       let supports = gdf.supports( o2 );
       if( supports )
       _.arrayAppendOnce( result, _.files.encoder[ fromMethodName ]( gdf ) );
@@ -373,9 +370,9 @@ function deduce( o )
   {
     if( o.feature === null )
     return encoders;
-    if( _.mapKeys( o.feature ).length === 0 )
+    if( _.props.keys( o.feature ).length === 0 )
     return encoders;
-    return _.filter_( encoders, ( encoder ) =>
+    return _.filter_( encoders, encoders, ( encoder ) =>
     {
       let satisfied = _.objectSatisfy
       ({
@@ -401,6 +398,54 @@ deduce.defaults =
   returning : 'name',
 }
 
+//
+
+function _for( o )
+{
+
+  _.routine.options( _for, o );
+
+  if( o.encoding === _.unknown ) /* qqq : cover */
+  {
+    o.encoder = _.files.encoder.deduce
+    ({
+      filePath : o.filePath,
+      ext : o.ext,
+      format : o.format,
+      data : o.data,
+      feature : o.feature,
+      returning : 'encoder',
+      single : 1,
+    });
+    debugger;
+    _.assert( _.strDefined( o.encoder.name ) );
+    o.encoding = o.encoder.name;
+    return o;
+  }
+
+  o.encoder = _.files.ReadEncoders[ o.encoding ];
+
+  if( !o.encoder )
+  return o;
+
+  if( o.encoder.onSelect )
+  return o.encoder.onSelect( o );
+
+  return o;
+}
+
+_for.defaults =
+{
+  encoding : null,
+  encoder : null,
+  data : null,
+  format : null,
+  filePath : null,
+  ext : null,
+  feature : null,
+  fileProvider : null,
+}
+
 // --
 // declaration
 // --
@@ -420,13 +465,15 @@ let Extension =
   fromGdfs,
   deduce,
 
+  for : _for,
+
   // fields
 
   gdfTypesForFiles,
 
 }
 
-_.mapSupplement( Self, Extension );
+_.props.supplement( Self, Extension );
 
 // --
 // export

@@ -5,14 +5,14 @@
 
 const _global = _global_;
 const _ = _global_.wTools;
-const FileRecord = _.FileRecord;
+const FileRecord = _.files.FileRecord;
 const Abstract = _.FileProvider.Abstract;
 const Partial = _.FileProvider.Partial;
 const Find = _.FileProvider.FindMixin;
 const fileRead = Partial.prototype.fileRead;
 
-_.assert( _.lengthOf( _.files.ReadEncoders ) > 0 );
-_.assert( _.routineIs( _.FileRecord ) );
+_.assert( _.entity.lengthOf( _.files.ReadEncoders ) > 0 );
+_.assert( _.routineIs( _.files.FileRecord ) );
 _.assert( _.routineIs( Abstract ) );
 _.assert( _.routineIs( Partial ) );
 _.assert( _.routineIs( Find ) );
@@ -48,7 +48,7 @@ Self.shortName = 'ConfigMixin';
 //
 //   if( _.strIs( o ) )
 //   {
-//     o = { name : o };
+//     o = { name : o || null };
 //   }
 //
 //   if( o.dir === undefined )
@@ -57,7 +57,7 @@ Self.shortName = 'ConfigMixin';
 //   if( o.result === undefined )
 //   o.result = Object.create( null );
 //
-//   _.routineOptions( configRead2, o );
+//   _.routine.options_( configRead2, o );
 //
 //   if( !o.name )
 //   {
@@ -116,7 +116,7 @@ Self.shortName = 'ConfigMixin';
 //       {
 //         filename : fileName,
 //       });
-//       _.mapExtend( o.result, read );
+//       _.props.extend( o.result, read );
 //
 //     }
 //   }
@@ -129,7 +129,7 @@ Self.shortName = 'ConfigMixin';
 //
 //     read = self.fileReadSync( fileName );
 //     read = JSON.parse( read );
-//     _.mapExtend( o.result, read );
+//     _.props.extend( o.result, read );
 //
 //   }
 //
@@ -142,7 +142,7 @@ Self.shortName = 'ConfigMixin';
 //     debugger;
 //     read = self.fileReadSync( fileName );
 //     read = _.exec( read );
-//     _.mapExtend( o.result, read );
+//     _.props.extend( o.result, read );
 //
 //   }
 //
@@ -186,7 +186,7 @@ function configFind_body( o )
     let encoder = _.files.ReadEncoders[ e ];
     if( encoder === null )
     continue;
-    _.assert( _.objectIs( encoder ), `Read encoder ${e} is missing` );
+    _.assert( _.object.isBasic( encoder ), `Read encoder ${e} is missing` );
     if( encoder.exts )
     {
       for( let s = 0 ; s < encoder.exts.length ; s++ )
@@ -194,7 +194,7 @@ function configFind_body( o )
     }
   }
 
-  o.filePath = _.arrayAs( o.filePath );
+  o.filePath = _.array.as( o.filePath );
   _.assert( _.strsAreAll( o.filePath ) );
 
   /* */
@@ -238,7 +238,7 @@ defaults.filePath = null;
 defaults.outputFormat = 'array';
 // defaults.recursive = 1;
 
-let configFind = _.routine.uniteCloning_( Partial.prototype._preFilePathVectorWithProviderDefaults, configFind_body );
+let configFind = _.routine.uniteCloning_replaceByUnite( Partial.prototype._preFilePathVectorWithProviderDefaults, configFind_body );
 
 //
 
@@ -254,7 +254,7 @@ let configFind = _.routine.uniteCloning_( Partial.prototype._preFilePathVectorWi
 //   if( self.path.like( o ) )
 //   o = { filePath : self.path.from( o ) };
 //
-//   _.routineOptions( routine, o );
+//   _.routine.options_( routine, o );
 //
 //   o.filePath = self.path.normalize( o.filePath );
 //
@@ -302,7 +302,7 @@ function configRead_body( o )
 
   if( o.many === 'all' )
   {
-    let filePath = _.arrayAs( o.filePath ).slice();
+    let filePath = _.array.as( o.filePath ).slice();
     let found = o.found.slice();
 
     for( let f1 = filePath.length-1 ; f1 >= 0 ; f1-- )
@@ -345,7 +345,7 @@ function configRead_body( o )
     {
       let file = o.found[ f ];
 
-      let o2 = _.mapExtend( null, o );
+      let o2 = _.props.extend( null, o );
       o2.filePath = file.particularPath;
       o2.encoding = file.encoding;
       // if( o2.verbosity >= 2 )
@@ -358,7 +358,7 @@ function configRead_body( o )
       if( read === undefined )
       read = Object.create( null );
 
-      _.sure( _.mapIs( read ), () => 'Expects map, but read ' + _.entity.exportStringShallow( result ) + ' from ' + o2.filePath );
+      _.sure( _.mapIs( read ), () => 'Expects map, but read ' + _.entity.exportStringDiagnosticShallow( result ) + ' from ' + o2.filePath );
 
       if( result === null )
       result = read;
@@ -394,7 +394,7 @@ defaults.found = null;
 
 //
 
-var configRead = _.routine.uniteCloning_( Partial.prototype._preFilePathVectorWithProviderDefaults, configRead_body );
+var configRead = _.routine.uniteCloning_replaceByUnite( Partial.prototype._preFilePathVectorWithProviderDefaults, configRead_body );
 
 configRead.having.aspect = 'entry';
 
@@ -406,9 +406,9 @@ function configUserPath( o )
   let path = self.path;
 
   if( !_.mapIs( o ) )
-  o = { name : o }
+  o = { name : o || configUserPath.defaults.name }
 
-  o = _.routineOptions( configUserPath, o );
+  o = _.routine.options_( configUserPath, o );
   _.assert( _.strDefined( o.name ) );
 
   if( o.filePath )
@@ -435,9 +435,9 @@ function configUserRead( o )
   let path = self.path;
 
   if( !_.mapIs( o ) )
-  o = { name : o }
+  o = { name : o || configUserRead.defaults.name }
 
-  o = _.routineOptions( configUserRead, o );
+  o = _.routine.options_( configUserRead, o );
 
   let o2 = _.mapOnly_( null, o, self.configUserPath.defaults );
   let filePath = self.configUserPath( o2 );
@@ -470,8 +470,8 @@ function configUserWrite( o )
   let path = self.path;
 
   if( !_.mapIs( o ) )
-  o = { name : arguments[ 0 ], structure : arguments[ 1 ] }
-  o = _.routineOptions( configUserWrite, o );
+  o = { name : arguments[ 0 ], structure : ( arguments.length > 1 ? arguments[ 1 ] : null ) }
+  o = _.routine.options_( configUserWrite, o );
   _.assert( o.structure !== null );
 
   let o2 = _.mapOnly_( null, o, self.configUserPath.defaults );
@@ -511,7 +511,7 @@ function configUserLock( o )
 
   if( !_.mapIs( o ) )
   o = { name : arguments[ 0 ] }
-  o = _.routineOptions( configUserLock, o );
+  o = _.routine.options_( configUserLock, o );
 
   let filePath = self.configUserPath( o );
 
@@ -532,7 +532,7 @@ function configUserUnlock( o )
 
   if( !_.mapIs( o ) )
   o = { name : arguments[ 0 ] }
-  o = _.routineOptions( configUserUnlock, o );
+  o = _.routine.options_( configUserUnlock, o );
 
   let filePath = self.configUserPath( o );
 
@@ -554,7 +554,7 @@ function storageNameFrom( o )
 
   if( _.strIs( arguments[ 0 ] ) )
   o = { storageName : arguments[ 0 ] };
-  o = _.routineOptions( storageNameFrom, o );
+  o = _.routine.options_( storageNameFrom, o );
 
   _.assert( _.strIs( o.storageDir ), 'Expects defined {- o.storageDir -}' );
 
@@ -576,7 +576,7 @@ function storagePathFrom( o )
 
   if( _.strIs( arguments[ 0 ] ) )
   o = { storageName : arguments[ 0 ] };
-  o = _.routineOptions( storagePathFrom, o );
+  o = _.routine.options_( storagePathFrom, o );
 
   if( o.storagePath === null )
   o.storagePath = self.configUserPath( o.storageName );
@@ -597,7 +597,7 @@ function storageNameMapFrom( o )
 
   if( _.strIs( arguments[ 0 ] ) )
   o = { storageName : arguments[ 0 ] };
-  o = _.routineOptions( storageNameMapFrom, o );
+  o = _.routine.options_( storageNameMapFrom, o );
 
   if( o.storageName === null )
   o.storageName = self.storageNameFrom( o );
@@ -622,7 +622,7 @@ function storageRead( o )
 
     if( _.strIs( arguments[ 0 ] ) )
     o = { storageDir : arguments[ 0 ] };
-    o = _.routineOptions( storageRead, o );
+    o = _.routine.options_( storageRead, o );
 
     _.assert( _.strIs( o.storageDir ), 'Expects defined {- o.storageDir -}' );
 
@@ -661,13 +661,13 @@ function storageDel( o )
 
     if( _.strIs( arguments[ 0 ] ) )
     o = { storageDir : arguments[ 0 ] };
-    o = _.routineOptions( storageDel, o );
+    o = _.routine.options_( storageDel, o );
 
     _.assert( _.strIs( o.storageDir ), 'Expects defined {- o.storageDir -}' );
 
     let o2 = _.mapOnly_( null, o, self.storageNameMapFrom.defaults );
     self.storageNameMapFrom( o2 );
-    _.mapExtend( o, o2 );
+    _.props.extend( o, o2 );
 
     if( self.fileExists( o.storagePath ) )
     self.filesDelete
@@ -698,7 +698,7 @@ function storageProfileNameFrom( o )
 
   if( _.strIs( arguments[ 0 ] ) )
   o = { storageName : arguments[ 0 ] };
-  o = _.routineOptions( storageProfileNameFrom, o );
+  o = _.routine.options_( storageProfileNameFrom, o );
 
   _.assert( _.strIs( o.storageDir ), 'Expects defined {- o.storageDir -}' );
   _.assert( _.strIs( o.profileDir ), 'Expects defined {- o.profileDir -}' );
@@ -729,7 +729,7 @@ function storageProfilePathFrom( o )
 
   if( _.strIs( arguments[ 0 ] ) )
   o = { storageName : arguments[ 0 ] };
-  o = _.routineOptions( storageProfilePathFrom, o );
+  o = _.routine.options_( storageProfilePathFrom, o );
 
   if( o.storagePath === null )
   o.storagePath = self.configUserPath( o.storageName );
@@ -750,7 +750,7 @@ function storageProfileNameMapFrom( o )
 
   if( _.strIs( arguments[ 0 ] ) )
   o = { storageName : arguments[ 0 ] };
-  o = _.routineOptions( storageProfileNameMapFrom, o );
+  o = _.routine.options_( storageProfileNameMapFrom, o );
 
   if( o.storageName === null )
   o.storageName = self.storageProfileNameFrom( o );
@@ -775,7 +775,7 @@ function storageProfileRead( o )
 
     if( _.strIs( arguments[ 0 ] ) )
     o = { storageDir : arguments[ 0 ] };
-    o = _.routineOptions( storageProfileRead, o );
+    o = _.routine.options_( storageProfileRead, o );
 
     _.assert( _.strIs( o.storageDir ), 'Expects defined {- o.storageDir -}' );
     _.assert( _.strIs( o.profileDir ), 'Expects defined {- o.profileDir -}' );
@@ -815,14 +815,14 @@ function storageProfileDel( o )
 
     if( _.strIs( arguments[ 0 ] ) )
     o = { storageDir : arguments[ 0 ] };
-    o = _.routineOptions( storageProfileDel, o );
+    o = _.routine.options_( storageProfileDel, o );
 
     _.assert( _.strIs( o.storageDir ), 'Expects defined {- o.storageDir -}' );
     _.assert( _.strIs( o.profileDir ), 'Expects defined {- o.profileDir -}' );
 
     let o2 = _.mapOnly_( null, o, self.storageProfileNameMapFrom.defaults );
     self.storageProfileNameMapFrom( o2 );
-    _.mapExtend( o, o2 );
+    _.props.extend( o, o2 );
 
     if( self.fileExists( o.storagePath ) )
     self.filesDelete
@@ -853,7 +853,7 @@ function storageTerminalNameFrom( o )
 
   if( _.strIs( arguments[ 0 ] ) )
   o = { storageName : arguments[ 0 ] };
-  o = _.routineOptions( storageTerminalNameFrom, o );
+  o = _.routine.options_( storageTerminalNameFrom, o );
 
   _.assert( _.strIs( o.storageDir ), 'Expects defined {- o.storageDir -}' );
   _.assert( _.strIs( o.profileDir ), 'Expects defined {- o.profileDir -}' );
@@ -893,7 +893,7 @@ function storageTerminalPathFrom( o )
 
   if( _.strIs( arguments[ 0 ] ) )
   o = { storageName : arguments[ 0 ] };
-  o = _.routineOptions( storageTerminalPathFrom, o );
+  o = _.routine.options_( storageTerminalPathFrom, o );
 
   if( o.storagePath === null )
   o.storagePath = self.configUserPath( o.storageName );
@@ -916,7 +916,7 @@ function storageTerminalNameMapFrom( o )
 
   if( _.strIs( arguments[ 0 ] ) )
   o = { storageName : arguments[ 0 ] };
-  o = _.routineOptions( storageTerminalNameMapFrom, o );
+  o = _.routine.options_( storageTerminalNameMapFrom, o );
 
   if( o.storageName === null )
   o.storageName = self.storageTerminalNameFrom( o );
@@ -941,7 +941,7 @@ function storageTerminalRead( o )
 
     if( _.strIs( arguments[ 0 ] ) )
     o = { storageDir : arguments[ 0 ] };
-    o = _.routineOptions( storageTerminalRead, o );
+    o = _.routine.options_( storageTerminalRead, o );
 
     self.storageTerminalNameMapFrom( o );
 
@@ -976,11 +976,11 @@ function storageTerminalOpen( o )
 
     if( _.strIs( arguments[ 0 ] ) )
     o = { storageName : arguments[ 0 ] };
-    o = _.routineOptions( storageTerminalOpen, o );
+    o = _.routine.options_( storageTerminalOpen, o );
 
     let o2 = _.mapOnly_( null, o, self.storageTerminalNameFrom.defaults );
     self.storageTerminalNameMapFrom( o2 );
-    _.mapExtend( o, o2 );
+    _.props.extend( o, o2 );
 
     o.storage = self.configUserRead
     ({
@@ -1027,13 +1027,13 @@ function storageTerminalClose( o )
 
     if( _.strIs( arguments[ 0 ] ) )
     o = { storageDir : arguments[ 0 ] };
-    o = _.routineOptions( storageTerminalClose, o );
+    o = _.routine.options_( storageTerminalClose, o );
 
     _.assert( _.mapIs( o.storage ), 'Expects defined {- o.storage -}' );
 
     let o2 = _.mapOnly_( null, o, self.storageTerminalNameFrom.defaults );
     self.storageTerminalNameMapFrom( o2 );
-    _.mapExtend( o, o2 );
+    _.props.extend( o, o2 );
 
     o.storage = self.configUserWrite
     ({
@@ -1070,11 +1070,11 @@ function storageTerminalDel( o )
 
     if( _.strIs( arguments[ 0 ] ) )
     o = { storageDir : arguments[ 0 ] };
-    o = _.routineOptions( storageTerminalDel, o );
+    o = _.routine.options_( storageTerminalDel, o );
 
     let o2 = _.mapOnly_( null, o, self.storageTerminalNameMapFrom.defaults );
     self.storageTerminalNameMapFrom( o2 );
-    _.mapExtend( o, o2 );
+    _.props.extend( o, o2 );
 
     if( self.fileExists( o.storagePath ) )
     self.filesDelete
@@ -1098,7 +1098,7 @@ storageTerminalDel.defaults =
 }
 
 // --
-// relationship
+// relations
 // --
 
 let Composes =

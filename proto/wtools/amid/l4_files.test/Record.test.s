@@ -73,7 +73,7 @@ function recordFields( test )
   /* - */
 
   var dir = _.path.normalize( __dirname );
-  var fileRecord = _.FileRecord;
+  var fileRecord = _.files.FileRecord;
   var filePath, got;
   var filter = {}
   var o =
@@ -114,7 +114,7 @@ function recordFields( test )
   //
 
   test.case = 'dir/relative options';
-  var factory = _.FileRecordFactory.TolerantFrom( o, { dirPath : dir } ).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { dirPath : dir } ).form();
 
   /*absolute path, not exist*/
 
@@ -138,7 +138,7 @@ function recordFields( test )
   /*absolute path, change dir to it root, filePath - dir*/
 
   var filePath = _.path.normalize( dir );
-  var factory = _.FileRecordFactory.TolerantFrom( o, { dirPath : _.path.dir( dir ) } ).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { dirPath : _.path.dir( dir ) } ).form();
   var got = factory.record({ input : filePath, factory });
   check( got, filePath, factory );
   test.identical( got.stat.isDir(), true )
@@ -147,7 +147,7 @@ function recordFields( test )
   /*relative path without dir/relative options*/
 
   // filePath = _.path.relative( dir, __filename );
-  // var factory = _.FileRecordFactory.TolerantFrom( o, {} );
+  // var factory = _.files.FileRecordFactory.TolerantFrom( o, {} );
   // test.shouldThrowErrorSync( function()
   // {
   //   factory.record({ input : filePath, factory });
@@ -156,21 +156,21 @@ function recordFields( test )
   /*relative path with dir option*/
 
   var filePath = _.path.relative( dir, __filename );
-  var factory = _.FileRecordFactory.TolerantFrom( o, { dirPath : dir } ).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { dirPath : dir } ).form();
   var got = factory.record({ input : filePath, factory });
   check( got, __filename, factory );
 
   /*relative path with relative option*/
 
   var filePath = _.path.relative( dir, __filename );
-  var factory = _.FileRecordFactory.TolerantFrom( o, { basePath : dir } ).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { basePath : dir } ).form();
   var got = factory.record({ input : filePath, factory });
   check( got, __filename, factory );
 
   /*relative path with dir+relative, relative is root of dir*/
 
   var filePath = _.path.relative( dir, __filename );
-  var factory = _.FileRecordFactory.TolerantFrom( o, { dirPath : dir, basePath : _.path.dir( dir ) } ).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { dirPath : dir, basePath : _.path.dir( dir ) } ).form();
   var got = factory.record({ input : filePath, factory });
   // test.identical( got.relative, './file.test/Record.test.s' );
   test.identical( got.relative, './' + _.path.relative( _.path.join( __filename, '../..' ), __filename ) );
@@ -179,7 +179,7 @@ function recordFields( test )
   /*relative option can be any absolute path*/
 
   var filePath = _.path.normalize( __filename );
-  var factory = _.FileRecordFactory.TolerantFrom( o, { basePath : '/X' } ).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { basePath : '/X' } ).form();
   var got = factory.record({ input : filePath, factory });
   test.identical( got.relative, '..' + filePath );
   test.identical( got.absolute, filePath );
@@ -188,7 +188,7 @@ function recordFields( test )
   /*dir option can be any absolute path*/
 
   var filePath = _.path.normalize( __filename );
-  var factory = _.FileRecordFactory.TolerantFrom( o, { dirPath : '/X' } ).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { dirPath : '/X' } ).form();
   var got = factory.record({ input : filePath, factory });
   test.identical( got.relative, '..' + filePath );
   test.identical( got.absolute, filePath );
@@ -197,7 +197,7 @@ function recordFields( test )
   /*relative option is path to dir on other drive*/
 
   var filePath = _.path.normalize( __filename );
-  var factory = _.FileRecordFactory.TolerantFrom( o, { basePath : 'X:\\x' } ).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { basePath : 'X:\\x' } ).form();
   var got = factory.record({ input : filePath, factory });
   test.identical( got.relative, '../..' + filePath );
   test.identical( got.absolute, filePath );
@@ -206,7 +206,7 @@ function recordFields( test )
   /*dir option is path to dir on other drive*/
 
   var filePath = _.path.normalize( __filename );
-  var factory = _.FileRecordFactory.TolerantFrom( o, { basePath : 'X:\\x' } ).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { basePath : 'X:\\x' } ).form();
   var got = factory.record({ input : filePath, factory });
   test.identical( got.relative, '../..' + filePath );
   test.identical( got.absolute, filePath );
@@ -236,7 +236,7 @@ function recordFields( test )
 
   /*dir - path to other disk*/
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { dirPath : '/X'  } ).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { dirPath : '/X'  } ).form();
   var got = factory.record({ input : filePath, factory });
   test.identical( got.relative, '..' + filePath );
   test.identical( got.absolute, filePath );
@@ -245,11 +245,11 @@ function recordFields( test )
   // normalizeStrict does not exist now
   //test.identical( _.path.normalizeStrict( got.dir ), _.path.normalize( __dirname ) );
   test.identical( _.path.normalize( got.dir ), _.path.normalize( __dirname ) );
-  test.identical( _.objectIs( got.stat), true );
+  test.identical( _.object.isBasic( got.stat), true );
 
   /*relative - path to other disk*/
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { basePath : '/X'  } ).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { basePath : '/X'  } ).form();
   var got = factory.record({ input : filePath, factory });
   test.identical( got.relative, '..' + filePath );
   test.identical( got.absolute, filePath );
@@ -271,11 +271,11 @@ function recordFields( test )
    test.identical( _.path.normalizeStrict( got.dir ), _.path.normalize( __dirname ) );
   */
   test.identical( _.path.normalize( got.dir ), _.path.normalize( __dirname ) );
-  test.identical( _.objectIs( got.stat), true );
+  test.identical( _.object.isBasic( got.stat), true );
 
   /*dir - path to dir that contains that file*/
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { dirPath : __dirname  } ).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { dirPath : __dirname  } ).form();
   var got = factory.record({ input : filePath, factory });
   test.identical( got.relative, './' + _.path.name({ path : filePath, full : 1 }) );
   test.identical( got.absolute, filePath );
@@ -283,11 +283,11 @@ function recordFields( test )
   //test.identical( _.path.canonize( got.dir ), _.path.normalize( __dirname ) );
   // test.identical( _.path.normalizeStrict( got.dir ), _.path.normalize( __dirname ) );
   test.identical( _.path.normalize( got.dir ), _.path.normalize( __dirname ) );
-  test.identical( _.objectIs( got.stat), true );
+  test.identical( _.object.isBasic( got.stat), true );
 
   /*relative - path to dir that contains that file*/
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { basePath : __dirname  } ).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { basePath : __dirname  } ).form();
   var got = factory.record({ input : filePath, factory });
   test.identical( got.relative, './' + _.path.name({ path : filePath, full : 1 }) );
   test.identical( got.absolute, filePath );
@@ -295,11 +295,11 @@ function recordFields( test )
   //test.identical( _.path.canonize( got.dir ), _.path.normalize( __dirname ) );
   // test.identical( _.path.normalizeStrict( got.dir ), _.path.normalize( __dirname ) );
   test.identical( _.path.normalize( got.dir ), _.path.normalize( __dirname ) );
-  test.identical( _.objectIs( got.stat), true );
+  test.identical( _.object.isBasic( got.stat), true );
 
   /*dir === filePath */
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { dirPath : filePath  } ).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { dirPath : filePath  } ).form();
   var got = factory.record({ input : filePath, factory });
   test.identical( got.relative, '.');
   test.identical( got.absolute, filePath );
@@ -307,11 +307,11 @@ function recordFields( test )
   //test.identical( _.path.canonize( got.dir ), _.path.normalize( __dirname ) );
   // test.identical( _.path.normalizeStrict( got.dir ), _.path.normalize( __dirname ) );
   test.identical( _.path.normalize( got.dir ), _.path.normalize( __dirname ) );
-  test.identical( _.objectIs( got.stat), true );
+  test.identical( _.object.isBasic( got.stat), true );
 
   /*relative === filePath */
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { basePath : filePath  } ).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { basePath : filePath  } ).form();
   var got = factory.record({ input : filePath, factory });
   test.identical( got.relative, '.');
   test.identical( got.absolute, filePath );
@@ -319,11 +319,11 @@ function recordFields( test )
   //test.identical( _.path.canonize( got.dir ), _.path.normalize( __dirname ));
   // test.identical( _.path.normalizeStrict( got.dir ), _.path.normalize( __dirname ));
   test.identical( _.path.normalize( got.dir ), _.path.normalize( __dirname ) );
-  test.identical( _.objectIs( got.stat), true );
+  test.identical( _.object.isBasic( got.stat), true );
 
   /*dir + relative, affects only on record.relative */
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { dirPath : '/a', basePath : '/x'  } ).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { dirPath : '/a', basePath : '/x'  } ).form();
   var got = factory.record({ input : filePath, factory });
   test.identical( got.relative, '..' + filePath );
   test.identical( got.absolute, filePath );
@@ -331,7 +331,7 @@ function recordFields( test )
   // test.identical( _.path.canonize( got.dir ), _.path.normalize( __dirname ));
   // test.identical( _.path.normalizeStrict( got.dir ), _.path.normalize( __dirname ));
   test.identical( _.path.normalize( got.dir ), _.path.normalize( __dirname ) );
-  test.identical( _.objectIs( got.stat), true );
+  test.identical( _.object.isBasic( got.stat), true );
 
   //
 
@@ -346,21 +346,21 @@ function recordFields( test )
   _.fileProvider.fieldPush( 'safe', 1 );
   var dirPath = _.path.normalize( __dirname );
   dirPath = dirPath.substr( 0, dirPath.indexOf( '/', 1 ) );
-  var factory = _.FileRecordFactory.TolerantFrom( o, { dirPath } ).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { dirPath } ).form();
   test.shouldThrowErrorSync( () => record( '/', factory ) );
   _.fileProvider.fieldPush( 'safe', 1 );
 
   /*dir - path to other disk, path doesn't exist*/
 
   _.fileProvider.fieldPush( 'safe', 1 );
-  var factory = _.FileRecordFactory.TolerantFrom( o, { dirPath : '/X' } ).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { dirPath : '/X' } ).form();
   test.mustNotThrowError( () => factory.record({ input : filePath, factory }) );
   _.fileProvider.fieldPush( 'safe', 1 );
 
   /*relative - path to other disk*/
 
   _.fileProvider.fieldPush( 'safe', 0 );
-  var factory = _.FileRecordFactory.TolerantFrom( o, { basePath : '/X' } ).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { basePath : '/X' } ).form();
   var got = factory.record({ input : filePath, factory });
   test.identical( got.relative, filePath );
   test.identical( got.absolute, _.path.join( factory.basePath, name ) );
@@ -373,7 +373,7 @@ function recordFields( test )
 
   /*dir - path to dir with file*/
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { dirPath : __dirname } ).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { dirPath : __dirname } ).form();
   var got = factory.record({ input : filePath, factory });
   test.identical( got.relative, filePath );
   test.identical( got.absolute, _.path.join( factory.dirPath, name ) );
@@ -381,11 +381,11 @@ function recordFields( test )
   // test.identical( _.path.canonize( got.dir ), factory.dirPath );
   // test.identical( _.path.normalizeStrict( got.dir ), factory.dirPath );
   test.identical( _.path.normalize( got.dir ), factory.dirPath );
-  test.identical( _.objectIs( got.stat ), true );
+  test.identical( _.object.isBasic( got.stat ), true );
 
   /*relative - path to dir with file*/
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { basePath : __dirname } ).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { basePath : __dirname } ).form();
   var got = factory.record({ input : filePath, factory });
   test.identical( got.relative, filePath );
   test.identical( got.absolute, _.path.join( factory.basePath, name ) );
@@ -393,11 +393,11 @@ function recordFields( test )
   // test.identical( _.path.canonize( got.dir ), factory.basePath );
   // test.identical( _.path.normalizeStrict( got.dir ), factory.basePath );
   test.identical( _.path.normalize( got.dir ), factory.basePath );
-  test.identical( _.objectIs( got.stat ), true );
+  test.identical( _.object.isBasic( got.stat ), true );
 
   /*dir === filePath*/
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { dirPath : __filename } ).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { dirPath : __filename } ).form();
   var got = factory.record({ input : filePath, factory });
   test.identical( got.relative, filePath );
   test.identical( got.absolute, _.path.join( factory.dirPath, name ) );
@@ -409,7 +409,7 @@ function recordFields( test )
 
   /*relative === filePath*/
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { basePath : __filename } ).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { basePath : __filename } ).form();
   var got = factory.record({ input : filePath, factory });
   test.identical( got.relative, filePath );
   test.identical( got.absolute, _.path.join( factory.basePath, name ) );
@@ -422,7 +422,7 @@ function recordFields( test )
   /*dir+relative, relative affects only record.relative, dir affects on record.absolute, record.real*/
 
   _.fileProvider.fieldPush( 'safe', 0 );
-  var factory = _.FileRecordFactory.TolerantFrom( o, { dirPath : '/x', basePath : '/a' } ).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { dirPath : '/x', basePath : '/a' } ).form();
   var got = factory.record({ input : filePath, factory });
   test.identical( got.relative, '..' + _.path.join( factory.dirPath, name ) );
   test.identical( got.absolute, _.path.join( factory.dirPath, name ) );
@@ -468,7 +468,7 @@ function recordFields( test )
     test.identical( record.name, _.path.name( filePath ) );
   }
   var filePath = _.path.normalize( __filename );
-  var factory = _.FileRecordFactory.TolerantFrom( o, { dirPath : dir, onRecord : _onRecord } ).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { dirPath : dir, onRecord : _onRecord } ).form();
   factory.record({ input : filePath, factory });
 
   //
@@ -478,7 +478,7 @@ function recordFields( test )
   /*strict mode on by default, record is not extensible*/
 
   var filePath = _.path.normalize( __filename );
-  var factory = _.FileRecordFactory.TolerantFrom( o, { dirPath : _.path.dir( filePath ) } ).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { dirPath : _.path.dir( filePath ) } ).form();
   var got = factory.record({ input : filePath, factory });
   test.shouldThrowErrorSync( function()
   {
@@ -488,7 +488,7 @@ function recordFields( test )
   /*strict mode off*/
 
   var filePath = _.path.normalize( __filename );
-  var factory = _.FileRecordFactory.TolerantFrom( o, { dirPath : _.path.dir( filePath ), strict : 0 } ).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { dirPath : _.path.dir( filePath ), strict : 0 } ).form();
   var got = factory.record({ input : filePath, factory });
   test.mustNotThrowError( function()
   {
@@ -503,7 +503,7 @@ function recordFields( test )
 
   test.shouldThrowErrorSync( () =>
   {
-    _.FileRecordFactory.TolerantFrom( o, {} ).form();
+    _.files.FileRecordFactory.TolerantFrom( o, {} ).form();
   })
 }
 
@@ -512,7 +512,7 @@ function recordFields( test )
 function recordFiltering( test )
 {
   var dir = _.path.normalize( __dirname );
-  var fileRecord = _.FileRecord;
+  var fileRecord = _.files.FileRecord;
   var filePath, got;
   var filter = {}
   var o =
@@ -526,8 +526,8 @@ function recordFiltering( test )
 
   function makeFilter( o )
   {
-    _.mapSupplement( o, { system : _.fileProvider } );
-    var f = _.FileRecordFilter( o );
+    _.props.supplement( o, { system : _.fileProvider } );
+    var f = _.files.FileRecordFilter( o );
     f.form();
     return f;
   }
@@ -536,13 +536,13 @@ function recordFiltering( test )
 
   var mask = _.RegexpObject( 'Record', 'includeAny' );
   var filter = makeFilter({  maskAll : mask, basePath : filePath, filePath })
-  var factory = _.FileRecordFactory.TolerantFrom( o, { filter, basePath : filePath } ).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { filter, basePath : filePath } ).form();
   var got = factory.record({ input : filePath, factory });
   test.identical( got.isActual, false );
 
   var mask = _.RegexpObject( '.', 'includeAny' );
   var filter = makeFilter({  maskAll : mask, basePath : filePath, filePath })
-  var factory = _.FileRecordFactory.TolerantFrom( o, { filter, basePath : filePath } ).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { filter, basePath : filePath } ).form();
   var got = factory.record({ input : filePath, factory });
   test.identical( got.isActual, true );
 
@@ -550,7 +550,7 @@ function recordFiltering( test )
 
   var mask = _.RegexpObject( 'Abc', 'includeAny' );
   var filter = makeFilter({  maskAll : mask, basePath : filePath, filePath })
-  var factory = _.FileRecordFactory.TolerantFrom( o, { filter, basePath : filePath } ).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { filter, basePath : filePath } ).form();
   var got = factory.record({ input : filePath, factory });
   test.identical( got.isActual, false );
 
@@ -558,13 +558,13 @@ function recordFiltering( test )
 
   var mask = _.RegexpObject( 'Record', 'includeAny' );
   var filter = makeFilter({  maskTerminal : mask, basePath : filePath, filePath })
-  var factory = _.FileRecordFactory.TolerantFrom( o, { filter, basePath : filePath } ).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { filter, basePath : filePath } ).form();
   var got = factory.record({ input : filePath, factory });
   test.identical( got.isActual, false );
 
   var mask = _.RegexpObject( '.', 'includeAny' );
   var filter = makeFilter({  maskAll : mask, basePath : filePath, filePath })
-  var factory = _.FileRecordFactory.TolerantFrom( o, { filter, basePath : filePath } ).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { filter, basePath : filePath } ).form();
   var got = factory.record({ input : filePath, factory });
   test.identical( got.isActual, true );
 
@@ -573,7 +573,7 @@ function recordFiltering( test )
   var filePath = _.path.normalize( dir );
   var mask = _.RegexpObject( 'Record', 'includeAny' );
   var filter = makeFilter({  maskTerminal : mask, basePath : filePath, filePath })
-  var factory = _.FileRecordFactory.TolerantFrom( o, { filter, basePath : filePath } ).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { filter, basePath : filePath } ).form();
   var got = factory.record({ input : filePath, factory });
   test.identical( got.isActual, true );
 
@@ -582,14 +582,14 @@ function recordFiltering( test )
   var filePath = _.path.normalize( dir );
   var mask = _.RegexpObject( 'test', 'includeAny' );
   var filter = makeFilter({  maskDirectory : mask, basePath : filePath, filePath })
-  var factory = _.FileRecordFactory.TolerantFrom( o, { filter, basePath : filePath } ).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { filter, basePath : filePath } ).form();
   var got = factory.record({ input : filePath, factory });
   test.identical( got.isActual, false );
 
   var filePath = _.path.normalize( dir );
   var mask = _.RegexpObject( '.', 'includeAny' );
   var filter = makeFilter({  maskDirectory : mask, basePath : filePath, filePath })
-  var factory = _.FileRecordFactory.TolerantFrom( o, { filter, basePath : filePath } ).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { filter, basePath : filePath } ).form();
   var got = factory.record({ input : filePath, factory });
   test.identical( got.isActual, true );
 
@@ -598,7 +598,7 @@ function recordFiltering( test )
   var filePath = _.path.normalize( dir );
   var mask = _.RegexpObject( 'Record', 'includeAny' );
   var filter = makeFilter({  maskDirectory : mask, basePath : filePath, filePath })
-  var factory = _.FileRecordFactory.TolerantFrom( o, { filter, basePath : filePath } ).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { filter, basePath : filePath } ).form();
   var got = factory.record({ input : filePath, factory });
   test.identical( got.isActual, false );
 
@@ -607,7 +607,7 @@ function recordFiltering( test )
   var filePath = _.path.normalize( __filename );
   var mask = _.RegexpObject( 'Record', 'includeAny' );
   var filter = makeFilter({  maskDirectory : mask, basePath : filePath, filePath })
-  var factory = _.FileRecordFactory.TolerantFrom( o, { filter, basePath : filePath } ).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { filter, basePath : filePath } ).form();
   var got = factory.record({ input : filePath, factory });
   test.identical( got.isActual, true );
 
@@ -619,7 +619,7 @@ function recordFiltering( test )
 
   var filePath = _.path.normalize( __filename );
   var filter = makeFilter({ notOlder : new Date( Date.UTC( 1900, 1, 1 ) ), basePath : filePath, filePath })
-  var factory = _.FileRecordFactory.TolerantFrom( o, { filter, basePath : filePath  }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { filter, basePath : filePath  }).form();
   var got = factory.record({ input : filePath, factory });
   console.log( got.stat.mtime )
   test.identical( got.isActual, true );
@@ -628,7 +628,7 @@ function recordFiltering( test )
 
   var filePath = _.path.normalize( __filename );
   var filter = makeFilter({ notNewer : new Date( Date.UTC( 1900, 1, 1 ) ), basePath : filePath, filePath })
-  var factory = _.FileRecordFactory.TolerantFrom( o, { filter, basePath : filePath  }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { filter, basePath : filePath  }).form();
   var got = factory.record({ input : filePath, factory });
   test.identical( got.isActual, false );
 
@@ -636,7 +636,7 @@ function recordFiltering( test )
 
   var filePath = _.path.normalize( __filename );
   var filter = makeFilter({ notOlderAge : new Date( Date.UTC( 1970, 1, 1 ) ), basePath : filePath, filePath })
-  var factory = _.FileRecordFactory.TolerantFrom( o, { filter, basePath : filePath  }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { filter, basePath : filePath  }).form();
   _.debugger = 1;
   debugger;
   var got = factory.record({ input : filePath, factory });
@@ -647,7 +647,7 @@ function recordFiltering( test )
 
   var filePath = _.path.normalize( __filename );
   var filter = makeFilter({ notNewerAge : new Date( Date.UTC( 1970, 1, 1 ) ), basePath : filePath, filePath })
-  var factory = _.FileRecordFactory.TolerantFrom( o, { filter, basePath : filePath  }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { filter, basePath : filePath  }).form();
   var got = factory.record({ input : filePath, factory });
   test.identical( got.isActual, false );
 
@@ -661,7 +661,7 @@ function recordFiltering( test )
     notOlder : new Date( Date.UTC( 1970, 1, 1 ) ),
     filePath : _.path.dir( filePath )
   })
-  var factory = _.FileRecordFactory.TolerantFrom( o, { filter, basePath : _.path.dir( filePath ) }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { filter, basePath : _.path.dir( filePath ) }).form();
   var got = factory.record({ input : filePath, factory });
   test.identical( got.isActual, true );
 
@@ -675,7 +675,7 @@ function recordFiltering( test )
     notNewer : new Date( Date.UTC( 1900, 1, 1 ) ),
     filePath : _.path.dir( filePath )
   })
-  var factory = _.FileRecordFactory.TolerantFrom( o, { filter, basePath : _.path.dir( filePath )  }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { filter, basePath : _.path.dir( filePath )  }).form();
   var got = factory.record({ input : filePath, factory });
   test.identical( got.isActual, false );
 
@@ -690,7 +690,7 @@ function recordFiltering( test )
     test.identical( record.name, _.path.name( filePath ) );
   }
   var filePath = _.path.normalize( __filename );
-  var factory = _.FileRecordFactory.TolerantFrom( o, { dirPath : dir, onRecord : _onRecord } ).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { dirPath : dir, onRecord : _onRecord } ).form();
   factory.record({ input : filePath, factory });
 
   //
@@ -700,7 +700,7 @@ function recordFiltering( test )
   /*strict mode on by default, record is not extensible*/
 
   var filePath = _.path.normalize( __filename );
-  var factory = _.FileRecordFactory.TolerantFrom( o, { dirPath : _.path.dir( filePath ) } ).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { dirPath : _.path.dir( filePath ) } ).form();
   var got = factory.record({ input : filePath, factory });
   test.shouldThrowErrorSync( function()
   {
@@ -710,7 +710,7 @@ function recordFiltering( test )
   /*strict mode off*/
 
   var filePath = _.path.normalize( __filename );
-  var factory = _.FileRecordFactory.TolerantFrom( o, { dirPath : _.path.dir( filePath ), strict : 0 } ).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { dirPath : _.path.dir( filePath ), strict : 0 } ).form();
   var got = factory.record({ input : filePath, factory });
   test.mustNotThrowError( function()
   {
@@ -725,12 +725,12 @@ function recordFiltering( test )
 
   test.shouldThrowErrorSync( () =>
   {
-    _.FileRecordFactory.TolerantFrom( o, {} ).form();
+    _.files.FileRecordFactory.TolerantFrom( o, {} ).form();
   })
 
   test.shouldThrowErrorSync( () =>
   {
-    _.FileRecordFactory.TolerantFrom( o, {} ).form();
+    _.files.FileRecordFactory.TolerantFrom( o, {} ).form();
   })
 
 }
@@ -769,28 +769,28 @@ function recordForLink( test )
 
   test.case = 'link to missing';
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0, allowingMissed : 0 }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0, allowingMissed : 0 }).form();
   var record = factory.record( pathLinkToMissing );
   test.identical( record.absolute, pathLinkToMissing );
   test.identical( record.real, pathLinkToMissing );
   test.true( record.isSoftLink );
   test.true( !record.isTerminal );
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0, allowingMissed : 1 }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0, allowingMissed : 1 }).form();
   var record = factory.record( pathLinkToMissing );
   test.identical( record.absolute, pathLinkToMissing );
   test.identical( record.real, pathLinkToMissing );
   test.true( record.isSoftLink );
   test.true( !record.isTerminal );
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1, allowingMissed : 0 }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1, allowingMissed : 0 }).form();
   test.shouldThrowErrorSync( () =>
   {
     let record = factory.record( pathLinkToMissing );
     record.stat;
   });
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1, allowingMissed : 1 }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1, allowingMissed : 1 }).form();
   var record = factory.record( pathLinkToMissing );
   test.identical( record.absolute, pathLinkToMissing );
   test.identical( record.real, pathToMissing );
@@ -801,28 +801,28 @@ function recordForLink( test )
 
   test.case = 'link to link to missing';
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0, allowingMissed : 0 }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0, allowingMissed : 0 }).form();
   var record = factory.record( pathLinkToLinkToMissing );
   test.identical( record.absolute, pathLinkToLinkToMissing );
   test.identical( record.real, pathLinkToLinkToMissing );
   test.true( record.isSoftLink );
   test.true( !record.isTerminal );
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0, allowingMissed : 1 }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0, allowingMissed : 1 }).form();
   var record = factory.record( pathLinkToLinkToMissing );
   test.identical( record.absolute, pathLinkToLinkToMissing );
   test.identical( record.real, pathLinkToLinkToMissing );
   test.true( record.isSoftLink );
   test.true( !record.isTerminal );
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1, allowingMissed : 0 }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1, allowingMissed : 0 }).form();
   test.shouldThrowErrorSync( () =>
   {
     let record = factory.record( pathLinkToLinkToMissing );
     record.stat;
   });
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1, allowingMissed : 1 }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1, allowingMissed : 1 }).form();
   var record = factory.record( pathLinkToLinkToMissing );
   test.identical( record.absolute, pathLinkToLinkToMissing );
   test.identical( record.real, pathToMissing );
@@ -833,14 +833,14 @@ function recordForLink( test )
 
   test.case = 'link to terminal';
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0 }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0 }).form();
   var record = factory.record( pathLinkToTerminal );
   test.identical( record.absolute, pathLinkToTerminal );
   test.identical( record.real, pathLinkToTerminal );
   test.true( record.isSoftLink );
   test.true( !record.isTerminal );
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1 }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1 }).form();
   var record = factory.record( pathLinkToTerminal );
   test.identical( record.absolute, pathLinkToTerminal );
   test.identical( record.real, pathTerminal );
@@ -849,7 +849,7 @@ function recordForLink( test )
 
   test.case = 'link to directory';
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0 }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0 }).form();
   var record = factory.record( pathLinkToDir );
   test.identical( record.absolute, pathLinkToDir );
   test.identical( record.real, pathLinkToDir );
@@ -857,7 +857,7 @@ function recordForLink( test )
   test.true( !record.isTerminal );
   test.true( !record.isDir );
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1 }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1 }).form();
   var record = factory.record( pathLinkToDir );
   test.identical( record.absolute, pathLinkToDir );
   test.identical( record.real, pathToDir );
@@ -867,14 +867,14 @@ function recordForLink( test )
 
   test.case = 'link - link - terminal';
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0 }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0 }).form();
   var record = factory.record( pathLinkToLinkToTerminal );
   test.identical( record.absolute, pathLinkToLinkToTerminal );
   test.identical( record.real, pathLinkToLinkToTerminal );
   test.true( record.isSoftLink );
   test.true( !record.isTerminal );
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1 }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1 }).form();
   var record = factory.record( pathLinkToLinkToTerminal );
   test.identical( record.absolute, pathLinkToLinkToTerminal );
   test.identical( record.real, pathTerminal );
@@ -883,7 +883,7 @@ function recordForLink( test )
 
   test.case = 'link - link - directory';
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0 }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0 }).form();
   var record = factory.record( pathLinkToLinkToDir );
   test.identical( record.absolute, pathLinkToLinkToDir );
   test.identical( record.real, pathLinkToLinkToDir );
@@ -891,7 +891,7 @@ function recordForLink( test )
   test.true( !record.isTerminal );
   test.true( !record.isDir );
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1 }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1 }).form();
   var record = factory.record( pathLinkToLinkToDir );
   test.identical( record.absolute, pathLinkToLinkToDir );
   test.identical( record.real, pathToDir );
@@ -904,28 +904,28 @@ function recordForLink( test )
   var pathSelfCycled = _.path.join( dir, 'pathSelfCycled' );
   _.fileProvider.softLink({ dstPath : pathSelfCycled, srcPath : pathSelfCycled, allowingMissed : 1 });
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0, allowingMissed : 0 }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0, allowingMissed : 0 }).form();
   var record = factory.record( pathSelfCycled );
   test.identical( record.absolute, pathSelfCycled );
   test.identical( record.real, pathSelfCycled );
   test.true( record.isSoftLink );
   test.true( !record.isTerminal );
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0, allowingMissed : 1 }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0, allowingMissed : 1 }).form();
   var record = factory.record( pathSelfCycled );
   test.identical( record.absolute, pathSelfCycled );
   test.identical( record.real, pathSelfCycled );
   test.true( record.isSoftLink );
   test.true( !record.isTerminal );
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1, allowingMissed : 0, allowingCycled : 0 }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1, allowingMissed : 0, allowingCycled : 0 }).form();
   test.shouldThrowErrorSync( () =>
   {
     let record = factory.record( pathSelfCycled );
     record.stat;
   });
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1, allowingMissed : 0, allowingCycled : 1 }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1, allowingMissed : 0, allowingCycled : 1 }).form();
   var record = factory.record( pathSelfCycled );
   test.identical( record.absolute, pathSelfCycled );
   test.identical( record.real, pathSelfCycled );
@@ -939,28 +939,28 @@ function recordForLink( test )
   _.fileProvider.softLink({ dstPath : pathA, srcPath : pathB, allowingMissed : 1 });
   _.fileProvider.softLink({ dstPath : pathB, srcPath : pathA, allowingMissed : 1 });
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0, allowingMissed : 0, allowingCycled : 0 }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0, allowingMissed : 0, allowingCycled : 0 }).form();
   var record = factory.record( pathA );
   test.identical( record.absolute, pathA );
   test.identical( record.real, pathA );
   test.true( record.isSoftLink );
   test.true( !record.isTerminal );
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0, allowingMissed : 0, allowingCycled : 1 }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0, allowingMissed : 0, allowingCycled : 1 }).form();
   var record = factory.record( pathA );
   test.identical( record.absolute, pathA );
   test.identical( record.real, pathA );
   test.true( record.isSoftLink );
   test.true( !record.isTerminal );
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1, allowingMissed : 1, allowingCycled : 0 }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1, allowingMissed : 1, allowingCycled : 0 }).form();
   test.shouldThrowErrorSync( () =>
   {
     let record = factory.record( pathSelfCycled );
     record.stat;
   });
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1, allowingMissed : 0, allowingCycled : 1 }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1, allowingMissed : 0, allowingCycled : 1 }).form();
   var record = factory.record( pathA );
   test.identical( record.absolute, pathA );
   test.identical( record.real, pathA ); /* qqq : fix please aaa : changed expected result */
@@ -1015,28 +1015,28 @@ function recordForRelativeLink( test )
 
   test.case = 'link to missing';
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0, allowingMissed : 0 }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0, allowingMissed : 0 }).form();
   var record = factory.record( pathLinkToMissing );
   test.identical( record.absolute, pathLinkToMissing );
   test.identical( record.real, pathLinkToMissing );
   test.true( record.isSoftLink );
   test.true( !record.isTerminal );
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0, allowingMissed : 1 }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0, allowingMissed : 1 }).form();
   var record = factory.record( pathLinkToMissing );
   test.identical( record.absolute, pathLinkToMissing );
   test.identical( record.real, pathLinkToMissing );
   test.true( record.isSoftLink );
   test.true( !record.isTerminal );
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1, allowingMissed : 0 }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1, allowingMissed : 0 }).form();
   test.shouldThrowErrorSync( () =>
   {
     let record = factory.record( pathLinkToMissing );
     record.stat;
   });
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1, allowingMissed : 1 }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1, allowingMissed : 1 }).form();
   var record = factory.record( pathLinkToMissing );
   test.identical( record.absolute, pathLinkToMissing );
   test.identical( record.real, pathToMissing );
@@ -1047,28 +1047,28 @@ function recordForRelativeLink( test )
 
   test.case = 'link relative - link relative to missing';
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0, allowingMissed : 0 }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0, allowingMissed : 0 }).form();
   var record = factory.record( pathLinkToLinkToMissing );
   test.identical( record.absolute, pathLinkToLinkToMissing );
   test.identical( record.real, pathLinkToLinkToMissing );
   test.true( record.isSoftLink );
   test.true( !record.isTerminal );
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0, allowingMissed : 1 }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0, allowingMissed : 1 }).form();
   var record = factory.record( pathLinkToLinkToMissing );
   test.identical( record.absolute, pathLinkToLinkToMissing );
   test.identical( record.real, pathLinkToLinkToMissing );
   test.true( record.isSoftLink );
   test.true( !record.isTerminal );
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1, allowingMissed : 0 }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1, allowingMissed : 0 }).form();
   test.shouldThrowErrorSync( () =>
   {
     let record = factory.record( pathLinkToLinkToMissing );
     record.stat;
   });
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1, allowingMissed : 1 }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1, allowingMissed : 1 }).form();
   var record = factory.record( pathLinkToLinkToMissing );
   test.identical( record.absolute, pathLinkToLinkToMissing );
   test.identical( record.real, pathToMissing );
@@ -1079,14 +1079,14 @@ function recordForRelativeLink( test )
 
   test.case = 'link to terminal';
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0 }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0 }).form();
   var record = factory.record( pathLinkToTerminal );
   test.identical( record.absolute, pathLinkToTerminal );
   test.identical( record.real, pathLinkToTerminal );
   test.true( record.isSoftLink );
   test.true( !record.isTerminal );
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1 }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1 }).form();
   var record = factory.record( pathLinkToTerminal );
   test.identical( record.absolute, pathLinkToTerminal );
   test.identical( record.real, pathTerminal );
@@ -1095,7 +1095,7 @@ function recordForRelativeLink( test )
 
   test.case = 'link to directory';
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0 }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0 }).form();
   var record = factory.record( pathLinkToDir );
   test.identical( record.absolute, pathLinkToDir );
   test.identical( record.real, pathLinkToDir );
@@ -1103,7 +1103,7 @@ function recordForRelativeLink( test )
   test.true( !record.isTerminal );
   test.true( !record.isDir );
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1 }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1 }).form();
   var record = factory.record( pathLinkToDir );
   test.identical( record.absolute, pathLinkToDir );
   test.identical( record.real, pathToDir );
@@ -1113,14 +1113,14 @@ function recordForRelativeLink( test )
 
   test.case = 'link relative - link relative - terminal';
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0 }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0 }).form();
   var record = factory.record( pathLinkToLinkToTerminal );
   test.identical( record.absolute, pathLinkToLinkToTerminal );
   test.identical( record.real, pathLinkToLinkToTerminal );
   test.true( record.isSoftLink );
   test.true( !record.isTerminal );
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1 }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1 }).form();
   var record = factory.record( pathLinkToLinkToTerminal );
   test.identical( record.absolute, pathLinkToLinkToTerminal );
   test.identical( record.real, pathTerminal );
@@ -1129,7 +1129,7 @@ function recordForRelativeLink( test )
 
   test.case = 'link relative - link relative - directory';
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0 }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0 }).form();
   var record = factory.record( pathLinkToLinkToDir );
   test.identical( record.absolute, pathLinkToLinkToDir );
   test.identical( record.real, pathLinkToLinkToDir );
@@ -1137,7 +1137,7 @@ function recordForRelativeLink( test )
   test.true( !record.isTerminal );
   test.true( !record.isDir );
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1 }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1 }).form();
   var record = factory.record( pathLinkToLinkToDir );
   test.identical( record.absolute, pathLinkToLinkToDir );
   test.identical( record.real, pathToDir );
@@ -1157,28 +1157,28 @@ function recordForRelativeLink( test )
   });
   _.fileProvider.softLink( pathLinkAbsolute, pathLinkRelative );
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0, allowingMissed : 0 }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0, allowingMissed : 0 }).form();
   var record = factory.record( pathLinkAbsolute );
   test.identical( record.absolute, pathLinkAbsolute );
   test.identical( record.real, pathLinkAbsolute );
   test.true( record.isSoftLink );
   test.true( !record.isTerminal );
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0, allowingMissed : 1 }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0, allowingMissed : 1 }).form();
   var record = factory.record( pathLinkAbsolute );
   test.identical( record.absolute, pathLinkAbsolute );
   test.identical( record.real, pathLinkAbsolute );
   test.true( record.isSoftLink );
   test.true( !record.isTerminal );
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1, allowingMissed : 0 }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1, allowingMissed : 0 }).form();
   test.shouldThrowErrorSync( () =>
   {
     record = factory.record( pathLinkAbsolute );
     record.stat;
   });
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1, allowingMissed : 1 }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1, allowingMissed : 1 }).form();
   var record = factory.record( pathLinkAbsolute );
   test.identical( record.absolute, pathLinkAbsolute );
   test.identical( record.real, pathToMissing );
@@ -1194,7 +1194,7 @@ function recordForRelativeLink( test )
   _.fileProvider.softLink( pathLinkRelative, _.path.resolve( pathLinkRelative, pathTerminal ) );
   _.fileProvider.softLink( pathLinkAbsolute, pathLinkRelative );
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0 }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0 }).form();
   var record = factory.record( pathLinkAbsolute );
   test.identical( record.absolute, pathLinkAbsolute );
   test.identical( record.real, pathLinkAbsolute );
@@ -1202,7 +1202,7 @@ function recordForRelativeLink( test )
   test.true( !record.isTerminal );
   test.true( !record.isDir );
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1 }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1 }).form();
   var record = factory.record( pathLinkAbsolute );
   test.identical( record.absolute, pathLinkAbsolute );
   test.identical( record.real, pathTerminal );
@@ -1217,7 +1217,7 @@ function recordForRelativeLink( test )
   _.fileProvider.softLink( pathLinkRelative, _.path.resolve( pathLinkRelative, pathToDir ) );
   _.fileProvider.softLink( pathLinkAbsolute, pathLinkRelative );
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0 }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0 }).form();
   var record = factory.record( pathLinkAbsolute );
   test.identical( record.absolute, pathLinkAbsolute );
   test.identical( record.real, pathLinkAbsolute );
@@ -1225,7 +1225,7 @@ function recordForRelativeLink( test )
   test.true( !record.isTerminal );
   test.true( !record.isDir );
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1 }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1 }).form();
   var record = factory.record( pathLinkAbsolute );
   test.identical( record.absolute, pathLinkAbsolute );
   test.identical( record.real, pathToDir );
@@ -1240,28 +1240,28 @@ function recordForRelativeLink( test )
   _.fileProvider.softLink({ dstPath : pathLinkAbsolute, srcPath : pathToMissing, allowingMissed : 1 });
   _.fileProvider.softLink( pathLinkRelative, _.path.relative( pathLinkRelative, pathLinkAbsolute ) );
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0, allowingMissed : 0 }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0, allowingMissed : 0 }).form();
   var record = factory.record( pathLinkAbsolute );
   test.identical( record.absolute, pathLinkAbsolute );
   test.identical( record.real, pathLinkAbsolute );
   test.true( record.isSoftLink );
   test.true( !record.isTerminal );
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0, allowingMissed : 1 }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0, allowingMissed : 1 }).form();
   var record = factory.record( pathLinkAbsolute );
   test.identical( record.absolute, pathLinkAbsolute );
   test.identical( record.real, pathLinkAbsolute );
   test.true( record.isSoftLink );
   test.true( !record.isTerminal );
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1, allowingMissed : 0 }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1, allowingMissed : 0 }).form();
   test.shouldThrowErrorSync( () =>
   {
     let record = factory.record( pathLinkAbsolute );
     record.stat;
   });
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1, allowingMissed : 1 }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1, allowingMissed : 1 }).form();
   var record = factory.record( pathLinkAbsolute );
   test.identical( record.absolute, pathLinkAbsolute );
   test.identical( record.real, pathToMissing );
@@ -1277,7 +1277,7 @@ function recordForRelativeLink( test )
   _.fileProvider.softLink( pathLinkAbsolute, pathTerminal );
   _.fileProvider.softLink( pathLinkRelative, _.path.relative( pathLinkRelative, pathLinkAbsolute ) );
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0 }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0 }).form();
   var record = factory.record( pathLinkAbsolute );
   test.identical( record.absolute, pathLinkAbsolute );
   test.identical( record.real, pathLinkAbsolute );
@@ -1285,7 +1285,7 @@ function recordForRelativeLink( test )
   test.true( !record.isTerminal );
   test.true( !record.isDir );
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1 }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1 }).form();
   var record = factory.record( pathLinkAbsolute );
   test.identical( record.absolute, pathLinkAbsolute );
   test.identical( record.real, pathTerminal );
@@ -1300,7 +1300,7 @@ function recordForRelativeLink( test )
   _.fileProvider.softLink( pathLinkAbsolute, pathToDir );
   _.fileProvider.softLink( pathLinkRelative, _.path.relative( pathLinkRelative, pathLinkAbsolute ) );
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0 }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0 }).form();
   var record = factory.record( pathLinkAbsolute );
   test.identical( record.absolute, pathLinkAbsolute );
   test.identical( record.real, pathLinkAbsolute );
@@ -1308,7 +1308,7 @@ function recordForRelativeLink( test )
   test.true( !record.isTerminal );
   test.true( !record.isDir );
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1 }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1 }).form();
   var record = factory.record( pathLinkAbsolute );
   test.identical( record.absolute, pathLinkAbsolute );
   test.identical( record.real, pathToDir );
@@ -1321,28 +1321,28 @@ function recordForRelativeLink( test )
   var pathSelfCycled = _.path.join( dir, 'pathSelfCycled' );
   _.fileProvider.softLink({ dstPath : pathSelfCycled, srcPath : '../pathSelfCycled', allowingMissed : 1 });
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0, allowingMissed : 0 }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0, allowingMissed : 0 }).form();
   var record = factory.record( pathSelfCycled );
   test.identical( record.absolute, pathSelfCycled );
   test.identical( record.real, pathSelfCycled );
   test.true( record.isSoftLink );
   test.true( !record.isTerminal );
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0, allowingMissed : 0, allowingCycled : 1 }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0, allowingMissed : 0, allowingCycled : 1 }).form();
   var record = factory.record( pathSelfCycled );
   test.identical( record.absolute, pathSelfCycled );
   test.identical( record.real, pathSelfCycled );
   test.true( record.isSoftLink );
   test.true( !record.isTerminal );
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1, allowingMissed : 1, allowingCycled : 0 }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1, allowingMissed : 1, allowingCycled : 0 }).form();
   test.shouldThrowErrorSync( () =>
   {
     let record = factory.record( pathSelfCycled );
     record.stat;
   });
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1, allowingMissed : 0, allowingCycled : 1 }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1, allowingMissed : 0, allowingCycled : 1 }).form();
   var record = factory.record( pathSelfCycled );
   test.identical( record.absolute, pathSelfCycled );
   test.identical( record.real, pathSelfCycled );
@@ -1356,28 +1356,28 @@ function recordForRelativeLink( test )
   _.fileProvider.softLink({ dstPath : pathA, srcPath : _.path.relative( pathA, pathB ), allowingMissed : 1 });
   _.fileProvider.softLink({ dstPath : pathB, srcPath : _.path.relative( pathB, pathA ), allowingMissed : 1 });
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0, allowingMissed : 0, allowingCycled : 0 }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0, allowingMissed : 0, allowingCycled : 0 }).form();
   var record = factory.record( pathA );
   test.identical( record.absolute, pathA );
   test.identical( record.real, pathA );
   test.true( record.isSoftLink );
   test.true( !record.isTerminal );
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0, allowingMissed : 0, allowingCycled : 1 }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0, allowingMissed : 0, allowingCycled : 1 }).form();
   var record = factory.record( pathA );
   test.identical( record.absolute, pathA );
   test.identical( record.real, pathA );
   test.true( record.isSoftLink );
   test.true( !record.isTerminal );
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1, allowingMissed : 1, allowingCycled : 0 }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1, allowingMissed : 1, allowingCycled : 0 }).form();
   test.shouldThrowErrorSync( () =>
   {
     let record = factory.record( pathSelfCycled );
     record.stat;
   });
 
-  var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1, allowingMissed : 0, allowingCycled : 1 }).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1, allowingMissed : 0, allowingCycled : 1 }).form();
   var record = factory.record( pathA );
   test.identical( record.absolute, pathA );
   test.identical( record.real, pathA ); /* qqq : fix please aaa : changed expected result */
@@ -1399,7 +1399,7 @@ function recordStating( test )
     stating : false
   };
   var filePath = _.path.normalize( __filename );
-  var factory = _.FileRecordFactory.TolerantFrom( o ).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o ).form();
   var got = factory.record({ input : filePath, factory });
   var stat = got.stat;
   test.identical( stat, 0 );
@@ -1413,7 +1413,7 @@ function recordStating( test )
     stating : true
   };
   var filePath = _.path.normalize( __filename );
-  var factory = _.FileRecordFactory.TolerantFrom( o ).form();
+  var factory = _.files.FileRecordFactory.TolerantFrom( o ).form();
   var got = factory.record({ input : filePath, factory });
   var stat = got.stat;
   test.true( _.fileStatIs( stat ) );

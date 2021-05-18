@@ -25,7 +25,7 @@ function wFileRecord( o )
 
 Self.shortName = 'FileRecord';
 
-_.assert( !_.FileRecord );
+_.assert( !_.files.FileRecord );
 
 // --
 // inter
@@ -39,9 +39,9 @@ function init( o )
   o = { input : o }
 
   _.assert( arguments.length === 1 );
-  _.assert( !( arguments[ 0 ] instanceof _.FileRecordFactory ) );
+  _.assert( !( arguments[ 0 ] instanceof _.files.FileRecordFactory ) );
   _.assert( _.strIs( o.input ), () => 'Expects string {-o.input-}, but got ' + _.entity.strType( o.input ) );
-  _.assert( _.objectIs( o.factory ) );
+  _.assert( _.object.isBasic( o.factory ) );
 
   _.workpiece.initFields( record );
 
@@ -82,7 +82,7 @@ function form()
   _.assert( record.factory.system instanceof _.FileProvider.Abstract );
   _.assert( record.factory.effectiveProvider instanceof _.FileProvider.Abstract );
   _.assert( _.strIs( record.input ), '{ record.input } must be a string' );
-  _.assert( record.factory instanceof _.FileRecordFactory, 'Expects instance of { FileRecordFactory }' );
+  _.assert( record.factory instanceof _.files.FileRecordFactory, 'Expects instance of { FileRecordFactory }' );
 
   record._pathsForm();
 
@@ -111,7 +111,7 @@ function clone( src )
   _.assert( arguments.length === 0 || arguments.length === 1 );
   _.assert( _.strIs( src ) );
 
-  let result = _.FileRecord({ input : src, factory : f });
+  let result = _.files.FileRecord({ input : src, factory : f });
 
   return result;
 }
@@ -177,7 +177,7 @@ function toAbsolute( record )
   if( _.strIs( record ) )
   return record;
 
-  _.assert( _.objectIs( record ) );
+  _.assert( _.object.isBasic( record ) );
 
   let result = record.absolute;
 
@@ -392,7 +392,7 @@ function _statAnalyze()
   let path = record.path;
   let logger = fileProvider.logger || _global.logger;
 
-  _.assert( f instanceof _.FileRecordFactory, '_record expects instance of ( FileRecordFactory )' );
+  _.assert( f instanceof _.files.FileRecordFactory, '_record expects instance of ( FileRecordFactory )' );
   _.assert( fileProvider instanceof _.FileProvider.Abstract, 'Expects file provider instance of FileProvider' );
   _.assert( arguments.length === 0, 'Expects no arguments' );
 
@@ -864,7 +864,7 @@ function statCopier( it )
 {
   let record = this;
   if( it.technique === 'data' )
-  return _.property.fields( it.src );
+  return _.props.fields( it.src );
   else
   return it.src;
 }
@@ -1064,14 +1064,8 @@ _.classDeclare
 
 _.Copyable.mixin( Self );
 
-_.assert( !_global_.wFileRecord && !_.FileRecord, 'wFileRecord already defined' );
+_.assert( !_global_.wFileRecord && !_.files.FileRecord, 'wFileRecord already defined' );
 
-// --
-// export
-// --
-
-_[ Self.shortName ] = Self;
-if( typeof module !== 'undefined' )
-module[ 'exports' ] = Self;
+_.files[ Self.shortName ] = Self;
 
 })();

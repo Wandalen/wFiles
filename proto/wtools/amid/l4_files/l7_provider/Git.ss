@@ -269,29 +269,35 @@ function filesReflectSingle_body( o )
   let path = self.path;
   let con = new _.Consequence();
 
-  o.extra = o.extra || Object.create( null );
-  _.routineOptions( filesReflectSingle_body, o.extra, filesReflectSingle_body.extra );
+  o.extra = _.routine.options_( { defaults : filesReflectSingle_body.extra }, o.extra || null );
+  // o.extra = o.extra || Object.create( null );
+  // _.routine.options_( filesReflectSingle_body, o.extra, filesReflectSingle_body.extra );
 
-  _.assertRoutineOptions( filesReflectSingle_body, o );
-  // _.assert( o.mandatory === undefined )
+  _.routine.assertOptions( filesReflectSingle_body, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( _.routineIs( o.onUp ) && o.onUp.composed && o.onUp.composed.elements.length === 0, 'Not supported options' );
-  _.assert( _.routineIs( o.onDown ) && o.onDown.composed && o.onDown.composed.elements.length === 0, 'Not supported options' );
-  _.assert( _.routineIs( o.onWriteDstUp ) && o.onWriteDstUp.composed && o.onWriteDstUp.composed.elements.length === 0, 'Not supported options' );
-  _.assert( _.routineIs( o.onWriteDstDown ) && o.onWriteDstDown.composed && o.onWriteDstDown.composed.elements.length === 0, 'Not supported options' );
-  _.assert( _.routineIs( o.onWriteSrcUp ) && o.onWriteSrcUp.composed && o.onWriteSrcUp.composed.elements.length === 0, 'Not supported options' );
-  _.assert( _.routineIs( o.onWriteSrcDown ) && o.onWriteSrcDown.composed && o.onWriteSrcDown.composed.elements.length === 0, 'Not supported options' );
-  // _.assert( o.outputFormat === 'record' || o.outputFormat === 'nothing', 'Not supported options' );
-  _.assert( o.outputFormat === undefined );
-  _.assert( o.linking === 'fileCopy' || o.linking === 'hardLinkMaybe' || o.linking === 'softLinkMaybe', 'Not supported options' );
+
+  // _.assert( _.routineIs( o.onUp ) && o.onUp.composed && o.onUp.composed.bodies.length === 0, 'Not supported options' );
+  // _.assert( _.routineIs( o.onDown ) && o.onDown.composed && o.onDown.composed.bodies.length === 0, 'Not supported options' );
+  // _.assert( _.routineIs( o.onWriteDstUp ) && o.onWriteDstUp.composed && o.onWriteDstUp.composed.bodies.length === 0, 'Not supported options' );
+  // _.assert( _.routineIs( o.onWriteDstDown ) && o.onWriteDstDown.composed && o.onWriteDstDown.composed.bodies.length === 0, 'Not supported options' );
+  // _.assert( _.routineIs( o.onWriteSrcUp ) && o.onWriteSrcUp.composed && o.onWriteSrcUp.composed.bodies.length === 0, 'Not supported options' );
+  // _.assert( _.routineIs( o.onWriteSrcDown ) && o.onWriteSrcDown.composed && o.onWriteSrcDown.composed.bodies.length === 0, 'Not supported options' );
+
+  _.assert( o.onUp === null, 'Not supported options' );
+  _.assert( o.onDown === null, 'Not supported options' );
+  _.assert( o.onWriteDstUp === null, 'Not supported options' );
+  _.assert( o.onWriteDstDown === null, 'Not supported options' );
+  _.assert( o.onWriteSrcUp === null, 'Not supported options' );
+  _.assert( o.onWriteSrcDown === null, 'Not supported options' );
+
+  _.assert( o.outputFormat === 'record' || o.outputFormat === 'nothing', 'Not supported options' );
+  _.assert( o.linkingAction === 'fileCopy' || o.linkingAction === 'hardLinkMaybe' || o.linkingAction === 'softLinkMaybe', 'Not supported options' );
   _.assert( !o.src.hasFiltering(), 'Not supported options' );
   _.assert( !o.dst.hasFiltering(), 'Not supported options' );
   _.assert( o.src.formed === 3 );
   _.assert( o.dst.formed === 3 );
   _.assert( o.srcPath === undefined );
-  // _.assert( o.filter === null || !o.filter.hasFiltering(), 'Not supported options' );
   _.assert( o.filter === undefined );
-  // _.assert( !!o.recursive, 'Not supported options' );
 
   /* */
 
@@ -301,9 +307,9 @@ function filesReflectSingle_body( o )
 
   // if( _.mapIs( srcPath ) )
   // {
-  //   _.assert( _.mapVals( srcPath ).length === 1 );
-  //   _.assert( _.mapVals( srcPath )[ 0 ] === true || _.mapVals( srcPath )[ 0 ] === dstPath );
-  //   srcPath = _.mapKeys( srcPath )[ 0 ];
+  //   _.assert( _.props.vals( srcPath ).length === 1 );
+  //   _.assert( _.props.vals( srcPath )[ 0 ] === true || _.props.vals( srcPath )[ 0 ] === dstPath );
+  //   srcPath = _.props.keys( srcPath )[ 0 ];
   // }
 
   let parsed = self.pathParse( srcPath );
@@ -364,14 +370,9 @@ function filesReflectSingle_body( o )
   // !!! : remove GitConfig
   // if( gitConfigExists )
   // {
-  //   debugger;
   //   let read = localProvider.fileRead( path.join( dstPath, '.git/config' ) );
   //   let config = Ini.parse( read );
-  //   debugger;
   // }
-
-  // if( gitConfigExists )
-  // debugger;
 
   if( gitConfigExists )
   ready.then( () =>
@@ -415,7 +416,7 @@ function filesReflectSingle_body( o )
       'git branch'
     ]);
 
-    ready.ifNoErrorThen( function( arg )
+    ready.ifNoErrorThen( ( arg ) =>
     {
       // let args = arg.runs;
       let args = arg.sessions;
@@ -494,6 +495,10 @@ function filesReflectSingle_body( o )
   function recordsMake()
   {
     /* zzz : fast solution to return records instead of empty array */
+    // if( o.extra.makingRecordsFast )
+    // o.result = localProvider.dirRead({ filePath : dstPath, outputFormat : 'record' });
+    // else
+    if( o.outputFormat !== 'nothing' )
     o.result = localProvider.filesReflectEvaluate
     ({
       src : { filePath : dstPath },
@@ -586,10 +591,10 @@ extra.stashing = 0;
 
 var defaults = filesReflectSingle_body.defaults;
 let filesReflectSingle =
-_.routine.uniteCloning_( _.FileProvider.FindMixin.prototype.filesReflectSingle.head, filesReflectSingle_body );
+_.routine.uniteCloning_replaceByUnite( _.FileProvider.FindMixin.prototype.filesReflectSingle.head, filesReflectSingle_body );
 
 // --
-// relationship
+// relations
 // --
 
 /**

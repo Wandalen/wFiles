@@ -3,15 +3,6 @@
 
 'use strict';
 
-// if( typeof module !== 'undefined' )
-// {
-//
-//   require( '../UseBase.s' );
-//
-// }
-
-//
-
 /**
  * @class wFileRecordFactory
  * @namespace wTools
@@ -20,7 +11,7 @@
 
 const _global = _global_;
 const _ = _global_.wTools;
-const Parent = _.FileRecordContext;
+const Parent = _.files.FileRecordContext;
 const Self = wFileRecordFactory;
 function wFileRecordFactory( o )
 {
@@ -29,7 +20,7 @@ function wFileRecordFactory( o )
 
 Self.shortName = 'FileRecordFactory';
 
-_.assert( !_.FileRecordFactory );
+_.assert( !_.files.FileRecordFactory );
 
 // --
 // routine
@@ -198,7 +189,7 @@ function form()
     _.assert( _.strDefined( factory.basePath ) );
     _.assert( _.path.isGlobal( factory.basePath ) || path.isAbsolute( factory.basePath ), () => '{-o.basePath-} should be absolute path' + _.strQuote( factory.basePath ) );
 
-    _.assert( factory.filter === null || factory.filter instanceof _.FileRecordFilter );
+    _.assert( factory.filter === null || factory.filter instanceof _.files.FileRecordFilter );
 
     if( factory.filter )
     {
@@ -232,7 +223,7 @@ function record( o )
 {
   let factory = this;
 
-  if( o instanceof _.FileRecord )
+  if( o instanceof _.files.FileRecord )
   {
     _.assert( o.factory === factory || !!o.factory );
     return o;
@@ -246,13 +237,13 @@ function record( o )
   }
 
   _.assert( arguments.length === 1 );
-  _.assert( _.objectIs( o ) );
+  _.assert( _.object.isBasic( o ) );
   _.assert( _.strIs( o.input ), () => 'Expects string {-o.input-}, but got ' + _.entity.strType( o.input ) );
   _.assert( o.factory === undefined || o.factory === factory );
 
   o.factory = factory;
 
-  return _.FileRecord( o );
+  return _.files.FileRecord( o );
 }
 
 //
@@ -573,13 +564,6 @@ _.classDeclare
   extend : Extension,
 });
 
-_[ Self.shortName ] = Self;
-
-// --
-// export
-// --
-
-if( typeof module !== 'undefined' )
-module[ 'exports' ] = Self;
+_.files[ Self.shortName ] = Self;
 
 })();

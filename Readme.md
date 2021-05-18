@@ -1,4 +1,4 @@
-# module::Files [![status](https://img.shields.io/circleci/build/github/Wandalen/wFiles?label=Test&logo=Test)](https://circleci.com/gh/Wandalen/wFiles) [![status](https://github.com/Wandalen/wFiles/workflows/publish/badge.svg)](https://github.com/Wandalen/wFiles/actions?query=workflow%3Apublish) [![stable](https://img.shields.io/badge/stability-stable-brightgreen.svg)](https://github.com/emersion/stability-badges#stable)
+# module::Files [![status](https://img.shields.io/circleci/build/github/Wandalen/wFiles?label=Test&logo=Test)](https://circleci.com/gh/Wandalen/wFiles) [![status](https://github.com/Wandalen/wFiles/actions/workflows/StandardPublish.yml/badge.svg)](https://github.com/Wandalen/wFiles/actions/workflows/StandardPublish.yml) [![stable](https://img.shields.io/badge/stability-stable-brightgreen.svg)](https://github.com/emersion/stability-badges#stable)
 
 Collection of classes to abstract files systems. Many interfaces provide files, but not called as file systems and treated differently. For example server-side gives access to local files and browser-side HTTP/HTTPS protocol gives access to files as well, but in the very different way, it does the first. This problem forces a developer to break fundamental programming principle DRY and make code written to solve a problem not applicable to the same problem, on another platform/technology.
 
@@ -13,11 +13,11 @@ will .npm.install
 node sample/trivial/Sample.s
 ```
 
-Make sure you have utility `willbe` installed. To install willbe: `npm i -g willbe@delta`. Willbe is required to build of the module.
+Make sure you have utility `willbe` installed. To install willbe: `npm i -g willbe@stable`. Willbe is required to build of the module.
 
 ### To add to your project
 ```
-npm add 'wfiles@delta'
+npm add 'wfiles@stable'
 ```
 
 `Willbe` is not required to use the module in your project as submodule.

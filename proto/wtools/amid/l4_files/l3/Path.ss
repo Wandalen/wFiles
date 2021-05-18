@@ -7,7 +7,7 @@ const _global = _global_;
 const _ = _global_.wTools;
 const Self = _global_.wTools.path;
 
-_.assert( _.objectIs( Self ) );
+_.assert( _.object.isBasic( Self ) );
 
 // --
 // path
@@ -152,7 +152,7 @@ function dirTempAt( o )
     }
   }
 
-  o = _.routineOptions( dirTempAt, o );
+  o = _.routine.options_( dirTempAt, o );
 
   if( !o.packageName )
   o.packageName = _.idWithGuid();
@@ -224,7 +224,7 @@ Unix
 //   o.name = arguments[ 1 ];
 //   o.filePath = self.resolve( o.filePath );
 
-//   _.routineOptions( tempOpen, o );
+//   _.routine.options_( tempOpen, o );
 //   _.assert( arguments.length === 1 || arguments.length === 2 );
 //   _.assert( !!self.fileProvider );
 //   _.assert( self.isAbsolute( o.filePath ) );
@@ -273,7 +273,7 @@ function tempOpen( o )
   else
   o.filePath = self.resolve( o.filePath );
 
-  _.routineOptions( tempOpen, o );
+  _.routine.options_( tempOpen, o );
   _.assert( arguments.length <= 2 );
   _.assert( !!self.fileProvider );
   _.assert( self.isAbsolute( o.filePath ) );
@@ -340,12 +340,16 @@ function tempOpen( o )
 
   function end()
   {
-    if( o.returnResolved )
+    if( o.resolving )
     result = self.fileProvider.pathResolveLinkFull
     ({
       filePath : result,
       resolvingSoftLink : 1
     }).absolutePath;
+
+    if( self.fileProvider instanceof _.FileProvider.Default ) /* xxx qqq : for Dmytro : find better way to fix problem */ /* Dmytro : it is hack, temporary */
+    _.assert( !self.path.isGlobal( result ), 'Expects non-global path' );
+    /* xxx : qqq : uncomment and fix */
 
     if( count[ result ] === undefined )
     count[ result ] = [];
@@ -362,7 +366,7 @@ tempOpen.defaults =
 {
   filePath : null,
   name : null,
-  returnResolved : 1,
+  resolving : 1,
   auto : 1
 }
 
@@ -454,7 +458,7 @@ close /dir1
 // {
 //   let self = this;
 
-//   _.routineOptions( pathDirTempMake, arguments );
+//   _.routine.options_( pathDirTempMake, arguments );
 //   _.assert( arguments.length === 1 );
 //   _.assert( !!self.fileProvider );
 //   _.assert( self.isAbsolute( o.filePath ) );
@@ -522,7 +526,6 @@ close /dir1
 //   {
 //     _.appExitHandlerOnce( () =>
 //     {
-//       debugger;
 //       self.tempClose()
 //     });
 //     logger.log( ' . Open temp directory ' + filePath2 );
@@ -535,7 +538,7 @@ function pathDirTempMake( o )
 {
   let self = this;
 
-  _.routineOptions( pathDirTempMake, arguments );
+  _.routine.options_( pathDirTempMake, arguments );
   _.assert( arguments.length === 1 );
   _.assert( !!self.fileProvider );
   _.assert( self.isAbsolute( o.filePath ) );
@@ -558,7 +561,7 @@ function pathDirTempMake( o )
   o.name = 'tmp';
   o.name = o.name + '-' + _.idWithDateAndTime() + '.tmp';
 
-  //
+  /* */
 
   let osTempDir = self.dirTemp();
   let sameDevice = self.fileProvider.filesAreOnSameDevice( o.filePath, osTempDir );
@@ -570,7 +573,7 @@ function pathDirTempMake( o )
     return end();
   }
 
-  //
+  /* */
 
   let id = self.fileProvider.id;
 
@@ -668,8 +671,6 @@ pathDirTempMake.defaults = Object.create( tempOpen.defaults );
 //   _.assert( arguments.length <= 1 );
 //   _.assert( !!self.fileProvider );
 
-//   debugger;
-
 //   if( !self.pathDirTempForMap )
 //   return;
 
@@ -687,7 +688,6 @@ pathDirTempMake.defaults = Object.create( tempOpen.defaults );
 
 //     let devicePath = devicePathGet( tempDirPath );
 
-//     debugger;
 //     if( !self.pathDirTempForMap[ devicePath ] )
 //     throw _.err( 'Not found temp dir for device ' + devicePath );
 
@@ -718,7 +718,6 @@ pathDirTempMake.defaults = Object.create( tempOpen.defaults );
 //     delete self.pathDirTempForMap[ keyPath ];
 //     _.assert( !self.fileProvider.fileExists( tempPath ) );
 //     logger.log( ' . Close temp directory ' + tempPath );
-//     debugger;
 //     return tempPath;
 //   }
 
@@ -807,7 +806,6 @@ function tempClose( filePath )
     delete cache[ filePath ];
     _.assert( !self.fileProvider.fileExists( tempPath ), 'Temp dir:', _.strQuote( tempPath ), 'was closed, but still exist in file system.' );
     // logger.log( ' . Close temp directory ' + tempPath );
-    // debugger;
     return tempPath;
   }
 }
@@ -857,7 +855,7 @@ function tempClose( filePath )
 // {
 //   let self = this;
 
-//   _.assert( _.objectIs( self.Index ) )
+//   _.assert( _.object.isBasic( self.Index ) )
 
 //   let lockReady = self.fileProvider.fileLock
 //   ({
@@ -875,7 +873,7 @@ function tempClose( filePath )
 //   }
 //   _.assert( self.fileProvider.fileIsLocked( self.IndexPath ) );
 //   let loadedIndex = self.fileProvider.fileRead({ filePath : self.IndexPath, encoding : 'json' });
-//   _.mapExtend( loadedIndex, self.Index );
+//   _.props.extend( loadedIndex, self.Index );
 //   self.fileProvider.fileWrite({ filePath : self.IndexPath, data : loadedIndex, encoding : 'json' });
 //   self.fileProvider.fileUnlock( self.IndexPath );
 // }
@@ -893,7 +891,7 @@ function tempClose( filePath )
 //   else
 //   o.filePath = self.resolve( o.filePath );
 
-//   _.routineOptions( _nextPathDirTempOpen, o );
+//   _.routine.options_( _nextPathDirTempOpen, o );
 //   _.assert( arguments.length <= 2 );
 //   _.assert( !!self.fileProvider );
 //   _.assert( self.isAbsolute( o.filePath ) );
@@ -1008,7 +1006,7 @@ function tempClose( filePath )
 // {
 //   let self = this;
 
-//   _.routineOptions( _nextPathDirTempMake, arguments );
+//   _.routine.options_( _nextPathDirTempMake, arguments );
 //   _.assert( arguments.length === 1 );
 //   _.assert( !!self.fileProvider );
 //   _.assert( self.isAbsolute( o.filePath ) );
@@ -1118,7 +1116,6 @@ function tempClose( filePath )
 //     if( o.auto )
 //     _.process._exitHandlerOnce( () =>
 //     {
-//       debugger;
 //       self._nextPathDirTempClose({ syncLock : 1 })
 //     });
 
@@ -1144,7 +1141,7 @@ function tempClose( filePath )
 
 //   _.assert( arguments.length <= 1 );
 //   _.assert( !!self.fileProvider );
-//   _.routineOptions( _nextPathDirTempClose, o );
+//   _.routine.options_( _nextPathDirTempClose, o );
 
 //   self._loadIndex( o.syncLock );
 
@@ -1234,7 +1231,6 @@ function tempClose( filePath )
 //     delete tempDirMap[ filePath ];
 //     _.assert( !self.fileProvider.fileExists( tempPath ), 'Temp dir:', _.strQuote( tempPath ), 'was closed, but still exist in file system.' );
 //     // logger.log( ' . Close temp directory ' + tempPath );
-//     // debugger;
 //     return tempPath;
 //   }
 // }
@@ -1257,7 +1253,7 @@ function forCopy_head( routine, args )
   if( !_.mapIs( o ) )
   o = { filePath : o };
 
-  _.routineOptions( routine, o );
+  _.routine.options_( routine, o );
   _.assert( _.strIs( o.filePath ) );
   _.assert( arguments.length === 2, 'Expects exactly two arguments' );
 
@@ -1345,7 +1341,7 @@ having.aspect = 'body';
  * @module Tools/mid/Files
  */
 
-let forCopy = _.routine.uniteCloning_( forCopy_head, forCopy_body );
+let forCopy = _.routine.uniteCloning_replaceByUnite( forCopy_head, forCopy_body );
 
 forCopy.having.aspect = 'entry';
 
@@ -1359,7 +1355,7 @@ function _firstAvailable_head( routine, args )
   if( !_.mapIs( o ) )
   o = { paths : o }
 
-  _.routineOptions( routine, o );
+  _.routine.options_( routine, o );
   _.assert( _.arrayIs( o.paths ) );
   _.assert( arguments.length === 2, 'Expects exactly two arguments' );
 
@@ -1395,7 +1391,7 @@ var having = _firstAvailable_body.having = Object.create( null );
 having.driving = 0;
 having.aspect = 'body';
 
-let firstAvailable = _.routine.uniteCloning_( _firstAvailable_head, _firstAvailable_body );
+let firstAvailable = _.routine.uniteCloning_replaceByUnite( _firstAvailable_head, _firstAvailable_body );
 firstAvailable.having.aspect = 'entry';
 
 // --
@@ -1447,7 +1443,7 @@ let Extension =
 
 }
 
-_.mapExtend( Self, Extension );
+_.props.extend( Self, Extension );
 
 // --
 // export

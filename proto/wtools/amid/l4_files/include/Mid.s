@@ -7,12 +7,6 @@ if( typeof module !== 'undefined' )
 {
   const _ = require( './Basic.s' );
 
-  _.assert( !!_.FieldsStack );
-  _.assert( !_.FileRecord );
-  _.assert( !_.FileRecordFactory );
-  _.assert( !_.FileRecordFilter );
-  _.assert( !_.FileStat );
-
   require( '../l1/Namespace.s' );
 
   require( '../l2/Encoder.s' );

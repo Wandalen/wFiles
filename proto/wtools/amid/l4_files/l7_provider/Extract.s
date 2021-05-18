@@ -7,10 +7,10 @@ const _global = _global_;
 const _ = _global_.wTools;
 const Abstract = _.FileProvider.Abstract;
 const Partial = _.FileProvider.Partial;
-const FileRecord = _.FileRecord;
+const FileRecord = _.files.FileRecord;
 const Find = _.FileProvider.FindMixin;
 
-_.assert( _.routineIs( _.FileRecord ) );
+_.assert( _.routineIs( _.files.FileRecord ) );
 _.assert( _.routineIs( Abstract ) );
 _.assert( _.routineIs( Partial ) );
 _.assert( !!Find );
@@ -149,7 +149,7 @@ function pathResolveSoftLinkAct( o )
   function resolveIntermediateDirectories()
   {
     let splits = self.path.split( o.filePath );
-    let o2 = _.mapExtend( null, o );
+    let o2 = _.props.extend( null, o );
 
     o2.resolvingIntermediateDirectories = 0;
     o2.filePath = '/';
@@ -177,7 +177,7 @@ function pathResolveSoftLinkAct( o )
     let descriptor = self._descriptorRead( result );
     if( !self._DescriptorIsSoftLink( descriptor ) )
     return result;
-    let o2 = _.mapExtend( null, o );
+    let o2 = _.props.extend( null, o );
     o2.filePath = result;
     return self.pathResolveSoftLinkAct( o2 );
   }
@@ -246,7 +246,7 @@ function pathResolveTextLinkAct( o )
   function resolveIntermediateDirectories()
   {
     let splits = self.path.split( o.filePath );
-    let o2 = _.mapExtend( null, o );
+    let o2 = _.props.extend( null, o );
 
     o2.resolvingIntermediateDirectories = 0;
     o2.filePath = '/';
@@ -274,7 +274,7 @@ function pathResolveTextLinkAct( o )
     let descriptor = self._descriptorRead( result );
     if( !self._DescriptorIsTextLink( descriptor ) )
     return result;
-    let o2 = _.mapExtend( null, o );
+    let o2 = _.props.extend( null, o );
     o2.filePath = result;
     return self.pathResolveTextLinkAct( o2 );
   }
@@ -309,13 +309,19 @@ function fileReadAct( o )
   let result = null;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assertRoutineOptions( fileReadAct, o );
+  _.map.assertHasAll( o, fileReadAct.defaults );
+  // _.routine.assertOptions( fileReadAct, o );
   _.assert( _.strIs( o.encoding ) );
+  // _.assert( o.fileProvider === self );
 
-  let encoder = fileReadAct.encoders[ o.encoding ];
+  // let encoder = fileReadAct.encoders[ o.encoding ];
+  o.fileProvider = self;
+  o.encoder = fileReadAct.encoders[ o.encoding ];
+  if( o.encoder && o.encoder.onSelect)
+  o.encoder.onSelect.call( self, o );
 
   if( o.encoding )
-  if( !encoder )
+  if( !o.encoder )
   return handleError( _.err( 'Encoding: ' + o.encoding + ' is not supported!' ) )
 
   /* exec */
@@ -326,7 +332,7 @@ function fileReadAct( o )
   ({
     filePath : o.filePath,
     resolvingSoftLink : o.resolvingSoftLink,
-    resolvingTextLink : o.resolvingTextLink,
+    // resolvingTextLink : o.resolvingTextLink,
   }).absolutePath;
 
   if( self.system && _.path.isGlobal( o.filePath ) )
@@ -367,8 +373,8 @@ function fileReadAct( o )
   function handleBegin()
   {
 
-    if( encoder && encoder.onBegin )
-    _.sure( encoder.onBegin.call( self, { operation : o, encoder }) === undefined );
+    if( o.encoder && o.encoder.onBegin )
+    _.sure( o.encoder.onBegin.call( self, { operation : o, encoder : o.encoder }) === undefined );
 
   }
 
@@ -377,9 +383,9 @@ function fileReadAct( o )
   function handleEnd( data )
   {
 
-    let context = { data, operation : o, encoder };
-    if( encoder && encoder.onEnd )
-    _.sure( encoder.onEnd.call( self, context ) === undefined );
+    let context = { data, operation : o, encoder : o.encoder };
+    if( o.encoder && o.encoder.onEnd )
+    _.sure( o.encoder.onEnd.call( self, context ) === undefined );
     data = context.data;
 
     if( o.sync )
@@ -407,10 +413,10 @@ function fileReadAct( o )
       level : 0,
     });
 
-    if( encoder && encoder.onError )
+    if( o.encoder && o.encoder.onError )
     try
     {
-      err = encoder.onError.call( self, { error : err, operation : o, encoder })
+      err = o.encoder.onError.call( self, { error : err, operation : o, encoder : o.encoder })
     }
     catch( err2 )
     {
@@ -440,7 +446,7 @@ function dirReadAct( o )
   let self = this;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assertRoutineOptions( dirReadAct, o );
+  _.routine.assertOptions( dirReadAct, o );
 
   let result;
 
@@ -468,7 +474,7 @@ function dirReadAct( o )
 
     if( file !== undefined )
     {
-      if( _.objectIs( file ) )
+      if( _.object.isBasic( file ) )
       {
         result = Object.keys( file );
       }
@@ -497,7 +503,7 @@ function statReadAct( o )
   let self = this;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assertRoutineOptions( statReadAct, o );
+  _.routine.assertOptions( statReadAct, o );
 
   /* */
 
@@ -551,7 +557,7 @@ function statReadAct( o )
       return result;
     }
 
-    result = new _.FileStat();
+    result = new _.files.FileStat();
 
     if( self.extraStats && self.extraStats[ filePath ] )
     {
@@ -678,13 +684,16 @@ function fileWriteAct( o )
   let self = this;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assertRoutineOptions( fileWriteAct, o );
+  _.routine.assertOptions( fileWriteAct, o );
   _.assert( self.path.isNormalized( o.filePath ) );
   _.assert( self.WriteMode.indexOf( o.writeMode ) !== -1 );
 
-  let encoder = fileWriteAct.encoders[ o.encoding ];
+  o.fileProvider = self;
+  o.encoder = fileWriteAct.encoders[ o.encoding ];
+  if( o.encoder && o.encoder.onSelect)
+  o.encoder.onSelect.call( self, o );
 
-  _.assert( self._DescriptorIsTerminal( o.data ), 'Expects string or BufferNode, but got', _.entity.strType( o.data ) );
+  _.assert( self._DescriptorIsTerminal( o.data ), `Expects string or BufferNode, but got ${_.entity.strType( o.data )}` );
 
   /* */
 
@@ -711,12 +720,12 @@ function fileWriteAct( o )
 
   function handleBegin( read )
   {
-    if( !encoder )
+    if( !o.encoder )
     return o.data;
 
-    _.assert( _.routineIs( encoder.onBegin ) )
-    let context = { data : o.data, read, operation : o, encoder };
-    _.sure( encoder.onBegin.call( self, context ) === undefined );
+    _.assert( _.routineIs( o.encoder.onBegin ) )
+    let context = { data : o.data, read, operation : o, encoder : o.encoder };
+    _.sure( o.encoder.onBegin.call( self, context ) === undefined );
 
     return context.data;
   }
@@ -789,9 +798,10 @@ function fileWriteAct( o )
 
     _.assert( self._DescriptorIsTerminal( read ) );
 
+    /* qqq : xxx : rewrite using extending module::Tools */
     if( writeMode === 'append' || writeMode === 'prepend' )
     {
-      if( !encoder )
+      if( !o.encoder )
       {
         //converts data from file to the type of o.data
         if( _.strIs( data ) )
@@ -942,7 +952,7 @@ function fileDeleteAct( o )
 {
   let self = this;
 
-  _.assertRoutineOptions( fileDeleteAct, o );
+  _.routine.assertOptions( fileDeleteAct, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( self.path.isNormalized( o.filePath ) );
 
@@ -1011,7 +1021,7 @@ function dirMakeAct( o )
   let self = this;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assertRoutineOptions( dirMakeAct, o );
+  _.routine.assertOptions( dirMakeAct, o );
 
   /* */
 
@@ -1061,7 +1071,7 @@ function fileLockAct( o )
   _.assert( !o.sharing || o.sharing === 'process', 'not implemented' );
   _.assert( self.path.isNormalized( o.filePath ) );
   _.assert( !o.waiting || o.timeOut >= 1000 );
-  _.assertRoutineOptions( fileLockAct, arguments );
+  _.routine.assertOptions( fileLockAct, arguments );
 
   let con = _.Consequence.Try( () =>
   {
@@ -1171,7 +1181,7 @@ function fileUnlockAct( o )
   let self = this;
 
   _.assert( self.path.isNormalized( o.filePath ) );
-  _.assertRoutineOptions( fileUnlockAct, arguments );
+  _.routine.assertOptions( fileUnlockAct, arguments );
 
   let con = _.Consequence.Try( () =>
   {
@@ -1232,7 +1242,7 @@ function fileIsLockedAct( o )
 {
   let self = this;
 
-  _.assertRoutineOptions( fileIsLockedAct, arguments );
+  _.routine.assertOptions( fileIsLockedAct, arguments );
   _.assert( self.path.isNormalized( o.filePath ) );
 
   let con = _.Consequence.Try( () =>
@@ -1255,7 +1265,7 @@ _.routineExtend( fileIsLockedAct, Parent.prototype.fileIsLockedAct );
 
 
 // --
-// linking
+// linkingAction
 // --
 
 function fileRenameAct( o )
@@ -1263,7 +1273,7 @@ function fileRenameAct( o )
   let self = this;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assertRoutineOptions( fileRenameAct, arguments );
+  _.routine.assertOptions( fileRenameAct, arguments );
   _.assert( self.path.isNormalized( o.srcPath ) );
   _.assert( self.path.isNormalized( o.dstPath ) );
 
@@ -1328,7 +1338,7 @@ function fileCopyAct( o )
   let srcFile;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assertRoutineOptions( fileCopyAct, arguments );
+  _.routine.assertOptions( fileCopyAct, arguments );
   _.assert( self.path.isNormalized( o.srcPath ) );
   _.assert( self.path.isNormalized( o.dstPath ) );
 
@@ -1371,7 +1381,7 @@ function fileCopyAct( o )
     // }
     // self.fileWriteAct({ filePath : o.dstPath, data : srcFile, sync : 1 });
 
-    let data = self.fileRead({ filePath : o.srcPath, encoding : 'original.type', sync : 1, resolvingTextLink : 0 });
+    let data = self.fileRead({ filePath : o.srcPath, encoding : 'meta.original', sync : 1, resolvingTextLink : 0 });
     _.assert( data !== null && data !== undefined );
 
     if( dstStat )
@@ -1418,7 +1428,7 @@ function fileCopyAct( o )
       return self.fileRead
       ({
         filePath : o.srcPath,
-        encoding : 'original.type',
+        encoding : 'meta.original',
         sync : 0,
         resolvingTextLink : 0
       })
@@ -1522,7 +1532,7 @@ function softLinkAct( o )
   let self = this;
 
   // debugger
-  _.assertRoutineOptions( softLinkAct, arguments );
+  _.routine.assertOptions( softLinkAct, arguments );
 
   _.assert( self.path.is( o.srcPath ) );
   _.assert( self.path.isAbsolute( o.dstPath ) );
@@ -1545,7 +1555,7 @@ function softLinkAct( o )
     dstDirCheck();
 
     /*
-      qqq : add tests for linking act routines
+      qqq : add tests for linkingAction act routines
       qqq : don't forget throwing cases
     */
 
@@ -1596,7 +1606,7 @@ function hardLinkAct( o )
 {
   let self = this;
 
-  _.assertRoutineOptions( hardLinkAct, arguments );
+  _.routine.assertOptions( hardLinkAct, arguments );
   _.assert( self.path.isNormalized( o.srcPath ) );
   _.assert( self.path.isNormalized( o.dstPath ) );
 
@@ -1693,7 +1703,7 @@ function hardLinkAct( o )
           ({
             filePath : o.dstPath,
             data : srcData,
-            encoding : 'original.type',
+            encoding : 'meta.original',
             writeMode : 'rewrite',
             sync : o.sync,
             advanced : null,
@@ -1839,7 +1849,7 @@ function areHardLinkedAct( o )
 {
   let self = this;
 
-  _.assertRoutineOptions( areHardLinkedAct, arguments );
+  _.routine.assertOptions( areHardLinkedAct, arguments );
   _.assert( o.filePath.length === 2, 'Expects exactly two arguments' );
 
   if( o.filePath[ 0 ] === o.filePath[ 1 ] )
@@ -1882,7 +1892,7 @@ _.routineExtend( areHardLinkedAct, Parent.prototype.areHardLinkedAct );
 function isInoAct( o )
 {
   let self = this;
-  _.assertRoutineOptions( isInoAct, arguments );
+  _.routine.assertOptions( isInoAct, arguments );
 
   if( self.usingExtraStat )
   {
@@ -1915,7 +1925,7 @@ function filesTreeSet( src )
 
   self[ filesTreeSymbol ] = src;
 
-  if( src && _.mapKeys( src ).length && self.usingExtraStat )
+  if( src && _.props.keys( src ).length && self.usingExtraStat )
   self.statsAdopt();
 
   return src;
@@ -1944,7 +1954,7 @@ function statsAdopt()
 // {
 //   let self = this;
 //
-//   _.routineOptions( linksRebase, o );
+//   _.routine.options_( linksRebase, o );
 //   _.assert( arguments.length === 1, 'Expects single argument' );
 //   _.assert( 0, 'not tested' );
 //
@@ -2024,7 +2034,7 @@ function _descriptorRead( o )
   if( _.strIs( arguments[ 0 ] ) )
   o = { filePath : arguments[ 0 ] };
 
-  _.routineOptions( _descriptorRead, o );
+  _.routine.options_( _descriptorRead, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( !path.isGlobal( o.filePath ), 'Expects local path, but got', o.filePath );
 
@@ -2102,7 +2112,7 @@ function _descriptorResolve( o )
 
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( o.descriptor );
-  _.routineOptions( _descriptorResolve, o );
+  _.routine.options_( _descriptorResolve, o );
   self._providerDefaultsApply( o );
   _.assert( !o.resolvingTextLink );
 
@@ -2148,7 +2158,7 @@ _descriptorResolve.defaults =
 
 //   _.assert( arguments.length === 1, 'Expects single argument' );
 //   _.assert( o.descriptor );
-//   _.routineOptions( _descriptorResolve, o );
+//   _.routine.options_( _descriptorResolve, o );
 //   self._providerDefaultsApply( o );
 //   _.assert( !o.resolvingTextLink );
 
@@ -2286,14 +2296,24 @@ function _DescriptorIs( file )
 
 function _DescriptorIsDir( file )
 {
-  return _.objectIs( file );
+  return _.object.isBasic( file );
 }
 
 //
 
 function _DescriptorIsTerminal( file )
 {
-  return _.strIs( file ) || _.numberIs( file ) || _.bufferRawIs( file ) || _.bufferTypedIs( file );
+  if( _.strIs( file ) )
+  return true;
+  if( _.numberIs( file ) )
+  return true;
+  if( _.bufferRawIs( file ) )
+  return true;
+  if( _.bufferTypedIs( file ) )
+  return true;
+  if( _.bufferNodeIs( file ) )
+  return true;
+  return false;
 }
 
 //
@@ -2355,7 +2375,7 @@ function _DescriptorIsTextLink( file )
   return false;
   if( _.arrayIs( file ) )
   return false;
-  if( _.objectIs( file ) )
+  if( _.object.isBasic( file ) )
   return false;
 
   let regexp = /^link ([^\n]+)\n?$/;
@@ -2391,9 +2411,9 @@ function _descriptorWrite( o )
   let self = this;
 
   if( _.strIs( arguments[ 0 ] ) )
-  o = { filePath : arguments[ 0 ], data : arguments[ 1 ] };
+  o = { filePath : arguments[ 0 ], data : ( arguments.length > 1 ? arguments[ 1 ] : null ) };
 
-  _.routineOptions( _descriptorWrite, o );
+  _.routine.options_( _descriptorWrite, o );
   _.assert( arguments.length === 1 || arguments.length === 2 );
 
   if( o.upToken === null )
@@ -2659,12 +2679,14 @@ readEncoders[ 'buffer.bytes' ] =
 
 }
 
-readEncoders[ 'original.type' ] =
+//
+
+readEncoders[ 'meta.original' ] =
 {
 
   onBegin : function( e )
   {
-    _.assert( e.operation.encoding === 'original.type' );
+    _.assert( e.operation.encoding === 'meta.original' );
   },
 
   onEnd : function( e )
@@ -2699,11 +2721,11 @@ readEncoders[ 'buffer.node' ] =
 
 //
 
-writeEncoders[ 'original.type' ] =
+writeEncoders[ 'meta.original' ] =
 {
   onBegin : function( e )
   {
-    _.assert( e.operation.encoding === 'original.type' );
+    _.assert( e.operation.encoding === 'meta.original' );
 
     if( e.read === undefined || e.operation.writeMode === 'rewrite' )
     return;
@@ -2723,14 +2745,14 @@ writeEncoders[ 'original.type' ] =
       else
       {
         _.assert( 0, 'not implemented for:', _.entity.strType( e.read ) );
-        // _.bufferFrom({ src : data, bufferConstructor : read.constructor });
+        // _.bufferCoerceFrom({ src : data, bufferConstructor : read.constructor });
       }
     }
   }
 }
 
 // --
-// relationship
+// relations
 // --
 
 /**
@@ -2834,7 +2856,7 @@ let Extension =
   fileUnlockAct,
   fileIsLockedAct,
 
-  // linking
+  // linkingAction
 
   fileRenameAct,
   fileCopyAct,

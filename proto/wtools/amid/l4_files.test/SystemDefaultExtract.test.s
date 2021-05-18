@@ -65,7 +65,16 @@ function onRoutineEnd( test )
 {
   let context = this;
   let provider = context.provider;
-  _.sure( _.arraySetIdentical( _.mapKeys( provider.providersWithProtocolMap ), [ 'second', 'current' ] ), test.name, 'has not restored system!' );
+  _.sure( _.arraySetIdentical( _.props.keys( provider.providersWithProtocolMap ), [ 'second', 'current' ] ), test.name, 'has not restored system!' );
+}
+
+//
+
+function pathFor( filePath )
+{
+  let context = this;
+  filePath = _.path.join( context.suiteTempPath, filePath );
+  return filePath
 }
 
 //
@@ -109,11 +118,13 @@ const Proto =
 
   context :
   {
+    pathFor,
     providerMake,
     // filesTree,
     provider : null,
     providerEffective : null,
-    globalFromPreferred : null
+    globalFromPreferred : null,
+    storingEncoding : true,
   },
 
   tests :

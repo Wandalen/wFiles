@@ -45,8 +45,8 @@ function fileStatIs( src )
   if( File )
   if( src instanceof File.Stats )
   return true;
-  if( _.FileStat )
-  if( src instanceof _.FileStat )
+  if( _.files.FileStat )
+  if( src instanceof _.files.FileStat )
   return true;
   let proto = Object.getPrototypeOf( File.Stats );
   if( proto.name && src instanceof proto )
@@ -192,23 +192,20 @@ let Tools =
 
 /* zzz : clean */
 
-_.mapExtend( _, Tools );
+_.props.extend( _, Tools );
 
-let Stat =
+//
+
+let StatExtension =
 {
+
   is : fileStatIs,
   different,
   areHardLinked,
   hashStatFrom,
+
 }
 
-_.mapExtend( _.files.stat, Stat );
-
-// --
-// export
-// --
-
-if( typeof module !== 'undefined' )
-module[ 'exports' ] = Self;
+_.props.extend( _.files.stat, StatExtension );
 
 })();

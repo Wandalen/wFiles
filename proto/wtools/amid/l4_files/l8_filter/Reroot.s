@@ -32,7 +32,7 @@ function init( o )
   if( o )
   self.copy( o );
 
-  _.assert( _.objectIs( self.original ) );
+  _.assert( _.object.isBasic( self.original ) );
 
   var self = _.proxyMap( self, self.original );
 
@@ -59,7 +59,7 @@ function pathNativizeAct( filePath )
 }
 
 // --
-// relationship
+// relations
 // --
 
 var Composes =

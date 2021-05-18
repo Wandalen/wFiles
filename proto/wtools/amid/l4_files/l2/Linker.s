@@ -6,12 +6,12 @@
 const _global = _global_;
 const _ = _global_.wTools;
 
-_.assert( _.objectIs( _.files ) );
+_.assert( _.object.isBasic( _.files ) );
 
 const Self = _.files.linker = _.files.linker || Object.create( null );
 
 // --
-// linking
+// linkingAction
 // --
 
 function multiple( o, link )
@@ -32,8 +32,7 @@ function multiple( o, link )
   let records = factory.records( o.dstPath );
   // Vova : should allow missing files?
   // Kos : test routine?
-  let newestRecord,
-    mostLinkedRecord;
+  let newestRecord, mostLinkedRecord;
 
   if( o.srcPath )
   {
@@ -71,7 +70,7 @@ function multiple( o, link )
 
   if( mostLinkedRecord.absolute !== newestRecord.absolute )
   {
-    let read = self.fileRead({ filePath : newestRecord.absolute, encoding : 'original.type' });
+    let read = self.fileRead({ filePath : newestRecord.absolute, encoding : 'meta.original' });
     self.fileWrite( mostLinkedRecord.absolute, read );
     /*
       fileCopy cant be used here
@@ -157,7 +156,6 @@ function multiple( o, link )
     // if( !self.filesCanBeSame( result.src, record.src, true ) )
     // if( result.src.stat.size !== 0 || record.src.stat.size !== 0 )
     // {
-    //   debugger
     //   throw _.err
     //   (
     //     'Cant\'t rewrite destination file by source file, because they have different content and option::allowingDiscrepancy is false\n'
@@ -171,8 +169,6 @@ function multiple( o, link )
     // {
     //   if( _.files.stat.different( newestRecord.stat , record.stat ) )
     //   {
-    //     let err = _.err( 'Several files has the same date but different content', newestRecord.absolute, record.absolute );
-    //     debugger;
     //     if( o.sync )
     //     throw err;
     //     else
@@ -182,11 +178,10 @@ function multiple( o, link )
 
     if( !record.stat || !_.files.stat.areHardLinked( mostLinkedRecord.stat, record.stat ) )
     {
-      let linkOptions = _.mapExtend( null, o );
-      linkOptions.allowingMissed = 0; // Vova : hardLink does not allow missing srcPath
+      let linkOptions = _.props.extend( null, o );
+      linkOptions.allowingMissed = 0; /* Vova : hardLink does not allow missing srcPath */
       linkOptions.dstPath = record.absolute;
       linkOptions.srcPath = mostLinkedRecord.absolute;
-      debugger;
       return link.call( self, linkOptions );
     }
 
@@ -239,8 +234,8 @@ function verify1( args )
 
   _.assert( args.length === 1, 'Expects single argument' );
   _.assert( _.routineIs( c.linkDo ), 'method', c.actMethodName, 'is not implemented' );
-  _.assert( _.objectIs( c.linkDo.defaults ), 'method', c.actMethodName, 'does not have defaults, but should' );
-  _.assertRoutineOptions( c.linkBody, args );
+  _.assert( _.object.isBasic( c.linkDo.defaults ), 'method', c.actMethodName, 'does not have defaults, but should' );
+  _.routine.assertOptions( c.linkBody, args );
   _.assert( _.boolLike( o.resolvingSrcSoftLink ) || _.numberIs( o.resolvingSrcSoftLink ) );
   _.assert( _.boolLike( o.resolvingSrcTextLink ) || _.numberIs( o.resolvingSrcTextLink ) );
   _.assert( _.boolLike( o.resolvingDstSoftLink ) || _.numberIs( o.resolvingDstSoftLink ) );
@@ -285,13 +280,10 @@ function verify2()
 
   if( !o.allowingMissed || c.skippingMissed )
   {
-    if( c.srcStat === undefined )
-    debugger;
     if( !c.srcStat )
     {
       if( !o.allowingMissed )
       {
-        debugger;
         let err = _.err( 'Source file', _.strQuote( o.srcPath ), 'does not exist' );
         c.error( err );
         return true;
@@ -312,15 +304,12 @@ function verify2()
   /* */
 
   /* xxx qqq : allowingDiscrepancy should be similar to !dstRewritingOnlyPreserving */
-  if( _.boolLikeFalse( o.allowingDiscrepancy ) )
-  debugger;
   if( _.boolLikeFalse( o.allowingDiscrepancy ) ) /* qqq : cover */
   if( c.srcResolvedStat )
   if( self.fileExists( c.options2.dstPath ) )
   if( !self.filesAreSameForSure( c.options2.srcPath, c.options2.dstPath, false ) ) /* qqq xxx : optimize */
   if( Number( c.srcResolvedStat.size ) !== 0 )
   {
-    debugger;
     throw _.err
     (
       'Cant\'t rewrite destination file by source file, because they have different content and option::allowingDiscrepancy is false\n'
@@ -564,6 +553,7 @@ function linksResolve()
         resolvingTextLink : o.resolvingDstTextLink,
         allowingCycled : 1,
         allowingMissed : 1,
+        preservingRelative : 1,
       }
       let resolved = self.pathResolveLinkFull( o2 );
       o.dstPath = resolved.absolutePath;
@@ -585,18 +575,28 @@ function linksResolve()
         resolvingTextLink : o.resolvingSrcTextLink,
         allowingCycled : o.allowingCycled,
         allowingMissed : o.allowingMissed,
-        throwing : o.throwing
+        throwing : o.throwing,
+        preservingRelative : 1,
       }
       let resolved = self.pathResolveLinkFull( o2 );
       o.srcPath = resolved.absolutePath;
 
-      if( resolved.relativePath )
+      if( ( resolved.filePath !== null && path.isRelative( resolved.filePath ) ) || path.isRelative( o.relativeSrcPath ) )
       {
-        if( path.isRelative( resolved.relativePath ) || path.isRelative( o.relativeSrcPath ) )
         o.relativeSrcPath = path.relative( o.dstPath, resolved.absolutePath );
-        else
-        o.relativeSrcPath = resolved.relativePath;
       }
+      else /* xxx : qqq : ? */
+      {
+        o.relativeSrcPath = resolved.filePath;
+      }
+
+      // if( resolved.relativePath )
+      // {
+      //   if( path.isRelative( resolved.relativePath ) || path.isRelative( o.relativeSrcPath ) )
+      //   o.relativeSrcPath = path.relative( o.dstPath, resolved.absolutePath );
+      //   else
+      //   o.relativeSrcPath = resolved.relativePath;
+      // }
 
       c.srcStat = o2.stat;
 
@@ -626,7 +626,6 @@ function linksResolve()
   }
   catch( err )
   {
-    debugger;
     c.error( err );
   }
 
@@ -659,6 +658,7 @@ function linksResolveAsync()
         sync : 0,
         allowingCycled : 1,
         allowingMissed : 1,
+        preservingRelative : 1,
       }
       return self.pathResolveLinkFull( o2 ).then( ( resolved ) =>
       {
@@ -689,6 +689,7 @@ function linksResolveAsync()
         allowingCycled : o.allowingCycled,
         allowingMissed : o.allowingMissed,
         sync : 0,
+        preservingRelative : 1,
         throwing : o.throwing
       }
 
@@ -697,13 +698,31 @@ function linksResolveAsync()
       {
         o.srcPath = resolved.absolutePath;
 
-        if( resolved.relativePath )
+        if( ( resolved.filePath !== null && path.isRelative( resolved.filePath ) ) || path.isRelative( o.relativeSrcPath ) )
         {
-          if( path.isRelative( resolved.relativePath ) || path.isRelative( o.relativeSrcPath ) )
           o.relativeSrcPath = path.relative( o.dstPath, resolved.absolutePath );
-          else
-          o.relativeSrcPath = resolved.relativePath;
         }
+        else /* xxx : qqq : ? */
+        {
+          o.relativeSrcPath = resolved.filePath;
+        }
+
+        // if( resolved.filePath !== null && path.isRelative( resolved.filePath ) )
+        // {
+        //   o.relativeSrcPath = path.relative( o.dstPath, resolved.absolutePath );
+        // }
+        // else /* xxx : qqq : bad */
+        // {
+        //   o.relativeSrcPath = resolved.filePath;
+        // }
+
+        // if( resolved.relativePath )
+        // {
+        //   if( path.isRelative( resolved.relativePath ) || path.isRelative( o.relativeSrcPath ) )
+        //   o.relativeSrcPath = path.relative( o.dstPath, resolved.absolutePath );
+        //   else
+        //   o.relativeSrcPath = resolved.relativePath;
+        // }
 
         c.srcStat = o2.stat;
         return true;
@@ -948,7 +967,6 @@ function validateSize()
 
   if( !srcStat )
   {
-    debugger;
     srcStat = c.srcStat;
     if( srcStat )
     {
@@ -980,7 +998,6 @@ function validateSize()
     throw _.err( err );
   }
 
-  // if( c.actMethodName === 'softLinkAct' ||  c.actMethodName === 'textLinkAct' || c.actMethodName === 'fileCopyAct' ) /* aaa : fix temp workaround */ /* Dmytro : added option `linkMaybe`, when functor creates routine it should be 1 for link routines */
   if( c.linkMaybe )
   {
     let updateStat =  _.strBegins( dstPath, srcPath );
@@ -1009,7 +1026,9 @@ function validateSize()
     let err =
     `Failed to ${c.entryMethodName} ${o.dstPath} (${dstSize}) from ${o.srcPath} (${srcSize}). `
     + `Have different size after ${c.entryMethodName} operation.`;
-    throw _.err( err );
+    err = _.err( err );
+    debugger;
+    throw err;
   }
 
 }
@@ -1062,10 +1081,11 @@ function end( r )
 
 //
 
+/* xxx : qqq : not optimal. optimize */
 function contextMake( o )
 {
   _.assert( arguments.length === 1 );
-  _.routineOptions( contextMake, o );
+  _.routine.options_( contextMake, o );
 
   let fop = o.fop;
   let options = o.options;
@@ -1076,10 +1096,11 @@ function contextMake( o )
   c.provider = provider;
   c.linkBody = undefined;
 
+  _.assert( !!fop );
+
   if( fop )
   {
     c.actMethodName = fop.actMethodName;
-
     c.onVerify1 = fop.onVerify1;
     c.onVerify2 = fop.onVerify2;
     c.onIsLink2 = fop.onIsLink;
@@ -1088,15 +1109,11 @@ function contextMake( o )
     c.renaming = fop.renaming;
     c.skippingSamePath = fop.skippingSamePath;
     c.skippingMissed = fop.skippingMissed;
-
     c.linkDo = fop.onDo;
-
     c.options2 = _.mapOnly_( null, options, c.linkDo.defaults );
   }
-  else debugger;
 
   c.entryMethodName = undefined;
-
   c.onIsLink = onIsLink;
   c.onStat = onStat;
   c.ended = false;
@@ -1134,7 +1151,6 @@ function contextMake( o )
   }
 
   Object.preventExtensions( c );
-
   return c;
 }
 
@@ -1150,7 +1166,6 @@ contextMake.defaults =
 function functor_head( routine, args )
 {
   let self = this;
-  // let o = self._preSrcDstPathWithProviderDefaults.apply( self, arguments );
 
   let o = self._preSrcDstPathWithoutProviderDefaults.apply( self, arguments );
   self._providerDefaultsApply( o );
@@ -1169,7 +1184,7 @@ function functor( fop )
   */
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.routineOptions( functor, fop );
+  _.routine.options_( functor, fop );
 
   let onDo = fop.onDo;
   let actMethodName = fop.actMethodName;
@@ -1185,7 +1200,7 @@ function functor( fop )
   let hardLinking = fop.hardLinking;
 
   _.assert( _.routineIs( onDo ) );
-  _.assert( _.objectIs( onDo.defaults ) );
+  _.assert( _.object.isBasic( onDo.defaults ) );
   _.assert( onVerify1 === null || _.routineIs( onVerify1 ) );
   _.assert( onVerify2 === null || _.routineIs( onVerify2 ) );
   _.assert( onIsLink2 === null || _.routineIs( onIsLink2 ) );
@@ -1193,7 +1208,7 @@ function functor( fop )
   _.assert( onSizeCheck === null || _.routineIs( onSizeCheck ) );
 
   _.routineExtend( link_body, onDo );
-  link_body.defaults = _.mapExtend( null, link_body.defaults ); /* xxx qqq : redundant? */
+  link_body.defaults = _.props.extend( null, link_body.defaults ); /* xxx qqq : redundant? */
   delete link_body.defaults.originalSrcPath;
   delete link_body.defaults.originalDstPath;
   delete link_body.defaults.relativeSrcPath;
@@ -1206,7 +1221,7 @@ function functor( fop )
 
   let linkEntry = _.routine.uniteReplacing({ head : functor_head, body : link_body, name : entryMethodName });
 
-  var having = linkEntry.having = _.mapExtend( null, linkEntry.having );
+  var having = linkEntry.having = _.props.extend( null, linkEntry.having );
   having.aspect = 'entry';
 
   return linkEntry;
@@ -1218,7 +1233,6 @@ function functor( fop )
     let self = this;
     let path = self.system ? self.system.path : self.path;
     let o2;
-
     let c = Self.contextMake({ provider : self, options : o, fop });
 
     c.entryMethodName = entryMethodName;
@@ -1235,10 +1249,8 @@ function functor( fop )
 
       /*
       zzz : multiple should work not only for hardlinks
-      Vova : low priority
       */
 
-      // if( _.longIs( o.dstPath ) && c.linkDo.having.hardLinking ) /* aaa : functor cant use fields of c.linkDo! check code */
       if( _.longIs( o.dstPath ) && hardLinking )
       return multiple.call( self, o, link_body );
       _.assert( _.strIs( o.srcPath ) && _.strIs( o.dstPath ) );
@@ -1259,7 +1271,7 @@ function functor( fop )
       if( c.ended )
       return c.end();
 
-      o2 = c.options2 = _.mapExtend( c.options2, _.mapOnly_( null, o, c.linkDo.defaults ) );
+      o2 = c.options2 = _.props.extend( c.options2, _.mapOnly_( null, o, c.linkDo.defaults ) );
       o2.context = c.options2.context = c;
 
       try
@@ -1302,7 +1314,6 @@ function functor( fop )
 
       c.con.then( () =>
       {
-        // if( _.longIs( o.dstPath ) && c.linkDo.having.hardLinking )
         if( _.longIs( o.dstPath ) && hardLinking )
         {
           c.result = multiple.call( self, o, link_body );
@@ -1324,7 +1335,7 @@ function functor( fop )
         if( c.result !== undefined )
         return c.result;
         /* prepare options map and launch main part */
-        o2 = c.options2 = _.mapExtend( c.options2, _.mapOnly_( null, o, c.linkDo.defaults ) );
+        o2 = c.options2 = _.props.extend( c.options2, _.mapOnly_( null, o, c.linkDo.defaults ) );
         o2.context = c.options2.context = c;
         /* main part */
         return mainPartAsync();
@@ -1416,8 +1427,9 @@ textLink
 //
 // --
 
-let Proto =
+let LinkerExtension =
 {
+
   multiple,
 
   onIsLink,
@@ -1462,6 +1474,8 @@ let Proto =
 
 }
 
-_.mapExtend( Self, Proto )
+_.props.extend( _.files.linker, LinkerExtension )
+
+//
 
 })()

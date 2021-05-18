@@ -12,8 +12,8 @@
 
 const _global = _global_;
 const _ = _global_.wTools;
-let Routines = Object.create( null );
-const FileRecord = _.FileRecord;
+const Routines = Object.create( null );
+const FileRecord = _.files.FileRecord;
 const Parent = _.FileProvider.Partial;
 const Self = wFileSystem;
 function wFileSystem( o )
@@ -41,7 +41,6 @@ function init( o )
   if( o )
   if( o.defaultOrigin !== undefined )
   {
-    debugger;
     throw _.err( 'not tested' );
   }
 
@@ -298,7 +297,7 @@ function _recordFactoryFormEnd( recordFactory )
 {
   let self = this;
 
-  _.assert( recordFactory instanceof _.FileRecordFactory );
+  _.assert( recordFactory instanceof _.files.FileRecordFactory );
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( recordFactory.effectiveProvider instanceof _.FileProvider.Abstract, 'No provider for base path', recordFactory.basePath, 'found' );
   // _.assert( !_.path.isGlobal( recordFactory.basePath ) );
@@ -313,7 +312,7 @@ function _recordFormBegin( record )
 {
   let self = this;
 
-  _.assert( record instanceof _.FileRecord );
+  _.assert( record instanceof _.files.FileRecord );
   _.assert( arguments.length === 1, 'Expects single argument' );
 
   return record;
@@ -324,7 +323,7 @@ function _recordFormBegin( record )
 // function _recordPathForm( record )
 // {
 //   let self = this;
-//   _.assert( record instanceof _.FileRecord );
+//   _.assert( record instanceof _.files.FileRecord );
 //   _.assert( arguments.length === 1, 'Expects single argument' );
 //
 //   return record;
@@ -335,7 +334,7 @@ function _recordFormBegin( record )
 function _recordFormEnd( record )
 {
   let self = this;
-  _.assert( record instanceof _.FileRecord );
+  _.assert( record instanceof _.files.FileRecord );
   _.assert( arguments.length === 1, 'Expects single argument' );
 
   return record;
@@ -346,7 +345,7 @@ function _recordFormEnd( record )
 function _recordAbsoluteGlobalMaybeGet( record )
 {
   let self = this;
-  _.assert( record instanceof _.FileRecord );
+  _.assert( record instanceof _.files.FileRecord );
   _.assert( arguments.length === 1, 'Expects single argument' );
   return record.absoluteGlobal;
 }
@@ -356,7 +355,7 @@ function _recordAbsoluteGlobalMaybeGet( record )
 function _recordRealGlobalMaybeGet( record )
 {
   let self = this;
-  _.assert( record instanceof _.FileRecord );
+  _.assert( record instanceof _.files.FileRecord );
   _.assert( arguments.length === 1, 'Expects single argument' );
   return record.realGlobal;
 }
@@ -423,7 +422,7 @@ function _pathLocalize( filePath )
   let path = self.path;
   let r = self._pathLocalizeMaybe( filePath );
 
-  _.sure( _.objectIs( r.provider ), () => 'No provider for path ' + _.strQuote( filePath ) );
+  _.sure( _.object.isBasic( r.provider ), () => 'No provider for path ' + _.strQuote( filePath ) );
 
   return r;
 }
@@ -478,13 +477,36 @@ function _pathRelocalize( r, provider )
 
 //
 
+function _pathPrepend( provider, filePath )
+{
+  let self = this;
+  let path = self.path;
+
+  _.assert( arguments.length === 2 );
+  _.assert( _.strIs( filePath ) || filePath === null );
+
+  if( filePath === null )
+  return filePath;
+  if( !provider.originPath )
+  return filePath;
+  if( provider.originPath === self.defaultOrigin )
+  // if( provider instanceof _.FileProvider.Default && provider.originPath === self.defaultOrigin )
+  return filePath;
+  if( _.strBegins( filePath, provider.originPath ) )
+  return filePath;
+
+  return path.join( provider.originPath, filePath );
+}
+
+//
+
 function pathNativizeAct( filePath )
 {
   let self = this;
   let r = self._pathLocalize( self, filePath );
   r.localPath = r.provider.path.nativize( r.localPath );
   _.assert( 0, 'not implemented' );
-  _.assert( _.objectIs( r.provider ), 'No provider for path', filePath );
+  _.assert( _.object.isBasic( r.provider ), 'No provider for path', filePath );
   _.assert( arguments.length === 1 );
 }
 
@@ -538,10 +560,8 @@ function pathNativizeAct( filePath )
   let r = self._pathLocalize( filePath );
   if( r && r.provider )
   return r.provider.pathNativizeAct.call( r.provider, r.localPath );
-  debugger;
   if( self.defaultProvider )
   return self.defaultProvider.path.dirTemp.apply( self.defaultProvider.path, arguments );
-  debugger;
   return filePath;
 }
 
@@ -575,9 +595,26 @@ function pathResolveLinkFull_body( o )
     if( result === null )
     return null;
 
-    result.filePath = self.path.join( r.provider.originPath, result.filePath );
-    result.relativePath = self.path.join( r.provider.originPath, result.relativePath );
-    result.absolutePath = self.path.join( r.provider.originPath, result.absolutePath );
+    // xxx
+    result.filePath = self._pathPrepend( r.provider, result.filePath );
+    result.relativePath = self._pathPrepend( r.provider, result.relativePath );
+    result.absolutePath = self._pathPrepend( r.provider, result.absolutePath );
+
+    // result.filePath = self.path.join( r.provider.originPath, result.filePath );
+    // result.relativePath = self.path.join( r.provider.originPath, result.relativePath );
+    // result.absolutePath = self.path.join( r.provider.originPath, result.absolutePath );
+
+    /* xxx : qqq : cover pathResolveLinkFull, take into account all branches of _pathPrepend. use:
+
+    a.fileProvider = _.FileProvider.System({ providers : [] });
+    _.FileProvider.Git().providerRegisterTo( a.fileProvider );
+    _.FileProvider.Npm().providerRegisterTo( a.fileProvider );
+    _.FileProvider.Http().providerRegisterTo( a.fileProvider );
+    let defaultProvider = _.FileProvider.Default();
+    defaultProvider.providerRegisterTo( a.fileProvider );
+    a.fileProvider.defaultProvider = defaultProvider;
+
+    */
 
     return result;
   }
@@ -586,7 +623,7 @@ function pathResolveLinkFull_body( o )
 // _.assert( _.entity.identicalShallow( Parent.prototype.pathResolveLinkFull.body.defaults, Parent.prototype.pathResolveLinkFull.defaults ) );
 _.routineExtend( pathResolveLinkFull_body, Parent.prototype.pathResolveLinkFull.body );
 
-let pathResolveLinkFull = _.routine.uniteCloning_( Parent.prototype.pathResolveLinkFull.head, pathResolveLinkFull_body );
+let pathResolveLinkFull = _.routine.uniteCloning_replaceByUnite( Parent.prototype.pathResolveLinkFull.head, pathResolveLinkFull_body );
 
 //
 
@@ -607,25 +644,30 @@ function pathResolveLinkTail_body( o )
   if( result.filePath === null )
   return null;
 
-  result.filePath = self.path.join( r.provider.originPath, result.filePath );
-  result.absolutePath = self.path.join( r.provider.originPath, result.absolutePath );
+  result.filePath = self._pathPrepend( r.provider, result.filePath );
+  result.absolutePath = self._pathPrepend( r.provider, result.absolutePath );
+
+  // result.filePath = self.path.join( r.provider.originPath, result.filePath );
+  // result.absolutePath = self.path.join( r.provider.originPath, result.absolutePath );
+  /* qqq : cover pathResolveLinkTail, take into account all branches of _pathPrepend */
 
   return result;
 }
 
 _.routineExtend( pathResolveLinkTail_body, Parent.prototype.pathResolveLinkTail.body );
 
-let pathResolveLinkTail = _.routine.uniteCloning_( Parent.prototype.pathResolveLinkTail.head, pathResolveLinkTail_body );
+let pathResolveLinkTail = _.routine.uniteCloning_replaceByUnite( Parent.prototype.pathResolveLinkTail.head, pathResolveLinkTail_body );
 
 //
 
 function pathResolveSoftLink_body( o )
 {
-  let self = this;
+  const self = this;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
 
-  let r = self._pathLocalize( o.filePath );
+  const filePath = o.filePath;
+  const r = self._pathLocalize( o.filePath );
 
   o.filePath = r.localPath;
 
@@ -636,12 +678,13 @@ function pathResolveSoftLink_body( o )
 
   _.assert( !!result );
 
-  result = self.path.join( r.provider.originPath, result );
+  result = self._pathPrepend( r.provider, result ); /* qqq : cover pathResolveSoftLink, take into account all branches of _pathPrepend */
+  // result = self.path.join( r.provider.originPath, result );
 
-  if( result === o.filePath )
+  if( result === filePath )
+  // if( result === o.filePath )
   {
-    debugger;
-    _.assert( 0, 'not tested' );
+    // _.assert( 0, 'not tested' );
     return r.originalPath;
   }
 
@@ -650,17 +693,18 @@ function pathResolveSoftLink_body( o )
 
 _.routineExtend( pathResolveSoftLink_body, Parent.prototype.pathResolveSoftLink.body );
 
-let pathResolveSoftLink = _.routine.uniteCloning_( Parent.prototype.pathResolveSoftLink.head, pathResolveSoftLink_body );
+let pathResolveSoftLink = _.routine.uniteCloning_replaceByUnite( Parent.prototype.pathResolveSoftLink.head, pathResolveSoftLink_body );
 
 //
 
 function pathResolveTextLink_body( o )
 {
-  let self = this;
+  const self = this;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
 
-  let r = self._pathLocalize( o.filePath );
+  const filePath = o.filePath;
+  const r = self._pathLocalize( o.filePath );
 
   o.filePath = r.localPath;
 
@@ -671,12 +715,14 @@ function pathResolveTextLink_body( o )
 
   _.assert( !!result );
 
-  result = self.path.join( r.provider.originPath, result );
+  result = self._pathPrepend( r.provider, result );
+  // result = self.path.join( r.provider.originPath, result );
+  /* qqq : cover pathResolveTextLink, take into account all branches of _pathPrepend */
 
-  if( result === o.filePath )
+  // if( result === o.filePath )
+  if( result === filePath )
   {
-    debugger;
-    _.assert( 0, 'not tested' );
+    // _.assert( 0, 'not tested' );
     return r.originalPath;
   }
 
@@ -685,7 +731,7 @@ function pathResolveTextLink_body( o )
 
 _.routineExtend( pathResolveTextLink_body, Parent.prototype.pathResolveTextLink.body );
 
-let pathResolveTextLink = _.routine.uniteCloning_( Parent.prototype.pathResolveTextLink.head, pathResolveTextLink_body );
+let pathResolveTextLink = _.routine.uniteCloning_replaceByUnite( Parent.prototype.pathResolveTextLink.head, pathResolveTextLink_body );
 
 //
 
@@ -705,7 +751,7 @@ function fileRead_body( o )
   o.filePath = o.filePath.absolutePath;
 
   let r = self._pathLocalize( o.filePath );
-  let o2 = _.mapExtend( null, o );
+  let o2 = _.props.extend( null, o );
 
   o2.resolvingSoftLink = 0;
   o2.filePath = r.localPath;
@@ -716,7 +762,7 @@ function fileRead_body( o )
 
 _.routineExtend( fileRead_body, Parent.prototype.fileRead.body );
 
-const fileRead = _.routine.uniteCloning_( Parent.prototype.fileRead.head, fileRead_body );
+const fileRead = _.routine.uniteCloning_replaceByUnite( Parent.prototype.fileRead.head, fileRead_body );
 
 // --
 // linker
@@ -724,7 +770,7 @@ const fileRead = _.routine.uniteCloning_( Parent.prototype.fileRead.head, fileRe
 
 function _link_functor( fop )
 {
-  fop = _.routineOptions( _link_functor, arguments );
+  fop = _.routine.options_( _link_functor, arguments );
 
   let routine = fop.routine;
   let routineName = routine.name;
@@ -732,9 +778,9 @@ function _link_functor( fop )
 
   _.assert( _.routineIs( fop.onDifferentProviders ) || _.boolIs( fop.onDifferentProviders ) );
   _.assert( _.strDefined( routineName ) );
-  _.assert( _.objectIs( routine.defaults ) );
+  _.assert( _.object.isBasic( routine.defaults ) );
   _.assert( routine.paths === undefined );
-  _.assert( _.objectIs( routine.having ) );
+  _.assert( _.object.isBasic( routine.having ) );
 
   _.routineExtend( hubLink, routine );
 
@@ -758,7 +804,7 @@ function _link_functor( fop )
     let self = this;
     let op = Object.create( null );
     op.continue = true;
-    op.options = _.mapExtend( null, o );
+    op.options = _.props.extend( null, o );
     op.routineName = routineName;
     op.end = function end()
     {
@@ -902,7 +948,6 @@ function _fileCopyActDifferent( op )
   {
     _.assert( 0, 'Expects terminal file, not soft link' );
     // let resolvedPath = op.src.provider.pathResolveSoftLink( op.src.localPath );
-    // debugger;
     // c.result = op.dst.provider.softLink
     // ({
     //   dstPath : op.dst.localPath,
@@ -930,7 +975,7 @@ function _fileCopyActDifferent( op )
     filePath : op.src.localPath,
     resolvingTextLink : 1,
     resolvingSoftLink : 1,
-    encoding : 'original.type',
+    encoding : 'meta.original',
     sync : o.sync,
   });
 
@@ -940,7 +985,7 @@ function _fileCopyActDifferent( op )
     ({
       filePath : op.dst.localPath,
       data : read,
-      encoding : 'original.type',
+      encoding : 'meta.original',
     });
 
     dstPathValidate();
@@ -954,7 +999,7 @@ function _fileCopyActDifferent( op )
         filePath : op.dst.localPath,
         data : read,
         sync : 0,
-        encoding : 'original.type',
+        encoding : 'meta.original',
       });
     })
     .then( ( arg ) =>
@@ -993,7 +1038,7 @@ function hardLinkBreak_body( o )
   _.assert( arguments.length === 1, 'Expects single argument' );
 
   let r = self._pathLocalize( o.filePath );
-  let o2 = _.mapExtend( null, o );
+  let o2 = _.props.extend( null, o );
 
   o2.filePath = r.localPath;
 
@@ -1002,7 +1047,7 @@ function hardLinkBreak_body( o )
 
 _.routineExtend( hardLinkBreak_body, Parent.prototype.hardLinkBreak.body );
 
-let hardLinkBreak = _.routine.uniteCloning_( Parent.prototype._preFilePathScalarWithProviderDefaults, hardLinkBreak_body );
+let hardLinkBreak = _.routine.uniteCloning_replaceByUnite( Parent.prototype._preFilePathScalarWithProviderDefaults, hardLinkBreak_body );
 
 //
 
@@ -1010,7 +1055,7 @@ function areHardLinkedAct( o )
 {
   let self = this;
 
-  _.assertRoutineOptions( areHardLinkedAct, arguments );
+  _.routine.assertOptions( areHardLinkedAct, arguments );
   _.assert( o.filePath.length === 2, 'Expects exactly two arguments' );
 
   let dst = self._pathLocalize( o.filePath[ 0 ] );
@@ -1036,14 +1081,14 @@ function dirMake_body( o )
   _.assert( arguments.length === 1 );
 
   let r = self._pathLocalize( o.filePath );
-  let o2 = _.mapExtend( null, o );
+  let o2 = _.props.extend( null, o );
   o2.filePath = r.localPath;
   return r.provider.dirMake.body.call( r.provider, o2 );
 }
 
 _.routineExtend( dirMake_body, Parent.prototype.dirMake.body );
 
-let dirMake = _.routine.uniteCloning_( Parent.prototype.dirMake.head, dirMake_body );
+let dirMake = _.routine.uniteCloning_replaceByUnite( Parent.prototype.dirMake.head, dirMake_body );
 
 // --
 // accessor
@@ -1152,9 +1197,6 @@ function _defaultOriginSet( src )
 //   for( var f in self.providersWithProtocolMap )
 //   {
 //     const fileProvider = self.providersWithProtocolMap[ f ];
-//     if( fileProvider.verbosity !== self.verbosity )
-//     debugger;
-//     // debugger;
 //     fileProvider.verbosity = self.verbosity;
 //   }
 //
@@ -1216,14 +1258,14 @@ function _Setup1()
     return;
 
     if(  original.defaults )
-    _.assert( _.objectIs( original.operates ) );
+    _.assert( _.object.isBasic( original.operates ) );
     if(  original.operates )
-    _.assert( _.objectIs( original.defaults ) );
+    _.assert( _.object.isBasic( original.defaults ) );
 
     let hubResolving = having.hubResolving;
     let havingBare = having.driving;
     var operates = original.operates;
-    let operatesLength = operates ? _.mapKeys( operates ).length : 0;
+    let operatesLength = operates ? _.props.keys( operates ).length : 0;
     let head = original.head;
     let body = original.body;
 
@@ -1262,14 +1304,14 @@ function _Setup1()
         }
         else
         {
-          if( o[ p ] instanceof _.FileRecord )
+          if( o[ p ] instanceof _.files.FileRecord )
           continue;
 
           o[ p ] = self.path.preferredFromGlobal( o[ p ] );
         }
       }
 
-      _.assert( _.objectIs( provider ), 'No provider for path', filePath );
+      _.assert( _.object.isBasic( provider ), 'No provider for path', filePath );
       return provider;
     }
 
@@ -1290,11 +1332,11 @@ function _Setup1()
         if( head )
         o = head.call( this, wrap, arguments );
 
-        let o2 = _.mapExtend( null, o );
+        let o2 = _.props.extend( null, o );
 
         if( !head && wrap.defaults )
         if( !wrap.having || !wrap.having.driving )
-        _.routineOptions( wrap, o2 );
+        _.routine.options_( wrap, o2 );
 
         let provider = self;
 
@@ -1335,7 +1377,7 @@ function Init()
     missingMap[ r ] = 'Routines.' + r;
   }
 
-  _.assert( !_.mapKeys( missingMap ).length, 'routine(s) were not written into Extension explicitly', '\n', _.entity.exportString( missingMap, { stringWrapper : '' } ) );
+  _.assert( !_.props.keys( missingMap ).length, 'routine(s) were not written into Extension explicitly', '\n', _.entity.exportString( missingMap, { stringWrapper : '' } ) );
   _.assert( !FilteredRoutines.pathResolveLinkFull );
   _.assert( !( 'pathResolveLinkFull' in FilteredRoutines ) );
   _.map.assertHasNoUndefine( FilteredRoutines );
@@ -1402,7 +1444,7 @@ let Path = _.uri.CloneExtending({ fileProvider : Self });
 _.assert( _.prototype.has( Path, _.uri ) );
 
 // --
-// relationship
+// relations
 // --
 
 let defaultProviderSymbol = Symbol.for( 'defaultProvider' );
@@ -1516,6 +1558,7 @@ let Extension =
   _pathLocalize,
   _pathLocalizeMaybe,
   _pathRelocalize,
+  _pathPrepend,
 
   pathCurrentAct,
   pathDirTempAct,

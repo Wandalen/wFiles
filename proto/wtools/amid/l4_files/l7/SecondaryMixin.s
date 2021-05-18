@@ -5,14 +5,14 @@
 
 const _global = _global_;
 const _ = _global_.wTools;
-const FileRecord = _.FileRecord;
+const FileRecord = _.files.FileRecord;
 const Abstract = _.FileProvider.Abstract;
 const Partial = _.FileProvider.Partial;
 const Find = _.FileProvider.FindMixin;
 const fileRead = Partial.prototype.fileRead;
 
-_.assert( _.lengthOf( _.files.ReadEncoders ) > 0 );
-_.assert( _.routineIs( _.FileRecord ) );
+_.assert( _.entity.lengthOf( _.files.ReadEncoders ) > 0 );
+_.assert( _.routineIs( _.files.FileRecord ) );
 _.assert( _.routineIs( Abstract ) );
 _.assert( _.routineIs( Partial ) );
 _.assert( _.routineIs( Find ) );
@@ -51,17 +51,17 @@ Self.shortName = 'SecondaryMixin';
 //
 //   if( o.preset )
 //   {
-//     _.assert( _.objectIs( filesReadOld.presets[ o.preset ] ), 'unknown preset', o.preset );
+//     _.assert( _.object.isBasic( filesReadOld.presets[ o.preset ] ), 'unknown preset', o.preset );
 //     _.mapSupplementAppending( o, filesReadOld.presets[ o.preset ] );
 //   }
 //
-//   _.routineOptions( filesReadOld, o );
+//   _.routine.options_( filesReadOld, o );
 //   _.assert( arguments.length === 1, 'Expects single argument' );
-//   _.assert( _.arrayIs( o.paths ) || _.objectIs( o.paths ) || _.strIs( o.paths ) );
+//   _.assert( _.arrayIs( o.paths ) || _.object.isBasic( o.paths ) || _.strIs( o.paths ) );
 //
-//   o.onBegin = o.onBegin ? _.arrayAs( o.onBegin ) : [];
-//   o.onEnd = o.onEnd ? _.arrayAs( o.onEnd ) : [];
-//   o.onProgress = o.onProgress ? _.arrayAs( o.onProgress ) : [];
+//   o.onBegin = o.onBegin ? _.array.as( o.onBegin ) : [];
+//   o.onEnd = o.onEnd ? _.array.as( o.onEnd ) : [];
+//   o.onProgress = o.onProgress ? _.array.as( o.onProgress ) : [];
 //
 //   let onBegin = o.onBegin;
 //   let onEnd = o.onEnd;
@@ -83,7 +83,7 @@ Self.shortName = 'SecondaryMixin';
 //
 //   /* paths */
 //
-//   if( _.objectIs( o.paths ) )
+//   if( _.object.isBasic( o.paths ) )
 //   {
 //     let _paths = [];
 //     for( let p in o.paths )
@@ -91,7 +91,7 @@ Self.shortName = 'SecondaryMixin';
 //     o.paths = _paths;
 //   }
 //
-//   o.paths = _.arrayAs( o.paths );
+//   o.paths = _.array.as( o.paths );
 //
 //   /* result */
 //
@@ -123,12 +123,12 @@ Self.shortName = 'SecondaryMixin';
 //     let readOptions = _.mapOnly_( null, o, self.fileRead.defaults );
 //     readOptions.onEnd = o.onEach;
 //
-//     if( _.objectIs( src ) )
+//     if( _.object.isBasic( src ) )
 //     {
-//       if( _.FileRecord && src instanceof _.FileRecord )
+//       if( _.files.FileRecord && src instanceof _.files.FileRecord )
 //       readOptions.filePath = src.absolute;
 //       else
-//       _.mapExtend( readOptions, _.mapOnly_( null, src, self.fileRead.defaults ) );
+//       _.props.extend( readOptions, _.mapOnly_( null, src, self.fileRead.defaults ) );
 //     }
 //     else
 //     readOptions.filePath = src;
@@ -164,7 +164,7 @@ Self.shortName = 'SecondaryMixin';
 //
 //     let read = got;
 //     if( !o.returningRead )
-//     read = _.map_( null, got, ( e ) => e.result );
+//     read = _.container.map_( null, got, ( e ) => e.result );
 //
 //     if( o.map === 'name' )
 //     {
@@ -181,7 +181,7 @@ Self.shortName = 'SecondaryMixin';
 //         {
 //           name = self.path.name( path );
 //         }
-//         else if( _.objectIs( path ) )
+//         else if( _.object.isBasic( path ) )
 //         {
 //           _.assert( _.strIs( path.name ) )
 //           name = path.name;
@@ -411,7 +411,7 @@ function _filesReadOldAsync( o )
 //     return  { stat : file };
 //     else if( _.strIs( file ) )
 //     return { stat : self.statResolvedRead( file ) };
-//     else if( !_.objectIs( file ) )
+//     else if( !_.object.isBasic( file ) )
 //     throw _.err( 'unknown descriptor of file' );
 //   }
 //
@@ -475,7 +475,7 @@ function filesAreUpToDate2_head( routine, args )
   _.assert( arguments.length === 2 );
   _.assert( !o.newer || _.dateIs( o.newer ) );
 
-  _.routineOptions( routine, o );
+  _.routine.options_( routine, o );
 
   return o;
 }
@@ -484,7 +484,7 @@ function filesAreUpToDate2_body( o )
 {
   let self = this;
   let factory = self.recordFactory({ allowingMissed : 1 });
-  let srcFiles = factory.records( _.arrayAs( o.src ) );
+  let srcFiles = factory.records( _.array.as( o.src ) );
 
   if( !srcFiles.length )
   {
@@ -508,7 +508,7 @@ function filesAreUpToDate2_body( o )
 
   /* */
 
-  let dstFiles = factory.records( _.arrayAs( o.dst ) );
+  let dstFiles = factory.records( _.array.as( o.dst ) );
   if( !dstFiles.length )
   {
     if( o.verbosity )
@@ -574,7 +574,7 @@ having.writing = 0;
 having.reading = 1;
 having.driving = 0;
 
-var filesAreUpToDate2 = _.routine.uniteCloning_( filesAreUpToDate2_head, filesAreUpToDate2_body );
+var filesAreUpToDate2 = _.routine.uniteCloning_replaceByUnite( filesAreUpToDate2_head, filesAreUpToDate2_body );
 
 //
 
@@ -590,7 +590,7 @@ function filesAreOnSameDevice_head( routine, args )
     o = { src : args[ 0 ], dst : args[ 1 ] }
   }
 
-  _.routineOptions( routine, o );
+  _.routine.options_( routine, o );
 
   _.assert( _.strDefined( o.src ) );
   _.assert( _.strDefined( o.dst ) );
@@ -650,7 +650,7 @@ having.writing = 0;
 having.reading = 1;
 having.driving = 0;
 
-var filesAreOnSameDevice = _.routine.uniteCloning_( filesAreOnSameDevice_head, filesAreOnSameDevice_body );
+var filesAreOnSameDevice = _.routine.uniteCloning_replaceByUnite( filesAreOnSameDevice_head, filesAreOnSameDevice_body );
 
 //
 
@@ -721,10 +721,10 @@ function filesSearchText( o )
   let self = this;
   let result = [];
 
-  _.routineOptions( filesSearchText, o );
+  _.routine.options_( filesSearchText, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
 
-  o.ins = _.arrayAs( o.ins );
+  o.ins = _.array.as( o.ins );
   o.ins = _.regexpsMaybeFrom
   ({
     srcStr : o.ins,
@@ -769,7 +769,7 @@ _.routineExtend( filesSearchText, Find.prototype.filesFind );
 
 var defaults = filesSearchText.defaults;
 
-_.mapSupplement( defaults, _.mapBut_( null, _.strSearch.defaults, { src : null } ) );
+_.props.supplement( defaults, _.mapBut_( null, _.strSearch.defaults, { src : null } ) );
 
 defaults.determiningLineNumber = 1;
 
@@ -827,7 +827,7 @@ function fileCodeRead_body( o )
   return result;
 }
 
-var defaults = fileCodeRead_body.defaults = _.mapExtend( null, fileRead.defaults );
+var defaults = fileCodeRead_body.defaults = _.props.extend( null, fileRead.defaults );
 
 defaults.encoding = 'utf8';
 defaults.wrapping = 1;
@@ -838,12 +838,12 @@ defaults.postfix = '\n})();\n';
 
 _.routineExtend( fileCodeRead_body, fileRead.body );
 
-var fileCodeRead = _.routine.uniteCloning_( fileRead.head, fileCodeRead_body );
+var fileCodeRead = _.routine.uniteCloning_replaceByUnite( fileRead.head, fileCodeRead_body );
 
 fileCodeRead.having.aspect = 'entry';
 
 // --
-// relationship
+// relations
 // --
 
 let Composes =

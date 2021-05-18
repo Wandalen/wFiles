@@ -39,6 +39,12 @@ _.files.ReadEncoders = _.files.ReadEncoders || Object.create( null );
 _.files.WriteEncoders = _.files.WriteEncoders || Object.create( null );
 _.files._ = _.files._ || Object.create( null );
 
+_.assert( !!_.FieldsStack );
+_.assert( !_.files.FileRecord );
+_.assert( !_.files.FileRecordFactory );
+_.assert( !_.files.FileRecordFilter );
+_.assert( !_.files.FileStat );
+
 // --
 // meta
 // --
@@ -48,113 +54,6 @@ let vectorizeAll = _.routineDefaults( null, _.vectorizeAll, { vectorizingContain
 let vectorizeAny = _.routineDefaults( null, _.vectorizeAny, { vectorizingContainerAdapter : 1, unwrapingContainerAdapter : 0 } );
 let vectorizeNone =
 _.routineDefaults( null, _.vectorizeNone, { vectorizingContainerAdapter : 1, unwrapingContainerAdapter : 0 } );
-
-// //
-//
-// function vectorize( routine, select )
-// {
-//   select = select || 1;
-//
-//   let routineName = routine.name;
-//
-//   _.assert( _.routineIs( routine ) );
-//   _.assert( _.strDefined( routineName ) );
-//   _.assert( arguments.length === 1 || arguments.length === 2 );
-//
-//   let routine2 = _.routineVectorize_functor
-//   ({
-//     routine : [ routineName ],
-//     vectorizingArray : 1,
-//     vectorizingMapVals : 0,
-//     vectorizingMapKeys : 0,
-//     select : select,
-//   });
-//
-//   _.routineExtend( routine2, routine );
-//
-//   return routine2;
-// }
-//
-// //
-//
-// function vectorizeAll( routine, select )
-// {
-//   _.assert( arguments.length === 1 || arguments.length === 2 );
-//   let routine2 = _vectorize( routine, select );
-//   _.routineExtend( all, routine );
-//   return all;
-//
-//   /* */
-//
-//   function all()
-//   {
-//     let result = routine2.apply( this, arguments );
-//     return _.all( result );
-//   }
-//
-// }
-//
-// //
-//
-// function vectorizeAny( routine, select )
-// {
-//   _.assert( arguments.length === 1 || arguments.length === 2 );
-//   let routine2 = _vectorize( routine, select );
-//   _.routineExtend( any, routine );
-//   return any;
-//
-//   /* */
-//
-//   function any()
-//   {
-//     let result = routine2.apply( this, arguments );
-//     return _.any( result );
-//   }
-//
-// }
-//
-// //
-//
-// function vectorizeNone( routine, select )
-// {
-//   _.assert( arguments.length === 1 || arguments.length === 2 );
-//   let routine2 = _vectorize( routine, select );
-//   _.routineExtend( none, routine );
-//   return none;
-//
-//   /* */
-//
-//   function none()
-//   {
-//     let result = routine2.apply( this, arguments );
-//     return _.none( result );
-//   }
-//
-// }
-//
-// function vectorizeKeysAndVals( routine, select )
-// {
-//   select = select || 1;
-//
-//   let routineName = routine.name;
-//
-//   _.assert( _.routineIs( routine ) );
-//   _.assert( _.strDefined( routineName ) );
-//   _.assert( arguments.length === 1 || arguments.length === 2 );
-//
-//   let routine2 = _.routineVectorize_functor
-//   ({
-//     routine : [ routineName ],
-//     vectorizingArray : 1,
-//     vectorizingMapVals : 1,
-//     vectorizingMapKeys : 1,
-//     select : select,
-//   });
-//
-//   _.routineExtend( routine2, routine );
-//
-//   return routine2;
-// }
 
 //
 
@@ -296,7 +195,7 @@ function regexpDirSafe( mask )
 
 function filterSafer( filter )
 {
-  _.assert( filter === null || _.mapIs( filter ) || filter instanceof _.FileRecordFilter );
+  _.assert( filter === null || _.mapIs( filter ) || filter instanceof _.files.FileRecordFilter );
 
   filter = filter || Object.create( null );
 
@@ -331,9 +230,9 @@ function filterSafer( filter )
 
 function _fileOptionsGet( filePath, o ) /* xxx : check */
 {
-  o = o || {};
+  o = o || Object.create( null );
 
-  if( _.objectIs( filePath ) )
+  if( _.object.isBasic( filePath ) )
   {
     o = filePath;
   }
@@ -394,14 +293,14 @@ function filesNewer( dst, src )
   src = { stat : src };
   else if( _.strIs( src ) )
   src = { stat : _.fileProvider.statRead( src ) };
-  else if( !_.objectIs( src ) )
+  else if( !_.object.isBasic( src ) )
   throw _.err( 'unknown src type' );
 
   if( _.fileStatIs( dst ) )
   dst = { stat : dst };
   else if( _.strIs( dst ) )
   dst = { stat : _.fileProvider.statRead( dst ) };
-  else if( !_.objectIs( dst ) )
+  else if( !_.object.isBasic( dst ) )
   throw _.err( 'unknown dst type' );
 
 
@@ -409,7 +308,7 @@ function filesNewer( dst, src )
   let timeDst = _.entityMax( [ dst.stat.mtime/* , dst.stat.birthtime */ ] ).value;
 
   // When mtime of the file is changed by timeWrite( fs.utime ), there is difference between passed and setted value.
-  // if( _.numbersAreEquivalent.call( { accuracy : 500 }, timeSrc.getTime(), timeDst.getTime() ) )
+  // if( _.number.equivalent.call( { accuracy : 500 }, timeSrc.getTime(), timeDst.getTime() ) )
   // return null;
 
   if( timeSrc > timeDst )
@@ -551,7 +450,7 @@ function filesSimilarity( o )
 {
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.routineOptions( filesSimilarity, o );
+  _.routine.options_( filesSimilarity, o );
 
   o.src1 = _.fileProvider.recordFactory().record( o.src1 );
   o.src2 = _.fileProvider.recordFactory().record( o.src2 );
@@ -578,14 +477,14 @@ function filesShadow( shadows, owners ) /* xxx : check */
   for( let s = 0 ; s < shadows.length ; s++ )
   {
     let shadow = shadows[ s ];
-    shadow = _.objectIs( shadow ) ? shadow.relative : shadow;
+    shadow = _.object.isBasic( shadow ) ? shadow.relative : shadow;
 
     for( let o = 0 ; o < owners.length ; o++ )
     {
 
       let owner = owners[ o ];
 
-      owner = _.objectIs( owner ) ? owner.relative : owner;
+      owner = _.object.isBasic( owner ) ? owner.relative : owner;
 
       if( _.strBegins( shadow, _.path.prefixGet( owner ) ) )
       {
@@ -606,7 +505,7 @@ function fileReport( file ) /* xxx : rename */
 {
   let report = '';
 
-  file = _.FileRecord( file );
+  file = _.files.FileRecord( file );
 
   let fileTypes = {};
 
@@ -637,7 +536,7 @@ function hashFrom( o )
 
   if( !_.mapIs( arguments[ 0 ] ) )
   o = { src : arguments[ 0 ] }
-  _.routineOptions( hashFrom, o );
+  _.routine.options_( hashFrom, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
 
   return _.files.hashMd5From( o );
@@ -655,7 +554,7 @@ function hashSzFrom( o )
 
   if( !_.mapIs( arguments[ 0 ] ) )
   o = { src : arguments[ 0 ] }
-  _.routineOptions( hashSzFrom, o );
+  _.routine.options_( hashSzFrom, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( !_.streamIs( o.src ), 'not implemented' ); /* qqq : implement */
 
@@ -664,7 +563,7 @@ function hashSzFrom( o )
   if( !result )
   return result;
 
-  let size = _.sizeOf( o.src );
+  let size = _.entity.sizeOf( o.src, 0 );
   _.assert( _.numberIs( size ) );
   result = size + '-' + result;
 
@@ -683,7 +582,7 @@ function hashMd5From( o )
 
   if( !_.mapIs( arguments[ 0 ] ) )
   o = { src : arguments[ 0 ] }
-  _.routineOptions( hashMd5From, o );
+  _.routine.options_( hashMd5From, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
 
   if( Crypto === undefined )
@@ -785,9 +684,11 @@ let Restricts =
 
 }
 
-_.mapSupplement( _.files._, Restricts );
+_.props.supplement( _.files._, Restricts );
 
-let Files =
+//
+
+let FilesExtension =
 {
 
   // regexp
@@ -823,13 +724,6 @@ let Files =
 
 }
 
-_.mapSupplement( _.files, Files );
-
-// --
-// export
-// --
-
-if( typeof module !== 'undefined' )
-module[ 'exports' ] = _;
+_.props.supplement( _.files, FilesExtension );
 
 })();

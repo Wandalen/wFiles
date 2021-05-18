@@ -12,9 +12,12 @@ if( typeof module !== 'undefined' )
   require( '../l4_files/entry/Files.s' );
 }
 
+/* qqq : ues test modules instead of real modules */
+
 //
 
 const _ = _global_.wTools;
+const __ = _globals_.testing.wTools;
 var RunningInsideTestContainer = _.process.insideTestContainer();
 
 //
@@ -101,9 +104,9 @@ function filesReflectTrivial( test )
       '.',
       './.ex.will.yml',
       './.im.will.yml',
-      './LICENSE',
+      './License',
       './package.json',
-      './README.md',
+      './Readme.md',
       './doc',
       './out',
       './out/wPathBasic.out.will.yml',
@@ -140,9 +143,9 @@ function filesReflectTrivial( test )
       '.',
       './.ex.will.yml',
       './.im.will.yml',
-      './LICENSE',
+      './License',
       './package.json',
-      './README.md',
+      './Readme.md',
       './doc',
       './out',
       './out/wPathBasic.out.will.yml',
@@ -179,9 +182,9 @@ function filesReflectTrivial( test )
       '.',
       './.ex.will.yml',
       './.im.will.yml',
-      './LICENSE',
+      './License',
       './package.json',
-      './README.md',
+      './Readme.md',
       './doc',
       './out',
       './out/wPathBasic.out.will.yml',
@@ -228,8 +231,8 @@ function filesReflectTrivial( test )
     let o = { reflectMap : { [ remotePath ] : clonePathGlobal } };
 
     let ready = new _.Consequence().take( null );
-    ready.then( () => system.filesReflect( _.mapExtend( null, o ) ) )
-    ready.then( () => system.filesReflect( _.mapExtend( null, o ) ) )
+    ready.then( () => system.filesReflect( _.props.extend( null, o ) ) )
+    ready.then( () => system.filesReflect( _.props.extend( null, o ) ) )
 
     return ready;
   })
@@ -249,9 +252,9 @@ function filesReflectTrivial( test )
       '.',
       './.ex.will.yml',
       './.im.will.yml',
-      './LICENSE',
+      './License',
       './package.json',
-      './README.md',
+      './Readme.md',
       './doc',
       './out',
       './out/wPathBasic.out.will.yml',
@@ -277,8 +280,8 @@ function filesReflectTrivial( test )
     };
 
     let ready = new _.Consequence().take( null );
-    ready.then( () => system.filesReflect( _.mapExtend( null, o ) ) )
-    ready.then( () => system.filesReflect( _.mapExtend( null, o ) ) )
+    ready.then( () => system.filesReflect( _.props.extend( null, o ) ) )
+    ready.then( () => system.filesReflect( _.props.extend( null, o ) ) )
 
     return ready;
   })
@@ -298,9 +301,9 @@ function filesReflectTrivial( test )
       '.',
       './.ex.will.yml',
       './.im.will.yml',
-      './LICENSE',
+      './License',
       './package.json',
-      './README.md',
+      './Readme.md',
       './doc',
       './out',
       './out/wPathBasic.out.will.yml',
@@ -591,7 +594,7 @@ function filesReflectTrivial( test )
 
     ready.then( ( got ) =>
     {
-      providerDst.fileWrite( providerDst.path.join( localPath, 'README.md' ), 'test' );
+      providerDst.fileWrite( providerDst.path.join( localPath, 'Readme.md' ), 'test' );
       return null;
     })
 
@@ -606,7 +609,7 @@ function filesReflectTrivial( test )
     ready.then( ( got ) =>
     {
       test.identical( got.exitCode, 0 );
-      test.true( _.strHas( got.output, `modified:   README.md` ) )
+      test.true( _.strHas( got.output, `modified:   Readme.md` ) )
       return null;
     })
 
@@ -627,7 +630,7 @@ function filesReflectTrivial( test )
     ready.then( ( got ) =>
     {
       test.identical( got.exitCode, 0 );
-      test.true( _.strHas( got.output, `modified:   README.md` ) )
+      test.true( _.strHas( got.output, `modified:   Readme.md` ) )
       return null;
     })
 
@@ -801,7 +804,7 @@ function filesReflectNoStashing( test )
 
     ready.then( () =>
     {
-      _.fileProvider.fileWrite( _.path.join( localPath, 'README.md' ), '' );
+      _.fileProvider.fileWrite( _.path.join( localPath, 'Readme.md' ), '' );
       return null;
     })
 
@@ -827,7 +830,7 @@ function filesReflectNoStashing( test )
     ready.then( ( got ) =>
     {
       test.identical( got.exitCode, 0 );
-      test.true( _.strHas( got.output, `modified:   README.md` ) )
+      test.true( _.strHas( got.output, `modified:   Readme.md` ) )
       return null;
     })
 
@@ -1866,6 +1869,206 @@ filesReflectFetchingTags.timeOut = 60000;
 
 //
 
+// function filesReflectPerformance( test )
+// {
+//   let context = this;
+//   let providerSrc = context.providerSrc;
+//   let providerDst = context.providerDst;
+//   let system = context.system;
+//   let path = context.providerDst.path;
+//
+//   let testPath = path.join( context.suiteTempPath, 'routine-' + test.name );
+//   let localPath = path.join( testPath, '' );
+//   let clonePathGlobal = providerDst.path.globalFromPreferred( localPath );
+//
+//   let shellLocal = _.process.starter
+//   ({
+//     currentPath : localPath,
+//     mode : 'shell'
+//   })
+//
+//   let con = new _.Consequence().take( null )
+//
+//   .then( () =>
+//   {
+//     let t1;
+//     providerDst.filesDelete( localPath );
+//     let remotePathFixate =
+//     'git+https:///github.com/Wandalen/wPathBasic.git#05930d3a7964b253ea3bbfeca7eb86848f550e96';
+//     let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git';
+//
+//     let ready = system.filesReflect({ reflectMap : { [ remotePath ] :
+//     clonePathGlobal }, verbosity : 5 });
+//
+//     ready.then( () =>
+//     {
+//       let structure = { dependencies : { 'willbe' : 'alpha' } };
+//       providerDst.fileWrite({ filePath : path.join( localPath,
+//       'package.json' ), data : structure, encoding : 'json' });
+//       return null;
+//     })
+//
+//     ready.then( () => shellLocal({ execPath : 'npm install', outputPiping : 0 }) );
+//     ready.then( () => shellLocal( 'git reset --hard' ) );
+//
+//     ready.then( () =>
+//     {
+//       t1 = _.time.now();
+//       return system.filesReflect({ reflectMap : { [ remotePathFixate ] :
+//       clonePathGlobal }, verbosity : 5 })
+//     });
+//
+//     ready.then( ( got ) =>
+//     {
+//       console.log( _.time.spent( t1 ) );
+//       test.identical( got.exitCode, 0 );
+//       return null;
+//     })
+//
+//     return ready;
+//   })
+//
+//   return con;
+//
+//   /* */
+//
+//   function init()
+//   {
+//     let data = { dependencies : { willbe : '', wTesting : '' } };
+//     a.shell( 'git init' );
+//     a.shell( 'git commit --allow-empty -m "init"' );
+//     a.shell( 'git branch one' );
+//     a.shell( 'git branch two' );
+//     a.ready.then( () =>
+//     {
+//       a.fileProvider.configWrite({ filePath : a.abs( 'package.json' ), data, encoding : 'json' });
+//       return null;
+//     });
+//     a.shell( 'git add .' );
+//     a.shell( 'git commit -m "package"' );
+//     return a.ready;
+//   }
+// }
+//
+// filesReflectPerformance.timeOut = 120000;
+
+function filesReflectPerformance( test )
+{
+  let context = this;
+  let system = context.system;
+  let a = test.assetFor( false );
+  let repoPath = a.abs( 'repo' );
+  let remotePath = `git+hd://${repoPath}`;
+  let localPath = a.abs( 'clone' );
+  let clonePathGlobal = a.fileProvider.path.globalFromPreferred( localPath );
+  let start;
+
+  debugger
+
+  /* - */
+
+  const times = 1;
+  const runsWithout = [];
+  const runsWith = [];
+  for( let i = 0 ; i < times; i++ )
+  run();
+
+  a.ready.then( () =>
+  {
+    const averageWithout = runsWithout.reduce( ( s, e ) => s + e ) / times;
+    const averageWith = runsWith.reduce( ( s, e ) => s + e ) / times;
+    console.log( averageWithout );
+    console.log( averageWith );
+    return null;
+  });
+
+  /* */
+
+  function run()
+  {
+    init().then( () =>
+    {
+      test.case = 'without installed dependencies';
+      return null;
+    });
+    a.ready.then( () =>
+    {
+      start = _.time.now();
+      return system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5, outputFormat : 'nothing' });
+    });
+    a.ready.then( () =>
+    {
+      let spent = _.time.now() - start;
+      runsWithout.push( spent );
+      test.le( spent, 10000 );
+      return null;
+    });
+
+    /* */
+
+    init().then( () =>
+    {
+      test.case = 'with installed dependencies';
+      return null;
+    });
+    a.shell({ currentPath : a.abs( 'clone' ), execPath : 'npm install' });
+    a.shell({ currentPath : a.abs( 'clone' ), execPath : 'git reset --hard' });
+    a.ready.then( () =>
+    {
+      console.log( '------reflect-------')
+      start = _.time.now();
+      return system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5, outputFormat : 'nothing' });
+    });
+    a.ready.then( () =>
+    {
+      let spent = _.time.now() - start;
+      runsWith.push( spent );
+      test.le( spent, 10000 );
+      return null;
+    });
+  }
+
+  /* - */
+
+  return a.ready;
+
+  /* */
+
+  function init()
+  {
+    a.ready.then( () => a.fileProvider.filesDelete( a.abs( '.' ) ) );
+    a.ready.then( () => { a.fileProvider.dirMake( a.abs( 'repo' ) ); return null } );
+    a.shell({ currentPath : repoPath, execPath : 'git init --bare' });
+    a.shell( 'git clone repo clone' );
+    a.shell({ currentPath : a.abs( 'clone' ), execPath : 'git commit --allow-empty -m "init"' });
+    a.shell({ currentPath : a.abs( 'clone' ), execPath : 'git branch one' });
+    a.shell({ currentPath : a.abs( 'clone' ), execPath : 'git branch two' });
+    a.ready.then( () =>
+    {
+      let data = { dependencies : { willbe : '', wTesting : '' } };
+      a.fileProvider.fileWrite({ filePath : a.abs( 'clone/package.json' ), data, encoding : 'json' });
+      return null;
+    });
+    a.shell({ currentPath : a.abs( 'clone' ), execPath : 'git add .' });
+    a.shell({ currentPath : a.abs( 'clone' ), execPath : 'git commit -m "package"' });
+    a.shell({ currentPath : a.abs( 'clone' ), execPath : 'git push' });
+    a.shell({ currentPath : a.abs( 'clone' ), execPath : 'git push -u origin one' });
+    a.shell({ currentPath : a.abs( 'clone' ), execPath : 'git push -u origin two' });
+    return a.ready;
+  }
+
+  /*
+     Results of benchmark. The average time for 5 runs:
+     without dependencies - 0.52s
+     with dependencies - 34.58s
+  */
+}
+
+filesReflectPerformance.timeOut = 500000;
+filesReflectPerformance.experimental = 1;
+
+//
+
 // --
 // declare
 // --
@@ -1898,7 +2101,8 @@ const Proto =
     filesReflectNoStashing,
     filesReflectDownloadThrowing,
     filesReflectEol,
-    filesReflectFetchingTags
+    filesReflectFetchingTags,
+    filesReflectPerformance,
   },
 
 }

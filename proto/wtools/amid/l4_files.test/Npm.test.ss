@@ -398,8 +398,8 @@ filesReflectTrivial.timeOut = 240000;
 //       dst : { effectiveProvider : providerDst },
 //       verbosity : 3
 //     }
-//     let con = providerSrc.filesReflect( _.mapExtend( null, o ) );
-//     con.then( () => providerSrc.filesReflect( _.mapExtend( null, o ) ) );
+//     let con = providerSrc.filesReflect( _.props.extend( null, o ) );
+//     con.then( () => providerSrc.filesReflect( _.props.extend( null, o ) ) );
 //     return con;
 //   })
 //   .then( ( got ) =>

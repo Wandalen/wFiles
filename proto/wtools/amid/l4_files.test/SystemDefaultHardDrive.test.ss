@@ -59,7 +59,7 @@ function onRoutineEnd( test )
   let context = this;
   let system = context.system || context.provider;
   _.sure( system instanceof _.FileProvider.System );
-  _.sure( _.entityIdentical( _.mapKeys( system.providersWithProtocolMap ), [ 'hd', 'file' ] ), test.name, 'has not restored system!' );
+  _.sure( _.entityIdentical( _.props.keys( system.providersWithProtocolMap ), [ 'hd', 'file' ] ), test.name, 'has not restored system!' );
 }
 
 //
@@ -68,9 +68,10 @@ function pathFor( filePath )
 {
   let context = this;
 
-  filePath =  _.path.join( context.suiteTempPath,  filePath );
+  filePath = _.path.join( context.suiteTempPath, filePath );
 
-  return context.providerEffective.originPath + _.path.normalize( filePath );
+  return filePath
+  // return context.providerEffective.originPath + _.path.normalize( filePath );
 }
 
 //
@@ -118,6 +119,7 @@ const Proto =
     providerEffective : null,
     suiteTempPath : null,
     globalFromPreferred : null,
+    storingEncoding : false,
   },
 
   tests :

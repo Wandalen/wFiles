@@ -213,7 +213,7 @@ function form( test )
   test.identical( filter.formed, 5 );
   test.identical( filter.formedFilePath, { '/a/b' : '', '/a/c' : '' } );
   test.identical( filter.formedBasePath, { '/a/b' : '/a', '/a/c' : '/a' } );
-  test.identical( _.mapKeys( filter.formedMasksMap ), [ '/a/b', '/a/c' ] );
+  test.identical( _.props.keys( filter.formedMasksMap ), [ '/a/b', '/a/c' ] );
   test.identical( filter.filePath, { '/a/b/*' : '', '/a/c/*' : '' } );
   test.identical( filter.basePath, { '/a/b/*' : '/a', '/a/c/*' : '/a' } );
   test.identical( filter.prefixPath, null );
@@ -262,7 +262,7 @@ function form( test )
   test.identical( filter.formed, 5 );
   test.identical( filter.formedFilePath, { '/dir1/dir2/d1' : '', '/dir1/dir2/d2' : '' } );
   test.identical( filter.formedBasePath, { '/dir1/dir2/d1' : '/dir1/dir2/d1/d11', '/dir1/dir2/d2' : '/dir1/dir2/d1/d11' } );
-  test.identical( _.mapKeys( filter.formedMasksMap ), [ '/dir1/dir2/d1', '/dir1/dir2/d2' ] );
+  test.identical( _.props.keys( filter.formedMasksMap ), [ '/dir1/dir2/d1', '/dir1/dir2/d2' ] );
   test.identical( filter.filePath, { '/dir1/dir2/d1/**' : '', '/dir1/dir2/d2/**' : '', '/**b**' : false } );
   test.identical( filter.basePath, { '/dir1/dir2/d1/**' : '/dir1/dir2/d1/d11', '/dir1/dir2/d2/**' : '/dir1/dir2/d1/d11' } );
   test.identical( filter.prefixPath, null );
@@ -281,7 +281,7 @@ function form( test )
   test.identical( filter.formed, 5 );
   test.identical( filter.formedFilePath, { '/dir' : '' } );
   test.identical( filter.formedBasePath, { '/dir' : '/dir/d1/d11' } );
-  test.identical( _.mapKeys( filter.formedMasksMap ), [ '/dir' ] );
+  test.identical( _.props.keys( filter.formedMasksMap ), [ '/dir' ] );
   test.identical( filter.filePath, { '/dir/**b**' : '' } );
   test.identical( filter.basePath, { '/dir/**b**' : '/dir/d1/d11' } );
   test.identical( filter.prefixPath, null );
@@ -331,7 +331,7 @@ function form( test )
   test.identical( filter.basePath, { '/src/*/a/b' : '/src', '/src/*/a/c' : '/src' } );
   test.identical( filter.formedFilePath, { '/src' : '' } );
   test.identical( filter.formedBasePath, { '/src' : '/src' } );
-  test.identical( _.mapKeys( filter.formedMasksMap ), [ '/src' ] );
+  test.identical( _.props.keys( filter.formedMasksMap ), [ '/src' ] );
   test.identical( filter.formed, 5 );
 
   test.case = 'entangled, base path and file path are relative, with glob, not only bools';
@@ -346,7 +346,7 @@ function form( test )
   test.identical( filter.basePath, { '/src/*/a/b' : '/src' } );
   test.identical( filter.formedFilePath, { '/src' : '' } );
   test.identical( filter.formedBasePath, { '/src' : '/src' } );
-  test.identical( _.mapKeys( filter.formedMasksMap ), [ '/src' ] );
+  test.identical( _.props.keys( filter.formedMasksMap ), [ '/src' ] );
   test.identical( filter.formed, 5 );
 
   test.case = 'base path and file path are relative, with glob, not only bools';
@@ -361,7 +361,7 @@ function form( test )
   test.identical( filter.basePath, { '/src/a/b' : '/src' } );
   test.identical( filter.formedFilePath, { '/src/a/b' : '' } );
   test.identical( filter.formedBasePath, { '/src/a/b' : '/src' } );
-  test.identical( _.mapKeys( filter.formedMasksMap ), [ '/src/a/b' ] );
+  test.identical( _.props.keys( filter.formedMasksMap ), [ '/src/a/b' ] );
   test.identical( filter.formed, 5 );
 
   if( Config.debug )
@@ -404,7 +404,7 @@ function form( test )
   test.identical( filter.formed, 5 );
   test.identical( filter.formedFilePath, { '/a' : '' } );
   test.identical( filter.formedBasePath, { '/a' : '/a' } );
-  test.identical( _.mapKeys( filter.formedMasksMap ), [ '/a' ] );
+  test.identical( _.props.keys( filter.formedMasksMap ), [ '/a' ] );
   test.identical( filter.filePath, { '/a/**/b' : '' } );
   test.identical( filter.basePath, { '/a/**/b' : '/a' } );
   test.identical( filter.prefixPath, null );
@@ -446,7 +446,7 @@ function form( test )
   test.identical( filter.formed, 5 );
   test.identical( filter.formedFilePath, { '/a/b' : '', '/a/c' : '' } );
   test.identical( filter.formedBasePath, { '/a/b' : '/a/b', '/a/c' : '/a/c' } );
-  test.identical( _.mapKeys( filter.formedMasksMap ), [ '/a/b', '/a/c' ] );
+  test.identical( _.props.keys( filter.formedMasksMap ), [ '/a/b', '/a/c' ] );
   test.identical( filter.filePath, { '/a/b/*x*' : '', '/a/c/*x*' : '' } );
   test.identical( filter.basePath, { '/a/b/*x*' : '/a/b', '/a/c/*x*' : '/a/c' } );
   test.identical( filter.prefixPath, null );
@@ -517,7 +517,7 @@ function form( test )
   test.identical( filter.formed, 5 );
   test.identical( filter.formedFilePath, { '/src1' : '', '/src2/d' : '' } );
   test.identical( filter.formedBasePath, { '/src1' : '/', '/src2/d' : '/' } );
-  test.identical( _.mapKeys( filter.formedMasksMap ), [ '/src1' ] );
+  test.identical( _.props.keys( filter.formedMasksMap ), [ '/src1' ] );
   test.identical( filter.filePath, { '/src1/d**' : true, '/src2/d/**' : true } );
   test.identical( filter.basePath, { '/src1/d**' : '/', '/src2/d/**' : '/' } );
   test.identical( filter.prefixPath, null );
@@ -711,7 +711,7 @@ function form( test )
   test.identical( filter.formed, 5 );
   test.identical( filter.formedFilePath, expectedFormedFilePath );
   test.identical( filter.formedBasePath, expectedFormedBasePath );
-  test.identical( _.mapKeys( filter.formedMasksMap ), [ '/src/proto' ] );
+  test.identical( _.props.keys( filter.formedMasksMap ), [ '/src/proto' ] );
   test.identical( filter.filePath, expectedFilePath );
   test.identical( filter.basePath, expectedBasePath );
   test.identical( filter.prefixPath, null );
@@ -785,7 +785,7 @@ function form( test )
   test.identical( filter.formed, 5 );
   test.identical( filter.formedFilePath, expectedFormedFilePath );
   test.identical( filter.formedBasePath, expectedFormedBasePath );
-  test.identical( _.mapKeys( filter.formedMasksMap ), [ '/src' ] );
+  test.identical( _.props.keys( filter.formedMasksMap ), [ '/src' ] );
   test.identical( filter.filePath, expectedFilePath );
   test.identical( filter.basePath, expectedBasePath );
   test.identical( filter.prefixPath, null );
@@ -822,7 +822,7 @@ function form( test )
   test.identical( filter.formed, 5 );
   test.identical( filter.formedFilePath, expectedFormedFilePath );
   test.identical( filter.formedBasePath, expectedFormedBasePath );
-  test.identical( _.mapKeys( filter.formedMasksMap ), [ '/src' ] );
+  test.identical( _.props.keys( filter.formedMasksMap ), [ '/src' ] );
   test.identical( filter.filePath, expectedFilePath );
   test.identical( filter.basePath, expectedBasePath );
   test.identical( filter.prefixPath, null );
@@ -989,7 +989,7 @@ function form( test )
   test.identical( src.formed, 5 );
   test.identical( src.formedFilePath, { '/src1' : '', '/src2/d' : '' } );
   test.identical( src.formedBasePath, { '/src1' : '/', '/src2/d' : '/' } );
-  test.identical( _.mapKeys( src.formedMasksMap ), [ '/src1' ] );
+  test.identical( _.props.keys( src.formedMasksMap ), [ '/src1' ] );
   test.identical( src.filePath, { '/src1/d**' : true, '/src2/d/**' : true } );
   test.identical( src.basePath, { '/src1/d**' : '/', '/src2/d/**' : '/' } );
   test.identical( src.prefixPath, null );
@@ -1776,7 +1776,7 @@ function formBaseDeducingFromFile( test )
 function clone( test )
 {
   let provider = _.fileProvider;
-  let filter = new _.FileRecordFilter({ defaultProvider : provider });
+  let filter = new _.files.FileRecordFilter({ defaultProvider : provider });
 
   filter.prefixPath = '/some/path';
 

@@ -3,15 +3,6 @@
 
 'use strict';
 
-// if( typeof module !== 'undefined' )
-// {
-//
-//   require( '../UseBase.s' );
-//
-// }
-
-//
-
 /**
  * @class wFileRecordContext
  * @namespace wTools
@@ -25,22 +16,11 @@ const Self = wFileRecordContext;
 function wFileRecordContext( o )
 {
   return _.workpiece.construct( Self, this, arguments );
-  // if( !( this instanceof Self ) )
-  // if( o instanceof Self && arguments.length === 1 )
-  // {
-  //   _.assert( arguments.length === 1, 'Expects single argument' );
-  //   return o;
-  // }
-  // else
-  // {
-  //   return new( _.constructorJoin( Self, arguments ) );
-  // }
-  // return Self.prototype.init.apply( this,arguments );
 }
 
 Self.shortName = 'FileRecordContext';
 
-_.assert( !_.FileRecordContext );
+_.assert( !_.files.FileRecordContext );
 
 // --
 // routine
@@ -59,7 +39,7 @@ function TolerantFrom( o )
 {
   let Cls = _.workpiece.constructorOf( this );
   _.assert( arguments.length >= 1, 'Expects at least one argument' );
-  _.assert( _.objectIs( Cls.prototype.Composes ) );
+  _.assert( _.object.isBasic( Cls.prototype.Composes ) );
   o = _.mapsExtend( null, arguments );
   return new Cls( _.mapOnly_( null, o, Cls.prototype.fieldsOfCopyableGroups ) );
 }
@@ -202,7 +182,7 @@ function _formAssociations()
   _.assert
   (
     !factory.system || factory.system instanceof _.FileProvider.System,
-    () => '{- factory.system -} should be instance of {- _.FileProvider.System -}, but it is ' + _.entity.exportStringShallow( factory.system )
+    () => '{- factory.system -} should be instance of {- _.FileProvider.System -}, but it is ' + _.entity.exportStringDiagnosticShallow( factory.system )
   );
   _.assert
   (
@@ -212,7 +192,7 @@ function _formAssociations()
   _.assert
   (
     factory.defaultProvider instanceof _.FileProvider.Abstract,
-    () => '{- factory.system -} should be instance of {- _.FileProvider.Abstract -}, but it is ' + _.entity.exportStringShallow( factory.defaultProvider )
+    () => '{- factory.system -} should be instance of {- _.FileProvider.Abstract -}, but it is ' + _.entity.exportStringDiagnosticShallow( factory.defaultProvider )
   );
 
 }
@@ -297,13 +277,6 @@ _.classDeclare
 });
 
 _.Copyable.mixin( Self );
-_[ Self.shortName ] = Self;
-
-// --
-// export
-// --
-
-if( typeof module !== 'undefined' )
-module[ 'exports' ] = Self;
+_.files[ Self.shortName ] = Self;
 
 })();

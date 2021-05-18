@@ -6,6 +6,7 @@ Explain how to start extending tests and the functionality of the module.
 
 Use your github account to fork the repository `https://github.com/Wandalen/wTools`.
 After forking the repository clone it on your local machine. It looks like that:
+
 ```bash
 git clone https://github.com/{{ your account }}/wFiles
 cd wFiles
@@ -16,11 +17,13 @@ Further commands should be entered from the directory to which you've to cloned 
 ### Prerequisites
 
 You need utility willbe to build the project. To installl willbe use npm:
+
 ```bash
 npm intall -g willbe@delta
 ```
 
 You need utility wTesting to test the project. To installl wTesting use npm:
+
 ```bash
 npm install -g wTesting@delta
 ```
@@ -30,7 +33,7 @@ npm install -g wTesting@delta
 To build the project run
 
 ```bash
-will .npm.intall
+will .npm.install
 ```
 
 To check build was successful run tests.
@@ -68,7 +71,6 @@ node proto/wtools/amid/l4_files.test/HardDrive.test.ss routine:readWriteBasic
 ```
 
 Will run test routine `readWriteBasic`. But better combination of options for running specific test routine is:
-
 
 ```bash
 node proto/wtools/amid/l4_files.test/HardDrive.test.ss verbosity:5 silencing:0 routine:readWriteBasic
@@ -120,31 +122,37 @@ You can see 2 test cases: `args array` and `options map`. The first case covers 
 ```js
 let a = context.assetFor( test, false );
 ```
+
 This code initializes the test asset and does the preparation required for the test routine.
 
 ```js
 test.case = 'args array';
 ```
+
 This code starts a new test case naming it.
 
 ```js
 test.case = 'a.reflect()';
 ```
+
 This code creates a temp directory and copies associated with the test routine test files if such exists.
 
 ```js
 var filePath = a.abs( 'file1.txt' );
 ```
+
 This code returns the absolute path to the file which is going to be created.
 
 ```js
 var filePath = a.abs( 'file1.txt' );
 ```
+
 This code writes the file `file1.txt` into the temp directory.
 
 ```js
 var got = a.fileProvider.fileRead( filePath );
 ```
+
 This code read the file `file1.txt` into variable `got`.
 
 ### The first task

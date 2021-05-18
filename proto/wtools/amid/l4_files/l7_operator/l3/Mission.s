@@ -22,6 +22,9 @@ function finit()
 {
   let mission = this;
   mission.unform();
+
+  _.assert( mission.operationArray.length === 0 );
+
   return _.Copyable.prototype.finit.call( mission );
 }
 
@@ -54,7 +57,9 @@ function unform()
   if( !mission.operator )
   return;
 
-  debugger;
+  mission.operationArray.slice().forEach( ( operation ) => operation.finit() );
+  _.assert( mission.operationArray.length === 0 );
+
   _.assert( mission.operator.missionSet.has( mission ) );
   mission.operator.missionSet.delete( mission );
 

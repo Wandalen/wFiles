@@ -18,6 +18,20 @@ Self.shortName = 'Operator';
 //
 // --
 
+function finit()
+{
+  let operator = this;
+  operator.unform();
+
+  _.assert( operator.missionSet.size === 0 );
+  _.assert( operator.operationArray.length === 0 );
+  _.assert( _.props.keys( operator.filesMap ).length === 0 );
+
+  return _.Copyable.prototype.finit.call( operator );
+}
+
+//
+
 function init( o )
 {
   let operator = this;
@@ -32,6 +46,22 @@ function init( o )
   operator.copy( o );
 
   operator.form();
+
+  return operator;
+}
+
+//
+
+function unform()
+{
+  let operator = this;
+
+  if( !operator.operator )
+  return;
+
+  debugger;
+  _.assert( operator.operator.missionSet.has( operator ) );
+  operator.operator.missionSet.delete( operator );
 
   return operator;
 }
@@ -117,7 +147,9 @@ let Statics =
 let Extension =
 {
 
+  finit,
   init,
+  unform,
   form,
   fileFor,
 

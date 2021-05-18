@@ -22,6 +22,9 @@ function finit()
 {
   let operation = this;
   operation.unform();
+
+  _.assert( operation.deedsArray.length === 0 );
+
   return _.Copyable.prototype.finit.call( this );
 }
 
@@ -51,6 +54,7 @@ function unform()
 {
   let operation = this;
 
+  debugger;
   if( !operation.mission )
   return;
 

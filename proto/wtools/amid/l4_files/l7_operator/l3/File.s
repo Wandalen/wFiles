@@ -22,6 +22,9 @@ function finit()
 {
   let file = this;
   file.unform();
+
+  _.assert( file.deeds.size === 0 );
+
   return _.Copyable.prototype.finit.call( this );
 }
 
@@ -84,7 +87,7 @@ let Composes =
 
 let Aggregates =
 {
-  deeds : _.define.own([]),
+  deeds : _.define.own( new Set ),
 }
 
 let Associates =

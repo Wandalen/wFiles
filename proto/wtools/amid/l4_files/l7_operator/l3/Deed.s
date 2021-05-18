@@ -22,6 +22,11 @@ function finit()
 {
   let deed = this;
   deed.unform();
+
+  _.assert( deed.formed === 0 );
+  _.assert( deed.dst.size === 0 );
+  _.assert( deed.src.size === 0 );
+
   return _.Copyable.prototype.finit.call( deed );
 }
 
@@ -34,11 +39,13 @@ function init( o )
   _.assert( arguments.length === 0 || arguments.length === 1 );
   _.workpiece.initFields( deed );
 
+  if( o.src )
+  o.src = _.set.as( o.src );
+  if( o.dst )
+  o.dst = _.set.as( o.dst );
+
   if( deed.Self === Self )
   Object.preventExtensions( deed );
-
-  deed.src = _.set.as( deed.src );
-  deed.dst = _.set.as( deed.dst );
 
   if( o )
   deed.copy( o );
@@ -60,6 +67,7 @@ function unform()
 
   _.arrayRemoveOnceStrictly( operation.deedsArray, deed );
 
+  deed.formed = 0;
 }
 
 //

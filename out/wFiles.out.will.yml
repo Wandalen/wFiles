@@ -240,10 +240,14 @@ module:
           - ../proto/wtools/amid/l4_files/l7/ConfigMixin.s
           - ../proto/wtools/amid/l4_files/l7/SecondaryMixin.s
           - ../proto/wtools/amid/l4_files/l7_operator
-          - ../proto/wtools/amid/l4_files/l7_operator/Mission.s
-          - ../proto/wtools/amid/l4_files/l7_operator/Namespace.s
-          - ../proto/wtools/amid/l4_files/l7_operator/Operation.s
-          - ../proto/wtools/amid/l4_files/l7_operator/Operator.s
+          - ../proto/wtools/amid/l4_files/l7_operator/l1
+          - ../proto/wtools/amid/l4_files/l7_operator/l1/Namespace.s
+          - ../proto/wtools/amid/l4_files/l7_operator/l3
+          - ../proto/wtools/amid/l4_files/l7_operator/l3/Deed.s
+          - ../proto/wtools/amid/l4_files/l7_operator/l3/File.s
+          - ../proto/wtools/amid/l4_files/l7_operator/l3/Mission.s
+          - ../proto/wtools/amid/l4_files/l7_operator/l3/Operation.s
+          - ../proto/wtools/amid/l4_files/l7_operator/l3/Operator.s
           - ../proto/wtools/amid/l4_files/l7_provider
           - ../proto/wtools/amid/l4_files/l7_provider/Extract.s
           - ../proto/wtools/amid/l4_files/l7_provider/Git.ss
@@ -530,7 +534,7 @@ module:
           prefixPath: ../proto
         mandatory: 1
         dstRewritingOnlyPreserving: 1
-        linking: hardLinkMaybe
+        linkingAction: hardLinkMaybe
         criterion:
           generated: 1
           content: proto

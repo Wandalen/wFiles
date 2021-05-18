@@ -43,10 +43,7 @@ function form()
   let mission = this;
 
   if( !mission.operator )
-  mission.operator = new _.files.operator.Operator();
-
-  // if( !mission.operationArray )
-  // mission.operationArray = [];
+  mission.operator = new _.files.operator.Operator({ mission });
 
   return mission;
 }

@@ -194,7 +194,7 @@ function configFind_body( o )
     }
   }
 
-  o.filePath = _.arrayAs( o.filePath );
+  o.filePath = _.array.as( o.filePath );
   _.assert( _.strsAreAll( o.filePath ) );
 
   /* */
@@ -302,7 +302,7 @@ function configRead_body( o )
 
   if( o.many === 'all' )
   {
-    let filePath = _.arrayAs( o.filePath ).slice();
+    let filePath = _.array.as( o.filePath ).slice();
     let found = o.found.slice();
 
     for( let f1 = filePath.length-1 ; f1 >= 0 ; f1-- )

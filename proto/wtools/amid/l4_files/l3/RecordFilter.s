@@ -904,8 +904,8 @@ function prefixesApply( o )
   return filter;
 
   let paired = filter.isPaired();
-  let prefixArray = _.arrayAs( filter.prefixPath || '.' );
-  let postfixArray = _.arrayAs( filter.postfixPath || '.' );
+  let prefixArray = _.array.as( filter.prefixPath || '.' );
+  let postfixArray = _.array.as( filter.postfixPath || '.' );
 
   o = _.routine.options_( prefixesApply, arguments );
   _.assert( filter.prefixPath === null || _.strIs( filter.prefixPath ) || _.strsAreAll( filter.prefixPath ) );
@@ -3391,7 +3391,7 @@ function sureBasePath( filePath, basePath )
   filePath = filePath.filter( ( e ) => _.strIs( e ) && e );
   filePath = path.s.join( filter.prefixPath || '', filePath );
   if( !filePath.length && basePath.length && filter.prefixPath )
-  filePath = _.arrayAs( filter.prefixPath || '' );
+  filePath = _.array.as( filter.prefixPath || '' );
 
   if( !filePath.length )
   {
@@ -3684,7 +3684,7 @@ function maskExtensionApply()
   {
     _.assert( _.strIs( filter.hasExtension ) || _.strsAreAll( filter.hasExtension ) );
 
-    filter.hasExtension = _.arrayAs( filter.hasExtension );
+    filter.hasExtension = _.array.as( filter.hasExtension );
     filter.hasExtension = new RegExp( '^.*\\.(' + _.regexpsEscape( filter.hasExtension ).join( '|' ) + ')(\\.|$)(?!.*\/.+)', 'i' );
 
     filter.maskAll = _.RegexpObject.And( filter.maskAll, { includeAll : filter.hasExtension } );
@@ -3711,7 +3711,7 @@ function maskBeginsApply()
   {
     _.assert( _.strIs( filter.begins ) || _.strsAreAll( filter.begins ) );
 
-    filter.begins = _.arrayAs( filter.begins );
+    filter.begins = _.array.as( filter.begins );
     filter.begins = new RegExp( '^(\\.\\/)?(' + _.regexpsEscape( filter.begins ).join( '|' ) + ')' );
 
     filter.maskAll = _.RegexpObject.And( filter.maskAll, { includeAll : filter.begins } );
@@ -3738,7 +3738,7 @@ function maskEndsApply()
   {
     _.assert( _.strIs( filter.ends ) || _.strsAreAll( filter.ends ) );
 
-    filter.ends = _.arrayAs( filter.ends );
+    filter.ends = _.array.as( filter.ends );
     filter.ends = new RegExp( '(' + '^\.|' + _.regexpsEscape( filter.ends ).join( '|' ) + ')$' );
 
     filter.maskAll = _.RegexpObject.And( filter.maskAll, { includeAll : filter.ends } );

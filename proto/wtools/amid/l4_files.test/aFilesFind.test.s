@@ -16118,7 +16118,7 @@ function filesReflectTrivial( test )
     filter : { recursive : 2 },
     writing : 1,
     srcDeleting : 0,
-    // linking : 'nop'
+    // linkingAction : 'nop'
   }
 
   extract.filesReflect( o );
@@ -16126,7 +16126,7 @@ function filesReflectTrivial( test )
 
   /* */
 
-  test.case = 'linking : nop, dst files will be deleted for rewriting after onWriteDstUp call'
+  test.case = 'linkingAction : nop, dst files will be deleted for rewriting after onWriteDstUp call'
   var tree =
   {
     'src' :
@@ -16160,7 +16160,7 @@ function filesReflectTrivial( test )
     dstDeleting : 0,
     dstRewriting : 1,
     srcDeleting : 0,
-    linking : 'nop'
+    linkingAction : 'nop'
   }
 
   extract.filesReflect( o )
@@ -16182,7 +16182,7 @@ function filesReflectTrivial( test )
 
   /* */
 
-  test.case = 'linking : nop, return _.dont from onWriteDstUp to prevent any action'
+  test.case = 'linkingAction : nop, return _.dont from onWriteDstUp to prevent any action'
   var tree =
   {
     'src' :
@@ -16215,7 +16215,7 @@ function filesReflectTrivial( test )
     dstDeleting : 0,
     dstRewriting : 1,
     srcDeleting : 0,
-    linking : 'nop'
+    linkingAction : 'nop'
   }
 
   extract.filesReflect( o )
@@ -16259,7 +16259,7 @@ function filesReflectRecursive( test )
     srcDeleting : 0,
     withDirs : 1,
     withTerminals : 1,
-    linking : 'fileCopy'
+    linkingAction : 'fileCopy'
   }
   provider.filesReflect( o );
   var expected =
@@ -16282,7 +16282,7 @@ function filesReflectRecursive( test )
     srcDeleting : 0,
     withDirs : 1,
     withTerminals : 1,
-    linking : 'fileCopy'
+    linkingAction : 'fileCopy'
   }
   provider.filesReflect( o );
   var expected =
@@ -16305,7 +16305,7 @@ function filesReflectRecursive( test )
     srcDeleting : 0,
     withDirs : 1,
     withTerminals : 1,
-    linking : 'fileCopy'
+    linkingAction : 'fileCopy'
   }
   provider.filesReflect( o );
   var expected =
@@ -16328,7 +16328,7 @@ function filesReflectRecursive( test )
     srcDeleting : 0,
     withDirs : 1,
     withTerminals : 1,
-    linking : 'fileCopy'
+    linkingAction : 'fileCopy'
   }
   provider.filesReflect( o );
   var expected =
@@ -16351,7 +16351,7 @@ function filesReflectRecursive( test )
     srcDeleting : 0,
     withDirs : 1,
     withTerminals : 1,
-    linking : 'fileCopy'
+    linkingAction : 'fileCopy'
   }
   provider.filesReflect( o );
   var expected =
@@ -16374,7 +16374,7 @@ function filesReflectRecursive( test )
     srcDeleting : 0,
     withDirs : 1,
     withTerminals : 1,
-    linking : 'fileCopy'
+    linkingAction : 'fileCopy'
   }
   provider.filesReflect( o );
   var expected =
@@ -16397,7 +16397,7 @@ function filesReflectRecursive( test )
     srcDeleting : 0,
     withDirs : 1,
     withTerminals : 1,
-    linking : 'fileCopy'
+    linkingAction : 'fileCopy'
   }
   provider.filesReflect( o );
   var expected =
@@ -17651,7 +17651,7 @@ function _filesReflectWithFilter( test, o )
 
   var o2 =
   {
-    linking : 'fileCopy',
+    linkingAction : 'fileCopy',
     srcDeleting : 0,
     dstDeleting : 1,
     writing : 1,
@@ -17772,7 +17772,7 @@ function _filesReflectWithFilter( test, o )
 
   var o2 =
   {
-    linking : 'fileCopy',
+    linkingAction : 'fileCopy',
     srcDeleting : 0,
     dstDeleting : 1,
     writing : 1,
@@ -17907,7 +17907,7 @@ function _filesReflectWithFilter( test, o )
 
   var o2 =
   {
-    linking : 'fileCopy',
+    linkingAction : 'fileCopy',
     srcDeleting : 0,
     dstDeleting : 1,
     writing : 1,
@@ -18091,7 +18091,7 @@ function filesReflect( test )
     var o1 = optionsMake();
     var o2 =
     {
-      linking : 'fileCopy',
+      linkingAction : 'fileCopy',
       srcDeleting : 0,
       dstDeleting : 0,
       writing : 1,
@@ -18160,7 +18160,7 @@ function filesReflect( test )
     var o1 = optionsMake();
     var o2 =
     {
-      linking : 'softLink',
+      linkingAction : 'softLink',
       srcDeleting : 0,
       dstDeleting : 0,
       writing : 1,
@@ -18169,7 +18169,7 @@ function filesReflect( test )
       preservingTime : 0,
     }
 
-    test.case = 'complex move with linking : softLink\n' + _.entity.exportString( o2 );
+    test.case = 'complex move with linkingAction : softLink\n' + _.entity.exportString( o2 );
 
     var records = p.system.filesReflect( _.props.extend( null, o1, o2 ) );
 
@@ -18222,7 +18222,7 @@ function filesReflect( test )
     var o1 = optionsMake();
     var o2 =
     {
-      linking : 'fileCopy',
+      linkingAction : 'fileCopy',
       srcDeleting : 0,
       dstDeleting : 0,
       writing : 1,
@@ -18272,7 +18272,7 @@ function filesReflect( test )
     var o1 = optionsMake();
     var o2 =
     {
-      linking : 'fileCopy',
+      linkingAction : 'fileCopy',
       srcDeleting : 0,
       dstDeleting : 0,
       writing : 1,
@@ -18329,7 +18329,7 @@ function filesReflect( test )
     var o1 = optionsMake();
     var o2 =
     {
-      linking : 'fileCopy',
+      linkingAction : 'fileCopy',
       srcDeleting : 0,
       dstDeleting : 0,
       writing : 0,
@@ -18385,7 +18385,7 @@ function filesReflect( test )
     var o1 = optionsMake();
     var o2 =
     {
-      linking : 'nop',
+      linkingAction : 'nop',
       srcDeleting : 0,
       dstDeleting : 0,
       writing : 1,
@@ -18394,7 +18394,7 @@ function filesReflect( test )
       preservingTime : 0,
     }
 
-    test.case = 'complex move with writing : 1, linking : nop\n' + _.entity.exportString( o2 );
+    test.case = 'complex move with writing : 1, linkingAction : nop\n' + _.entity.exportString( o2 );
 
     var records = p.system.filesReflect( _.props.extend( null, o1, o2 ) );
 
@@ -18456,7 +18456,7 @@ function filesReflect( test )
     var o1 = optionsMake();
     var o2 =
     {
-      linking : 'nop',
+      linkingAction : 'nop',
       srcDeleting : 0,
       dstDeleting : 0,
       writing : 1,
@@ -18466,7 +18466,7 @@ function filesReflect( test )
       includingNonAllowed : 0,
     }
 
-    test.case = 'complex move with writing : 1, dstRewriting : 0, includingNonAllowed : 0, linking : nop\n' + _.entity.exportString( o2 );
+    test.case = 'complex move with writing : 1, dstRewriting : 0, includingNonAllowed : 0, linkingAction : nop\n' + _.entity.exportString( o2 );
 
     var records = p.system.filesReflect( _.props.extend( null, o1, o2 ) );
 
@@ -18509,7 +18509,7 @@ function filesReflect( test )
     var o1 = optionsMake();
     var o2 =
     {
-      linking : 'nop',
+      linkingAction : 'nop',
       srcDeleting : 0,
       dstDeleting : 0,
       writing : 1,
@@ -18519,7 +18519,7 @@ function filesReflect( test )
       includingNonAllowed : 1,
     }
 
-    test.case = 'complex move with writing : 1, dstRewriting : 0, includingNonAllowed : 1, linking : nop\n' + _.entity.exportString( o2 );
+    test.case = 'complex move with writing : 1, dstRewriting : 0, includingNonAllowed : 1, linkingAction : nop\n' + _.entity.exportString( o2 );
 
     var records = p.system.filesReflect( _.props.extend( null, o1, o2 ) );
 
@@ -18568,7 +18568,7 @@ function filesReflect( test )
     var o1 = optionsMake();
     var o2 =
     {
-      linking : 'fileCopy',
+      linkingAction : 'fileCopy',
       srcDeleting : 0,
       dstDeleting : 0,
       writing : 1,
@@ -18578,7 +18578,7 @@ function filesReflect( test )
       preservingSame : 1,
     }
 
-    test.case = 'complex move with preservingSame : 1, linking : fileCopy\n' + _.entity.exportString( o2 );
+    test.case = 'complex move with preservingSame : 1, linkingAction : fileCopy\n' + _.entity.exportString( o2 );
 
     var records = p.system.filesReflect( _.props.extend( null, o1, o2 ) );
 
@@ -18633,7 +18633,7 @@ function filesReflect( test )
     var o1 = optionsMake();
     var o2 =
     {
-      linking : 'fileCopy',
+      linkingAction : 'fileCopy',
       srcDeleting : 1,
       dstDeleting : 0,
       writing : 1,
@@ -18699,7 +18699,7 @@ function filesReflect( test )
     var o1 = optionsMake();
     var o2 =
     {
-      linking : 'fileCopy',
+      linkingAction : 'fileCopy',
       srcDeleting : 1,
       dstDeleting : 0,
       writing : 1,
@@ -18766,7 +18766,7 @@ function filesReflect( test )
     var o1 = optionsMake();
     var o2 =
     {
-      linking : 'fileCopy',
+      linkingAction : 'fileCopy',
       srcDeleting : 1,
       dstDeleting : 0,
       writing : 1,
@@ -18822,7 +18822,7 @@ function filesReflect( test )
     var o1 = optionsMake();
     var o2 =
     {
-      linking : 'fileCopy',
+      linkingAction : 'fileCopy',
       srcDeleting : 0,
       dstDeleting : 1,
       writing : 1,
@@ -18890,7 +18890,7 @@ function filesReflect( test )
     var o1 = optionsMake();
     var o2 =
     {
-      linking : 'fileCopy',
+      linkingAction : 'fileCopy',
       srcDeleting : 1,
       dstDeleting : 1,
       writing : 1,
@@ -18973,7 +18973,7 @@ function filesReflect( test )
 
     var o2 =
     {
-      linking : 'fileCopy',
+      linkingAction : 'fileCopy',
       srcDeleting : 0,
       dstDeleting : 0,
       writing : 1,
@@ -19072,7 +19072,7 @@ function filesReflect( test )
 
     var o2 =
     {
-      linking : 'fileCopy',
+      linkingAction : 'fileCopy',
       srcDeleting : 0,
       dstDeleting : 0,
       writing : 1,
@@ -19151,7 +19151,7 @@ function filesReflect( test )
 
     var o2 =
     {
-      linking : 'fileCopy',
+      linkingAction : 'fileCopy',
       srcDeleting : 0,
       dstDeleting : 0,
       writing : 1,
@@ -19248,7 +19248,7 @@ function filesReflect( test )
 
     var o2 =
     {
-      linking : 'fileCopy',
+      linkingAction : 'fileCopy',
       srcDeleting : 0,
       dstDeleting : 0,
       writing : 1,
@@ -19357,7 +19357,7 @@ function filesReflect( test )
 
     var o2 =
     {
-      linking : 'fileCopy',
+      linkingAction : 'fileCopy',
       srcDeleting : 0,
       dstDeleting : 1,
       writing : 1,
@@ -19442,7 +19442,7 @@ function filesReflect( test )
 
     var o2 =
     {
-      linking : 'fileCopy',
+      linkingAction : 'fileCopy',
       srcDeleting : 0,
       dstDeleting : 1,
       writing : 1,
@@ -19535,7 +19535,7 @@ function filesReflect( test )
 
     var o2 =
     {
-      linking : 'fileCopy',
+      linkingAction : 'fileCopy',
       srcDeleting : 0,
       dstDeleting : 0,
       writing : 1,
@@ -19622,7 +19622,7 @@ function filesReflect( test )
 
     var o2 =
     {
-      linking : 'fileCopy',
+      linkingAction : 'fileCopy',
       srcDeleting : 0,
       dstDeleting : 0,
       writing : 1,
@@ -20784,7 +20784,7 @@ function filesReflectorBasic( test )
   ({
     src : { prefixPath : 'src:///', basePath : 'src:///' },
     dst : { prefixPath : 'current://' + routinePath, basePath : 'current://' + routinePath },
-    linking : 'fileCopy',
+    linkingAction : 'fileCopy',
     mandatory : 1,
   });
 
@@ -20812,7 +20812,7 @@ function filesReflectorBasic( test )
   ({
     src : { prefixPath : 'src:///', basePath : 'src:///' },
     dst : { prefixPath : 'current://' + routinePath, basePath : 'current://' + routinePath },
-    linking : 'softLink',
+    linkingAction : 'softLink',
     mandatory : 1,
   });
 
@@ -20875,7 +20875,7 @@ function filesReflectWithSystem( test )
   };
   var o2 =
   {
-    linking : 'fileCopy',
+    linkingAction : 'fileCopy',
     srcDeleting : 0,
     dstDeleting : 1,
     writing : 1,
@@ -20903,7 +20903,7 @@ function filesReflectWithSystem( test )
   var o1 = { reflectMap : { [ srcUrl ] : dstUrl } };
   var o2 =
   {
-    linking : 'fileCopy',
+    linkingAction : 'fileCopy',
     srcDeleting : 0,
     dstDeleting : 1,
     writing : 1,
@@ -25299,7 +25299,7 @@ function filesReflectSrcAndDstLinked( test )
   provider.filesReflect
   ({
     reflectMap : { [ srcPath ] : dstPath },
-    linking : 'hardLink'
+    linkingAction : 'hardLink'
   });
 
   var srcStat2 = provider.statResolvedRead( srcPath );
@@ -25333,7 +25333,7 @@ function filesReflectSrcAndDstLinked( test )
   provider.filesReflect
   ({
     reflectMap : { [ srcPath ] : dstPath },
-    linking : 'softLink'
+    linkingAction : 'softLink'
   });
 
   var srcStat2 = provider.statResolvedRead( srcPath );
@@ -25369,7 +25369,7 @@ function filesReflectSrcAndDstLinked( test )
   provider.filesReflect
   ({
     reflectMap : { [ srcPath ] : dstPath },
-    linking : 'textLink'
+    linkingAction : 'textLink'
   });
 
   var srcStat2 = provider.statResolvedRead( srcPath );
@@ -33120,7 +33120,7 @@ function filesReflectHardlinkingBreaking( test )
     filter : { filePath : { [ a.abs( 'src1' ) ] : a.abs( 'dst1' ) } },
     breakingSrcHardLink : 1,
     breakingDstHardLink : 1,
-    linking : 'hardLink',
+    linkingAction : 'hardLink',
     verbosity : 1,
   });
 
@@ -33156,7 +33156,7 @@ function filesReflectHardlinkingBreaking( test )
     filter : { filePath : { [ a.abs( 'src1' ) ] : a.abs( 'dst1' ) } },
     breakingSrcHardLink : 0,
     breakingDstHardLink : 1,
-    linking : 'hardLink',
+    linkingAction : 'hardLink',
     verbosity : 1,
   });
 
@@ -33190,7 +33190,7 @@ function filesReflectHardlinkingBreaking( test )
   a.fileProvider.filesReflect
   ({
     filter : { filePath : { [ a.abs( 'src1' ) ] : a.abs( 'dst1' ) } },
-    linking : 'hardLink',
+    linkingAction : 'hardLink',
     verbosity : 1,
   });
 
@@ -33226,7 +33226,7 @@ function filesReflectHardlinkingBreaking( test )
     filter : { filePath : { [ a.abs( 'src1' ) ] : a.abs( 'dst1' ) } },
     breakingSrcHardLink : 1,
     breakingDstHardLink : 0,
-    linking : 'hardLink',
+    linkingAction : 'hardLink',
     verbosity : 1,
   });
 
@@ -33268,7 +33268,7 @@ function filesReflectHardlinkingBreaking( test )
     breakingSrcHardLink : 1,
     breakingDstHardLink : 0,
     dstRewritingOnlyPreserving : 1,
-    linking : 'hardLink',
+    linkingAction : 'hardLink',
     verbosity : 1,
   });
 
@@ -33341,7 +33341,7 @@ function filesReflectHardlinkingBreakingOptionDstRewritingOnlyPreserving( test )
     breakingSrcHardLink : 1,
     breakingDstHardLink : 0,
     dstRewritingOnlyPreserving : 1,
-    linking : 'hardLink',
+    linkingAction : 'hardLink',
     verbosity : 1,
   });
 
@@ -33409,7 +33409,7 @@ function filesReflectHardlinkingBreakingOptionDstRewritingOnlyPreserving( test )
         breakingSrcHardLink : 1,
         breakingDstHardLink : 0,
         dstRewritingOnlyPreserving : 1,
-        linking : 'hardLink',
+        linkingAction : 'hardLink',
         verbosity : 1,
       });
     },

@@ -6,8 +6,8 @@
 const _global = _global_;
 const _ = _global_.wTools;
 const Parent = null;
-const Self = wFilesOperator;
-function wFilesOperator( o )
+const Self = wOperator;
+function wOperator( o )
 {
   return _.workpiece.construct( Self, this, arguments );
 }
@@ -20,7 +20,7 @@ Self.shortName = 'Operator';
 
 function init( o )
 {
-  var operator = this;
+  let operator = this;
 
   _.assert( arguments.length === 0 || arguments.length === 1 );
   _.workpiece.initFields( operator );
@@ -54,35 +54,57 @@ function form()
     operator.filesSystem = filesSystem;
   }
 
-  if( !operator.operationArray )
-  operator.operationArray = [];
-
   return operator;
+}
+
+//
+
+function fileFor( globalPath, localPath )
+{
+  let operator = this;
+
+  _.assert( _.strDefined( globalPath ) );
+  _.assert( arguments.length === 1 || arguments.length === 2 );
+
+  let file = operator.filesMap[ globalPath ];
+  if( !file )
+  {
+    file = operator.filesMap[ globalPath ] = _.files.operator.File
+    ({
+      globalPath : globalPath,
+      localPath : localPath || null,
+      operator : operator,
+    });
+  }
+
+  return file;
 }
 
 // --
 // relations
 // --
 
-var Composes =
+let Composes =
+{
+  counter : 0,
+}
+
+let Aggregates =
 {
 }
 
-var Aggregates =
+let Associates =
 {
+  operationArray : _.define.own([]),
+  filesMap : _.define.own({}),
 }
 
-var Associates =
-{
-  operationArray : null,
-}
-
-var Restricts =
+let Restricts =
 {
   filesSystem : null,
 }
 
-var Statics =
+let Statics =
 {
 }
 
@@ -90,11 +112,12 @@ var Statics =
 // declare
 // --
 
-var Extension =
+let Extension =
 {
 
   init,
   form,
+  fileFor,
 
   // relations
 
@@ -117,5 +140,6 @@ _.classDeclare
 
 _.Copyable.mixin( Self );
 _.files[ Self.shortName ] = Self;
+_.files.operator[ Self.shortName ] = Self;
 
 })();

@@ -30288,7 +30288,7 @@ function hardLinkMultipleSync( test )
 
   /* */
 
-  test.case = 'dstPath option, linking files from different dirs';
+  test.case = 'dstPath option, linkingAction files from different dirs';
   paths = fileNames.map( ( n ) => path.join( 'dir_'+ n, n ) );
   paths = makeFiles( paths, currentTestDir );
   paths = provider.path.s.normalize( paths )
@@ -32011,7 +32011,7 @@ function hardLinkAsync( test )
 
   .ifNoErrorThen( function( arg )
   {
-    test.case = 'dstPath option, linking files from different dirs';
+    test.case = 'dstPath option, linkingAction files from different dirs';
     paths = fileNames.map( ( n ) => path.join( 'dir_'+ n, n ) );
     paths = makeFiles( paths, currentTestDir );
     return provider.hardLink
@@ -51502,7 +51502,7 @@ const Proto =
 
     writeAsyncThrowingError,
 
-    // qqq : extend linking routines with cases using resolvingSrcSoftLink:2 and resolvingSrcTextLink:0-2
+    // qqq : extend linkingAction routines with cases using resolvingSrcSoftLink:2 and resolvingSrcTextLink:0-2
 
     fileCopyActSync,
     fileCopyActAsync,
@@ -51634,7 +51634,7 @@ const Proto =
     // hardLinkReturnTextLinkedSync,
     // hardLinkReturnTextLinkedAsync,
 
-    /* qqq3 : extend linking tests to check returned value. must be false if success, but no change was done */
+    /* qqq3 : extend linkingAction tests to check returned value. must be false if success, but no change was done */
 
     fileExchangeSync,
     fileExchangeAsync,

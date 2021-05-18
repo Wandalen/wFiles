@@ -12,7 +12,7 @@
 
 const _global = _global_;
 const _ = _global_.wTools;
-let Routines = Object.create( null );
+const Routines = Object.create( null );
 const FileRecord = _.files.FileRecord;
 const Parent = _.FileProvider.Partial;
 const Self = wFileSystem;

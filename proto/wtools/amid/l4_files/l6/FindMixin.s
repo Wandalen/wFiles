@@ -736,7 +736,7 @@ function filesFind_head( routine, args )
 
     if( 'outputFormat' in o )
     {
-      // let knownFormats = [ 'absolute', 'relative', 'real', 'record', 'nothing' ]; /* xxx2 */
+      // let knownFormats = [ 'absolute', 'relative', 'real', 'record', 'nothing' ];
       _.assert
       (
         // _.longHas( knownFormats, o.outputFormat ),
@@ -1769,8 +1769,8 @@ function _filesReflectPrepare( routine, args )
   _.assert( _.arrayIs( o.result ) );
   _.assert( _.routineIs( o.onUp ) || o.onUp === null );
   _.assert( _.routineIs( o.onDown ) || o.onDown === null );
-  // _.assert( _.longHas( [ 'fileCopy', 'hardLink', 'hardLinkMaybe', 'softLink', 'softLinkMaybe', 'textLink', 'nop' ], o.linking ), 'unknown kind of linking', o.linking );
-  _.assert( !!self.ReflectAction[ o.linking ], () => 'Unknown kind of linking' + o.linking );
+  // _.assert( _.longHas( [ 'fileCopy', 'hardLink', 'hardLinkMaybe', 'softLink', 'softLinkMaybe', 'textLink', 'nop' ], o.linkingAction ), 'unknown kind of linkingAction', o.linkingAction );
+  _.assert( !!self.ReflectAction[ o.linkingAction ], () => 'Unknown kind of linkingAction' + o.linkingAction );
 
   return o;
 }
@@ -2447,7 +2447,7 @@ function filesReflectEvaluate_body( o )
       if( !record.dst.stat )
       {
         /* src is terminal file and dst does not exists */
-        _.assert( record.action === o.linking || _.strHas( o.linking, 'Maybe' ) );
+        _.assert( record.action === o.linkingAction || _.strHas( o.linkingAction, 'Maybe' ) );
       }
       else if( record.dst.isDir )
       {
@@ -2579,25 +2579,25 @@ function filesReflectEvaluate_body( o )
     let record = recordMake( dstRecord, srcRecord, srcRecord );
     record.reason = 'srcLooking';
 
-    let isSoftLink = record.dst.isSoftLink;
-
-    if( o.filesGraph )
-    {
-      if( record.dst.absolute === dstPath )
-      {
-        debugger;
-        o.filesGraph.dst.filePath = o.dst.filePath;
-        o.filesGraph.src.filePath = o.src.filePath;
-        o.filesGraph.actionBegin( o.dst.filePath + ' <- ' + o.src.filePath );
-      }
-      if( !record.src.isDir )
-      {
-        o.filesGraph.filesUpdate( record.dst );
-        o.filesGraph.filesUpdate( record.src );
-        if( o.filesGraph.fileIsUpToDate( record.dst ) )
-        record.upToDate = true;
-      }
-    }
+    // let isSoftLink = record.dst.isSoftLink;
+    //
+    // if( o.filesGraph )
+    // {
+    //   if( record.dst.absolute === dstPath )
+    //   {
+    //     debugger;
+    //     o.filesGraph.dst.filePath = o.dst.filePath;
+    //     o.filesGraph.src.filePath = o.src.filePath;
+    //     o.filesGraph.actionBegin( o.dst.filePath + ' <- ' + o.src.filePath );
+    //   }
+    //   if( !record.src.isDir )
+    //   {
+    //     o.filesGraph.filesUpdate( record.dst );
+    //     o.filesGraph.filesUpdate( record.src );
+    //     if( o.filesGraph.fileIsUpToDate( record.dst ) )
+    //     record.upToDate = true;
+    //   }
+    // }
 
     /* */
 
@@ -2651,20 +2651,20 @@ function filesReflectEvaluate_body( o )
     if( !srcRecord.included )
     return;
 
-    if( o.filesGraph && !record.src.isDir && !record.upToDate )
-    {
-      record.dst.reset();
-      o.filesGraph.dependencyAdd( record.dst, record.src );
-    }
+    // if( o.filesGraph && !record.src.isDir && !record.upToDate )
+    // {
+    //   record.dst.reset();
+    //   o.filesGraph.dependencyAdd( record.dst, record.src );
+    // }
 
     dstDelete( record, op );
     handleDown( record, op );
 
-    if( o.filesGraph )
-    {
-      if( record.dst.absolute === dstPath )
-      o.filesGraph.actionEnd();
-    }
+    // if( o.filesGraph )
+    // {
+    //   if( record.dst.absolute === dstPath )
+    //   o.filesGraph.actionEnd();
+    // }
 
   }
 
@@ -2757,7 +2757,8 @@ function filesReflectEvaluate_body( o )
     // debugger;
 
     _.assert( arguments.length === 2 );
-    _.assert( _.longHas( [ 'exclude', 'ignore', 'fileDelete', 'dirMake', 'fileCopy', 'softLink', 'hardLink', 'textLink', 'nop' ], action ), () => 'Unknown action ' + _.strQuote( action ) );
+    // _.assert( _.longHas( [ 'exclude', 'ignore', 'fileDelete', 'dirMake', 'fileCopy', 'softLink', 'hardLink', 'textLink', 'nop' ], action ), () => 'Unknown action ' + _.strQuote( action ) );
+    _.assert( self.ReflecEvalAction[ action ] !== undefined, () => 'Unknown action ' + _.strQuote( action ) );
 
     let absolutePath = record.dst.absolute;
     let result = actionMap[ absolutePath ] === action;
@@ -2850,7 +2851,7 @@ function filesReflectEvaluate_body( o )
     if( record.upToDate )
     return true;
 
-    if( o.linking === 'fileCopy' )
+    if( o.linkingAction === 'fileCopy' ) /* xxx : qqq : investigate */
     {
       if( self.filesCanBeSame( record.dst, record.src, true ) )
       return true;
@@ -2916,16 +2917,16 @@ function filesReflectEvaluate_body( o )
       return;
     }
 
-    let linking = o.linking;
-    if( _.strHas( linking, 'Maybe' ) )
+    let linkingAction = o.linkingAction;
+    if( _.strHas( linkingAction, 'Maybe' ) )
     {
       if( src === dst )
-      linking = _.strRemoveEnd( linking, 'Maybe' );
+      linkingAction = _.strRemoveEnd( linkingAction, 'Maybe' );
       else
-      linking = 'fileCopy';
+      linkingAction = 'fileCopy';
     }
 
-    action( record, linking );
+    action( record, linkingAction );
     touch( record, 'constructive' );
 
     return record;
@@ -3078,7 +3079,8 @@ var defaults = filesReflectPrimeDefaults;
 defaults.result = null;
 defaults.visitedMap = null;
 defaults.extra = null;
-defaults.linking = 'fileCopy';
+defaults.linkingAction = 'fileCopy';
+// defaults.xxx = 'both';
 
 defaults.verbosity = 0;
 defaults.mandatory = 1;
@@ -3107,8 +3109,7 @@ defaults.onDown = null;
 defaults.onDstName = null;
 
 var defaults = filesReflectEvaluate_body.defaults = Object.create( filesReflectPrimeDefaults ); /* xxx : xxx : remove all inheriting of defaults */
-
-defaults.filesGraph = null;
+// defaults.filesGraph = null;
 defaults.src = null;
 defaults.dst = null;
 
@@ -3283,9 +3284,9 @@ function filesReflectSingle_body( o )
   function writeDstUp2( record )
   {
 
-    // let linking = _.longHas( [ 'fileCopy', 'hardLink', 'softLink', 'textLink', 'nop' ], record.action );
-    let linking = !!self.ReflectMandatoryAction[ record.action ];
-    if( linking && record.allow && !path.isRoot( record.dst.absolute ) )
+    // let linkingAction = _.longHas( [ 'fileCopy', 'hardLink', 'softLink', 'textLink', 'nop' ], record.action );
+    let linkingAction = !!self.ReflectMandatoryAction[ record.action ];
+    if( linkingAction && record.allow && !path.isRoot( record.dst.absolute ) )
     {
 
       let dirPath = record.dst.dir;
@@ -3311,7 +3312,7 @@ function filesReflectSingle_body( o )
 
     }
 
-    if( linking )
+    if( linkingAction )
     link( record );
     else if( record.action === 'fileDelete' )
     {}
@@ -3883,7 +3884,7 @@ function filesReflect_head( routine, args )
  * @param {Boolean} o.withDirs=1
  * @param {Boolean} o.includingNonAllowed=1
  * @param {Boolean} o.includingDst
- * @param {String} o.linking='fileCopy'
+ * @param {String} o.linkingAction='fileCopy'
  * @param {Boolean} o.writing=1
  * @param {Boolean} o.srcDeleting=0
  * @param {Boolean} o.dstDeleting=0
@@ -4991,7 +4992,7 @@ function filesDeleteTerminals_body( o )
 
   let o2 = _.mapOnly_( null, o, self.filesFind.defaults );
 
-  o2.onDown = _.arrayAppendElement( _.arrayAs( o.onDown ), handleDown );
+  o2.onDown = _.arrayAppendElement( _.array.as( o.onDown ), handleDown );
   if( _.arrayIs( o2.onDown ) )
   o2.onDown = _.routinesComposeReturningLast( o2.onDown );
 
@@ -5045,7 +5046,7 @@ function filesDeleteEmptyDirs_body( o )
 
   let o2 = _.mapOnly_( null, o, self.filesFind.defaults );
 
-  o2.onDown = _.arrayAppendElement( _.arrayAs( o.onDown ), handleDown );
+  o2.onDown = _.arrayAppendElement( _.array.as( o.onDown ), handleDown );
   if( _.arrayIs( o2.onDown ) )
   o2.onDown = _.routinesComposeReturningLast( o2.onDown );
 
@@ -5230,7 +5231,7 @@ function filesRename_head( routine, args )
   _.assert( args.length === 1 );
   _.assert( arguments.length === 2 );
   _.assert( _.routineIs( o.onRename ) );
-  _.assert( _.routineIs( self[ o.linking ] ), `Unknown linking method ${o.linking}` );
+  _.assert( _.routineIs( self[ o.linkingAction ] ), `Unknown linkingAction method ${o.linkingAction}` );
 
   return o;
 }
@@ -5246,7 +5247,7 @@ function filesRename_body( o )
 
   _.assert( o.outputFormat === undefined );
 
-  let o3 = _.mapOnly_( null, o, self[ o.linking ].defaults );
+  let o3 = _.mapOnly_( null, o, self[ o.linkingAction ].defaults );
   let o2 = _.mapOnly_( null, o, self.filesFind.defaults );
   o2.outputFormat = 'record';
   o2.onDown = onDown;
@@ -5261,7 +5262,7 @@ function filesRename_body( o )
       let o4 = Object.assign( Object.create( null ), o3 );
       o4.srcPath = r.absolute;
       o4.dstPath = dstPath;
-      r.effectiveProvider[ o.linking ]( o4 );
+      r.effectiveProvider[ o.linkingAction ]( o4 );
       r.absolute = dstPath;
     }
     if( o.onDown )
@@ -5275,7 +5276,7 @@ var defaults = filesRename_body.defaults = _.props.extend( null, Partial.prototy
 defaults.sync = 1;
 defaults.throwing = null;
 defaults.mode = 'distinct';
-defaults.linking = 'fileRename';
+defaults.linkingAction = 'fileRename';
 defaults.resolvingSoftLink = 1;
 defaults.resolvingTextLink = 1;
 defaults.withDirs = 0;
@@ -5299,7 +5300,7 @@ function softLinksBreak_body( o )
   /* */
 
   let optionsFind = _.mapOnly_( null, o, filesFind.defaults );
-  optionsFind.onDown = _.arrayAppendElement( _.arrayAs( optionsFind.onDown ), function( record )
+  optionsFind.onDown = _.arrayAppendElement( _.array.as( optionsFind.onDown ), function( record )
   {
 
     debugger;
@@ -5346,7 +5347,7 @@ function softLinksRebase_body( o )
   /* */
 
   let optionsFind = _.mapOnly_( null, o, filesFind.defaults );
-  optionsFind.onDown = _.arrayAppendElement( _.arrayAs( optionsFind.onDown ), function( record )
+  optionsFind.onDown = _.arrayAppendElement( _.array.as( optionsFind.onDown ), function( record )
   {
 
     if( !record.isSoftLink )
@@ -5397,7 +5398,7 @@ qqq : optimize
 
 function filesHasTerminal( filePath )
 {
-  var self = this;
+  let self = this;
   _.assert( arguments.length === 1 );
 
   let terminal = false;
@@ -5438,7 +5439,7 @@ function filesResolve( o )
 {
   let self = this;
   let result;
-  var o = _.routine.options_( filesResolve, arguments );
+  o = _.routine.options_( filesResolve, arguments );
 
   _.assert( _.object.isBasic( o.translator ) );
 
@@ -5488,6 +5489,19 @@ let ReflectMandatoryAction =
   'nop' : 'nop',
 }
 
+let ReflecEvalAction =
+{
+  'exclude' : 'exclude',
+  'ignore' : 'ignore',
+  'fileDelete' : 'fileDelete',
+  'dirMake' : 'dirMake',
+  'fileCopy' : 'fileCopy',
+  'softLink' : 'softLink',
+  'hardLink' : 'hardLink',
+  'textLink' : 'textLink',
+  'nop' : 'nop',
+}
+
 let FindOutputFormat =
 {
   'absolute' : 'absolute',
@@ -5517,6 +5531,7 @@ let Statics =
 {
   ReflectAction,
   ReflectMandatoryAction,
+  ReflecEvalAction,
   FindOutputFormat,
 }
 

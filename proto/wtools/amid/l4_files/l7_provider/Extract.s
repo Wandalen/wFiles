@@ -1265,7 +1265,7 @@ _.routineExtend( fileIsLockedAct, Parent.prototype.fileIsLockedAct );
 
 
 // --
-// linking
+// linkingAction
 // --
 
 function fileRenameAct( o )
@@ -1555,7 +1555,7 @@ function softLinkAct( o )
     dstDirCheck();
 
     /*
-      qqq : add tests for linking act routines
+      qqq : add tests for linkingAction act routines
       qqq : don't forget throwing cases
     */
 
@@ -2856,7 +2856,7 @@ let Extension =
   fileUnlockAct,
   fileIsLockedAct,
 
-  // linking
+  // linkingAction
 
   fileRenameAct,
   fileCopyAct,

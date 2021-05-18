@@ -25,7 +25,7 @@ function trivial( test )
 
   /* - */
 
-  test.case = 'universal, linking : fileCopy, dstRewriting : 0';
+  test.case = 'universal, linkingAction : fileCopy, dstRewriting : 0';
 
   var expectedExtract = _.FileProvider.Extract
   ({
@@ -98,7 +98,7 @@ function trivial( test )
     reflectMap : { '/src' : '/dst' },
     dstRewriting : 0,
     dstRewritingByDistinct : 0,
-    linking : 'fileCopy',
+    linkingAction : 'fileCopy',
   });
 
   archive.timelapseEnd();
@@ -118,7 +118,7 @@ function trivial( test )
 
   /* - */
 
-  test.case = 'universal, linking : fileCopy, dstRewriting : 1';
+  test.case = 'universal, linkingAction : fileCopy, dstRewriting : 1';
 
   var expectedExtract = _.FileProvider.Extract
   ({
@@ -185,7 +185,7 @@ function trivial( test )
   ({
     reflectMap : { '/src' : '/dst' },
     dstRewriting : 1,
-    linking : 'fileCopy',
+    linkingAction : 'fileCopy',
   });
 
   archive.timelapseEnd();
@@ -205,7 +205,7 @@ function trivial( test )
 
   /* - */
 
-  test.case = 'universal, linking : hardLink, dstRewriting : 1';
+  test.case = 'universal, linkingAction : hardLink, dstRewriting : 1';
 
   var expectedExtract = _.FileProvider.Extract
   ({
@@ -270,7 +270,7 @@ function trivial( test )
   ({
     reflectMap : { '/src' : '/dst' },
     dstRewriting : 1,
-    linking : 'hardLink',
+    linkingAction : 'hardLink',
   });
 
   archive.timelapseEnd();

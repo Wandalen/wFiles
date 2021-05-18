@@ -11,7 +11,7 @@ _.assert( _.object.isBasic( _.files ) );
 const Self = _.files.linker = _.files.linker || Object.create( null );
 
 // --
-// linking
+// linkingAction
 // --
 
 function multiple( o, link )

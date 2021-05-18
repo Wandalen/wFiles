@@ -2538,7 +2538,7 @@ let Extension =
   fileUnlockAct,
   fileIsLockedAct,
 
-  // linking
+  // linkingAction
 
   fileRenameAct,
   fileCopyAct,

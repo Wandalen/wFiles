@@ -59,9 +59,9 @@ Self.shortName = 'SecondaryMixin';
 //   _.assert( arguments.length === 1, 'Expects single argument' );
 //   _.assert( _.arrayIs( o.paths ) || _.object.isBasic( o.paths ) || _.strIs( o.paths ) );
 //
-//   o.onBegin = o.onBegin ? _.arrayAs( o.onBegin ) : [];
-//   o.onEnd = o.onEnd ? _.arrayAs( o.onEnd ) : [];
-//   o.onProgress = o.onProgress ? _.arrayAs( o.onProgress ) : [];
+//   o.onBegin = o.onBegin ? _.array.as( o.onBegin ) : [];
+//   o.onEnd = o.onEnd ? _.array.as( o.onEnd ) : [];
+//   o.onProgress = o.onProgress ? _.array.as( o.onProgress ) : [];
 //
 //   let onBegin = o.onBegin;
 //   let onEnd = o.onEnd;
@@ -91,7 +91,7 @@ Self.shortName = 'SecondaryMixin';
 //     o.paths = _paths;
 //   }
 //
-//   o.paths = _.arrayAs( o.paths );
+//   o.paths = _.array.as( o.paths );
 //
 //   /* result */
 //
@@ -484,7 +484,7 @@ function filesAreUpToDate2_body( o )
 {
   let self = this;
   let factory = self.recordFactory({ allowingMissed : 1 });
-  let srcFiles = factory.records( _.arrayAs( o.src ) );
+  let srcFiles = factory.records( _.array.as( o.src ) );
 
   if( !srcFiles.length )
   {
@@ -508,7 +508,7 @@ function filesAreUpToDate2_body( o )
 
   /* */
 
-  let dstFiles = factory.records( _.arrayAs( o.dst ) );
+  let dstFiles = factory.records( _.array.as( o.dst ) );
   if( !dstFiles.length )
   {
     if( o.verbosity )
@@ -724,7 +724,7 @@ function filesSearchText( o )
   _.routine.options_( filesSearchText, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
 
-  o.ins = _.arrayAs( o.ins );
+  o.ins = _.array.as( o.ins );
   o.ins = _.regexpsMaybeFrom
   ({
     srcStr : o.ins,

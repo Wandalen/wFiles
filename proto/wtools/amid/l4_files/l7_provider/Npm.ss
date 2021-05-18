@@ -287,7 +287,7 @@ function filesReflectSingle_body( o )
   _.assert( o.onWriteSrcDown === null, 'Not supported options' );
 
   _.assert( o.outputFormat === 'record' || o.outputFormat === 'nothing', 'Not supported options' );
-  _.assert( o.linking === 'fileCopy' || o.linking === 'hardLinkMaybe' || o.linking === 'softLinkMaybe', 'Not supported options' );
+  _.assert( o.linkingAction === 'fileCopy' || o.linkingAction === 'hardLinkMaybe' || o.linkingAction === 'softLinkMaybe', 'Not supported options' );
   _.assert( !o.src.hasFiltering(), 'Not supported options' );
   _.assert( !o.dst.hasFiltering(), 'Not supported options' );
   _.assert( o.src.formed === 3 );

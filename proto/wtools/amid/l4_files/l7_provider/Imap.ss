@@ -1115,7 +1115,7 @@ function dirMakeAct( o )
 _.routineExtend( dirMakeAct, Parent.prototype.dirMakeAct );
 
 // --
-// linking
+// linkingAction
 // --
 
 function fileRenameAct( o )
@@ -1213,7 +1213,7 @@ function fileCopyAct( o )
     srcPath = self._pathDirNormalize( srcPath );
     let dstPath = path.unabsolute( dstParsed.dirPath );
     dstPath = self._pathDirNormalize( dstPath );
-    let msgId = _.arrayAs( srcParsed.stripName );
+    let msgId = _.array.as( srcParsed.stripName );
 
     self._connection.openBox( srcPath )
     .then( () =>
@@ -1471,7 +1471,7 @@ let Extension =
   dirMakeAct,
   streamWriteAct : null,
 
-  // linking
+  // linkingAction
 
   fileRenameAct,
   fileCopyAct,

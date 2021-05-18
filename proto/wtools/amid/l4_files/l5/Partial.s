@@ -2391,7 +2391,7 @@ function filesSize_body( o )
   //
   // _.assert( arguments.length === 1, 'Expects single argument' );
 
-  o.filePath = _.arrayAs( o.filePath );
+  o.filePath = _.array.as( o.filePath );
 
   let optionsForSize = _.props.extend( null, o );
   optionsForSize.filePath = o.filePath[ 0 ];
@@ -5963,7 +5963,7 @@ let fileIsLocked = _.routine.uniteCloning_replaceByUnite( _preFilePathScalarWith
 dirMakeForFile.having.aspect = 'entry';
 
 // --
-// linking
+// linkingAction
 // --
 
 let fileRenameAct = Object.create( null );
@@ -6678,7 +6678,7 @@ function _hardLinkVerify1( c )
     !!c.options.breakingSrcHardLink || !!c.options.breakingDstHardLink,
     'Both source and destination hardlinks could not be preserved, please set breakingSrcHardLink or breakingDstHardLink to true'
   );
-  // _.assert( o.allowingMissed === 0 || _.longIs( o.dstPath ), 'o.allowingMissed could be disabled when linking two files' );
+  // _.assert( o.allowingMissed === 0 || _.longIs( o.dstPath ), 'o.allowingMissed could be disabled when linkingAction two files' );
 
 }
 
@@ -6701,7 +6701,7 @@ function _hardLinkVerify2( c )
   if( c.srcStat && c.srcStat.isLink() )
   return;
 
-  _.assert( o.allowingMissed === 0 || _.longIs( o.dstPath ), 'o.allowingMissed could be disabled when linking two files' );
+  _.assert( o.allowingMissed === 0 || _.longIs( o.dstPath ), 'o.allowingMissed could be disabled when linkingAction two files' );
 
   if( srcStat === null )
   {
@@ -6895,7 +6895,7 @@ defaults.resolvingDstTextLink = 0;
 
 _.props.extend( hardLink.defaults, hardLink.body.defaults );
 
-/* xxx qqq2 : add test routine to check linking methods fails if context is passed */
+/* xxx qqq2 : add test routine to check linkingAction methods fails if context is passed */
 
 //
 
@@ -8227,7 +8227,7 @@ let Extension =
   fileIsLockedAct,
   fileIsLocked,
 
-  // linking
+  // linkingAction
 
   fileRenameAct,
   fileRename,

@@ -6,8 +6,8 @@
 const _global = _global_;
 const _ = _global_.wTools;
 const Parent = null;
-const Self = wFilesMission;
-function wFilesMission( o )
+const Self = wOperatorMission;
+function wOperatorMission( o )
 {
   return _.workpiece.construct( Self, this, arguments );
 }
@@ -43,10 +43,10 @@ function form()
   let mission = this;
 
   if( !mission.operator )
-  mission.operator = new _.files.Operator();
+  mission.operator = new _.files.operator.Operator();
 
-  if( !mission.operationArray )
-  mission.operationArray = [];
+  // if( !mission.operationArray )
+  // mission.operationArray = [];
 
   return mission;
 }
@@ -59,7 +59,7 @@ function filesReflect( o )
   let operator = mission.operator;
   let filesSystem = operator.filesSystem;
 
-  o = filesSystem.filesReflect.head.call( filesSystem, filesSystem.filesReflect, arguments ); debugger;
+  o = filesSystem.filesReflect.head.call( filesSystem, filesSystem.filesReflect, arguments );
 
   let src = o.src;
   let dst = o.dst;
@@ -70,13 +70,13 @@ function filesReflect( o )
   delete o.src;
   delete o.dst;
 
-  let operation = _.files.Operation
+  let operation = _.files.operator.Operation
   ({
     mission,
     options : o,
-    type : 'filesReflect',
-    src : o.src,
-    dst : o.dst,
+    action : 'filesReflect',
+    src,
+    dst,
   });
 
   return operation;
@@ -91,8 +91,9 @@ filesReflect.defaults =
 
 function redo( o )
 {
+  let mission = this;
   let ready = _.take( null );
-  o = _.routine.options( arguments );
+  o = _.routine.options( redo, arguments );
 
   mission.operationArray.forEach( ( operation ) =>
   {
@@ -110,26 +111,26 @@ redo.defaults =
 // relations
 // --
 
-var Composes =
+let Composes =
 {
   missionName : null,
 }
 
-var Aggregates =
+let Aggregates =
 {
-  operationArray : null,
+  operationArray : _.define.own([]),
 }
 
-var Associates =
+let Associates =
 {
   operator : null,
 }
 
-var Restricts =
+let Restricts =
 {
 }
 
-var Statics =
+let Statics =
 {
 }
 
@@ -137,7 +138,7 @@ var Statics =
 // declare
 // --
 
-var Extension =
+let Extension =
 {
 
   init,
@@ -167,6 +168,6 @@ _.classDeclare
 });
 
 _.Copyable.mixin( Self );
-_.files[ Self.shortName ] = Self;
+_.files.operator[ Self.shortName ] = Self;
 
 })();

@@ -4,7 +4,7 @@ Explain how to start extending tests and the functionality of the module.
 
 ### Fork and clone
 
-Use your github account to fork the repository `https://github.com/Wandalen/wTools`.
+Use your github account to fork the repository `https://github.com/Wandalen/wFiles`.
 After forking the repository clone it on your local machine. It looks like below:
 ```bash
 git clone https://github.com/{{ your account }}/wFiles

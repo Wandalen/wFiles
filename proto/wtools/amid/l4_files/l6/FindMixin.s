@@ -4031,36 +4031,65 @@ function filesReflect_body( o )
 
     if( o.outputFormat !== 'record' )
     {
-      if( o.outputFormat === 'src.relative' )
+      const resultForm =
       {
-        for( let r = 0 ; r < o.result.length ; r++ )
-        o.result[ r ] = o.result[ r ].src.relative;
-      }
-      else if( o.outputFormat === 'src.absolute' )
-      {
-        for( let r = 0 ; r < o.result.length ; r++ )
-        o.result[ r ] = o.result[ r ].src.absolute;
-      }
-      else if( o.outputFormat === 'dst.relative' )
-      {
-        for( let r = 0 ; r < o.result.length ; r++ )
-        o.result[ r ] = o.result[ r ].dst.relative;
-      }
-      else if( o.outputFormat === 'dst.absolute' )
-      {
-        for( let r = 0 ; r < o.result.length ; r++ )
-        o.result[ r ] = o.result[ r ].dst.absolute;
-      }
-      else if( o.outputFormat === 'nothing' )
-      {
-        o.result.splice( 0, o.result.length );
-      }
-      else _.assert( 0, 'Unknown output format :', o.outputFormat );
+        'src.absolute' : pathForm,
+        'dst.absolute' : pathForm,
+        'src.relative' : pathForm,
+        'dst.relative' : pathForm,
+        'nothing' : nothingForm,
+      };
+      if( !( o.outputFormat in resultForm ) )
+      _.assert( 0, `Unknown output format : ${ o.outputFormat }` );
+      else
+      result = resultForm[ o.outputFormat ]( o.result, o.outputFormat );
+      // if( o.outputFormat === 'src.relative' )
+      // {
+      //   for( let r = 0 ; r < o.result.length ; r++ )
+      //   o.result[ r ] = o.result[ r ].src.relative;
+      // }
+      // else if( o.outputFormat === 'src.absolute' )
+      // {
+      //   for( let r = 0 ; r < o.result.length ; r++ )
+      //   o.result[ r ] = o.result[ r ].src.absolute;
+      // }
+      // else if( o.outputFormat === 'dst.relative' )
+      // {
+      //   for( let r = 0 ; r < o.result.length ; r++ )
+      //   o.result[ r ] = o.result[ r ].dst.relative;
+      // }
+      // else if( o.outputFormat === 'dst.absolute' )
+      // {
+      //   for( let r = 0 ; r < o.result.length ; r++ )
+      //   o.result[ r ] = o.result[ r ].dst.absolute;
+      // }
+      // else if( o.outputFormat === 'nothing' )
+      // {
+      //   o.result.splice( 0, o.result.length );
+      // }
+      // else _.assert( 0, 'Unknown output format :', o.outputFormat );
     }
 
     return o.result;
   }
 
+  /* */
+
+  function pathForm( src, format )
+  {
+    format = format.split( '.' );
+    for( let i = 0 ; i < src.length ; i++ )
+    src[ i ] = o.result[ i ][ format[ 0 ] ][ format[ 1 ] ];
+    return src;
+  }
+
+  /* */
+
+  function nothingForm( src )
+  {
+    src.splice( 0, src.length );
+    return src;
+  }
 }
 
 var defaults = filesReflect_body.defaults = Object.create( filesReflectEvaluate.defaults );

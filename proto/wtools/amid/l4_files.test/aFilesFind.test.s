@@ -16722,9 +16722,7 @@ function filesReflectMandatory( test )
 
   test.shouldThrowErrorSync( () =>
   {
-    debugger;
     var srcRel = provider.filesReflect( o );
-    debugger;
     var expRels = [ '.', './amid', './amid/terminal', './amid', './amid/terminal', './amid/terminal', '.' ];
     test.identical( srcRel, expRels );
   });
@@ -16797,6 +16795,7 @@ function filesReflectMutuallyExcluding( test )
     },
     srcDeleting : 1,
     dstDeleting : 1,
+    outputFormat : 'record',
   }
   var extract = new _.FileProvider.Extract({ filesTree : tree });
   extract.filesReflectTo( provider, routinePath );
@@ -16863,6 +16862,7 @@ function filesReflectMutuallyExcluding( test )
     },
     srcDeleting : 1,
     dstDeleting : 1,
+    outputFormat : 'record',
   }
   var extract = new _.FileProvider.Extract({ filesTree : tree });
   extract.filesReflectTo( provider, routinePath );
@@ -16930,6 +16930,7 @@ function filesReflectMutuallyExcluding( test )
     },
     srcDeleting : 1,
     dstDeleting : 1,
+    outputFormat : 'record',
   }
   var extract = new _.FileProvider.Extract({ filesTree : tree });
   extract.filesReflectTo( provider, routinePath );
@@ -17037,6 +17038,7 @@ function filesReflectMutuallyExcluding( test )
     },
     srcDeleting : 1,
     dstDeleting : 1,
+    outputFormat : 'record',
   }
   var extract = new _.FileProvider.Extract({ filesTree : tree });
   extract.filesReflectTo( provider, routinePath );
@@ -17124,6 +17126,7 @@ function filesReflectMutuallyExcluding( test )
     },
     srcDeleting : 1,
     dstDeleting : 1,
+    outputFormat : 'record',
   }
   var extract = new _.FileProvider.Extract({ filesTree : tree });
   extract.filesReflectTo( provider, routinePath );
@@ -17210,6 +17213,7 @@ function filesReflectMutuallyExcluding( test )
     },
     srcDeleting : 1,
     dstDeleting : 1,
+    outputFormat : 'record',
   }
   var extract = new _.FileProvider.Extract({ filesTree : tree });
   extract.filesReflectTo( provider, routinePath );
@@ -17292,6 +17296,7 @@ function filesReflectMutuallyExcluding( test )
     },
     srcDeleting : 1,
     dstDeleting : 1,
+    outputFormat : 'record',
   }
   var extract = new _.FileProvider.Extract({ filesTree : tree });
   extract.filesReflectTo( provider, routinePath );
@@ -17379,6 +17384,7 @@ function filesReflectMutuallyExcluding( test )
     },
     srcDeleting : 1,
     dstDeleting : 1,
+    outputFormat : 'record',
   }
   var extract = new _.FileProvider.Extract({ filesTree : tree });
   extract.filesReflectTo( provider, routinePath );
@@ -17481,6 +17487,7 @@ function filesReflectMutuallyExcluding( test )
     },
     srcDeleting : 1,
     dstDeleting : 1,
+    outputFormat : 'record',
   }
   var extract = new _.FileProvider.Extract({ filesTree : tree });
   extract.filesReflectTo( provider, routinePath );

@@ -23,7 +23,7 @@ function finit()
   let file = this;
   file.unform();
 
-  _.assert( file.deeds.size === 0 );
+  _.assert( file.deedArray.length === 0 );
 
   return _.Copyable.prototype.finit.call( this );
 }
@@ -52,13 +52,16 @@ function init( o )
 function unform()
 {
   let file = this;
+  let operator = file.operator;
 
-  if( !file.operation )
+  if( !file.id )
   return;
 
   _.assert( operator.filesMap[ file.globalPath ] === file );
   delete operator.filesMap[ file.globalPath ];
 
+  file.id = -1;
+  return file;
 }
 
 //
@@ -70,10 +73,94 @@ function form()
 
   _.assert( operator instanceof _.files.operator.Operator );
   _.assert( _.strDefined( file.globalPath ) );
-  _.assert( operator.filesMap[ file.globalPath ] === undefined || operator.filesMap[ file.globalPath ] === file ); debugger;
+  _.assert( operator.filesMap[ file.globalPath ] === undefined || operator.filesMap[ file.globalPath ] === file );
+  _.assert( file.id === null );
+
+  file.id = operator.idAllocate();
 
   operator.filesMap[ file.globalPath ] = file;
+  return file;
 }
+
+//
+
+function reform2()
+{
+  let file = this;
+  let operator = file.operator;
+
+  // if( isDst )
+  // if( file.firstEffectiveDeed === null )
+  // if( !deed.facetSet.has( 'editing' ) && deed.facetSet.size > 0 )
+  // {
+  //   file.firstEffectiveDeed = deed;
+  // }
+
+}
+
+// //
+//
+// function deedOff( usage )
+// {
+//   let file = this;
+//   let operator = file.operator;
+//
+//   _.assert( arguments.length === 1 );
+//   _.assert( _.files.operator.usageIs( usage ) );
+//   _.arrayRemoveElementOnceStrictly( file.deedArray, deed );
+//
+//   deed.filesSet.delete( usage );
+//   // if( isDst )
+//   // deed.dst.delete( usage );
+//   // else
+//   // deed.src.delete( usage );
+//
+//   if( file.deedArray.length === 0 )
+//   file.finit();
+//
+// }
+//
+// //
+//
+// function deedOn( usage )
+// {
+//   let file = this;
+//   let operator = file.operator;
+//
+//   _.assert( _.files.operator.usageIs( usage ) );
+//   _.assert( arguments.length === 1 );
+//   _.arrayAppendElementOnceStrictly( file.deedArray, usage );
+//
+//   // if( isDst )
+//   // if( file.firstEffectiveDeed === null )
+//   // if( !deed.facetSet.has( 'editing' ) && deed.facetSet.size > 0 )
+//   // {
+//   //   file.firstEffectiveDeed = deed;
+//   // }
+//
+// }
+
+// //
+//
+// function account( deed, attribute )
+// {
+//   let file = this;
+//   let operator = file.operator;
+//
+//   debugger;
+//   if( _.set.is( attribute ) && attribute.length === 1 )
+//   attribute = _.set.first( attribute );
+//
+//   if( _.set.is( attribute )
+//   {
+//     _.assert( 0, 'not implemented' );
+//   }
+//   else
+//   {
+//
+//   }
+//
+// }
 
 // --
 // relations
@@ -87,11 +174,13 @@ let Composes =
 
 let Aggregates =
 {
-  deeds : _.define.own( new Set ),
+  deedArray : _.define.own([]),
+  firstEffectiveDeed : null,
 }
 
 let Associates =
 {
+  id : null,
   operator : null,
 }
 
@@ -114,6 +203,10 @@ let Extension =
   init,
   unform,
   form,
+  reform2,
+
+  // deedOff,
+  // deedOn,
 
   // relations
 

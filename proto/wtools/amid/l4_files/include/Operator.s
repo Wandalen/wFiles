@@ -10,6 +10,7 @@ if( typeof module !== 'undefined' )
   require( '../l7_operator/l1/Namespace.s' );
   require( '../l7_operator/l3/Deed.s' );
   require( '../l7_operator/l3/File.s' );
+  require( '../l7_operator/l3/FileUsage.s' );
   require( '../l7_operator/l3/Mission.s' );
   require( '../l7_operator/l3/Operation.s' );
   require( '../l7_operator/l3/Operator.s' );

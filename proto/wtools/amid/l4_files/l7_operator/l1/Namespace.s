@@ -11,7 +11,17 @@ _.files.operator = _.files.operator || Object.create( null );
 //
 // --
 
-
+function includeIs( src )
+{
+  return src instanceof _.files.operator.FileUsage;
+  // if( !_.map.is( src ) )
+  // return false;
+  // if( !src.file )
+  // return false;
+  // if( !src.deed )
+  // return false;
+  // return true;
+}
 
 // --
 //
@@ -24,6 +34,8 @@ _.files.operator = _.files.operator || Object.create( null );
 
 let OperatorExtension =
 {
+
+  includeIs,
 
 }
 

@@ -25,6 +25,7 @@ function finit()
 
   _.assert( operator.missionSet.size === 0 );
   _.assert( operator.operationArray.length === 0 );
+  _.assert( operator.deedArray.length === 0 );
   _.assert( _.props.keys( operator.filesMap ).length === 0 );
 
   return _.Copyable.prototype.finit.call( operator );
@@ -56,12 +57,15 @@ function unform()
 {
   let operator = this;
 
-  if( !operator.operator )
-  return;
-
+  if( operator.missionSet.size )
   debugger;
-  _.assert( operator.operator.missionSet.has( operator ) );
-  operator.operator.missionSet.delete( operator );
+
+  _.container.each( operator.missionSet, ( mission ) => mission.finit() );
+  _.container.each( operator.operationArray.slice(), ( operation ) => operation.finit() );
+
+  _.assert( operator.missionSet.size === 0 );
+  _.assert( operator.operationArray.length === 0 );
+  _.assert( operator.deedArray.length === 0 );
 
   return operator;
 }
@@ -84,7 +88,21 @@ function form()
     operator.filesSystem = filesSystem;
   }
 
+  _.assert( operator.counter === 0 );
+
+  // operator.thirdOperation = _.files.operator.Operation({ operator });
+  // _.assert( operator.thirdOperation.id === 1 );
+
   return operator;
+}
+
+//
+
+function idAllocate()
+{
+  let operator = this;
+  operator.counter += 1;
+  return operator.counter;
 }
 
 //
@@ -105,7 +123,7 @@ function fileFor( globalPath, localPath )
       localPath : localPath || null,
       operator : operator,
     });
-    file.form();
+    // file.form();
   }
 
   return file;
@@ -128,12 +146,14 @@ let Associates =
 {
   missionSet : _.define.own( new Set ),
   operationArray : _.define.own([]),
+  deedArray : _.define.own([]),
   filesMap : _.define.own({}),
 }
 
 let Restricts =
 {
   filesSystem : null,
+  // thirdOperation : null,
 }
 
 let Statics =
@@ -151,6 +171,8 @@ let Extension =
   init,
   unform,
   form,
+
+  idAllocate,
   fileFor,
 
   // relations

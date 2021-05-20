@@ -53,16 +53,18 @@ function init( o )
 function unform()
 {
   let mission = this;
+  let operator = mission.operator;
 
-  if( !mission.operator )
+  if( !mission.id )
   return;
 
   mission.operationArray.slice().forEach( ( operation ) => operation.finit() );
   _.assert( mission.operationArray.length === 0 );
 
-  _.assert( mission.operator.missionSet.has( mission ) );
-  mission.operator.missionSet.delete( mission );
+  _.assert( operator.missionSet.has( mission ) );
+  operator.missionSet.delete( mission );
 
+  mission.id = -1;
   return mission;
 }
 
@@ -71,10 +73,20 @@ function unform()
 function form()
 {
   let mission = this;
+  let operator = mission.operator;
 
   if( !mission.operator )
-  mission.operator = new _.files.operator.Operator();
+  operator = mission.operator = new _.files.operator.Operator();
+
+  mission.thirdOperation = _.files.operator.Operation
+  ({
+    operator,
+    mission,
+    action : 'third',
+  });
+
   mission.operator.missionSet.add( mission );
+  mission.id = operator.idAllocate();
 
   return mission;
 }
@@ -151,11 +163,13 @@ let Aggregates =
 
 let Associates =
 {
+  id : null,
   operator : null,
 }
 
 let Restricts =
 {
+  thirdOperation : null,
 }
 
 let Statics =

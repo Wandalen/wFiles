@@ -23,9 +23,7 @@ function finit()
   let deed = this;
   deed.unform();
 
-  _.assert( deed.formed === 0 );
-  _.assert( deed.dst.size === 0 );
-  _.assert( deed.src.size === 0 );
+  _.assert( deed.fileSet.size === 0 );
 
   return _.Copyable.prototype.finit.call( deed );
 }
@@ -39,17 +37,13 @@ function init( o )
   _.assert( arguments.length === 0 || arguments.length === 1 );
   _.workpiece.initFields( deed );
 
-  if( o.src )
-  o.src = _.set.as( o.src );
-  if( o.dst )
-  o.dst = _.set.as( o.dst );
-
   if( deed.Self === Self )
   Object.preventExtensions( deed );
 
   if( o )
   deed.copy( o );
 
+  deed.form();
   return deed;
 }
 
@@ -58,16 +52,19 @@ function init( o )
 function unform()
 {
   let deed = this;
+  let operation = deed.operation;
+  let operator = operation.operator;
 
-  if( !deed.operation )
+  if( !deed.id )
   return;
 
-  if( !deed.formed )
-  return
+  deed.fileSet.forEach( ( usage ) => usage.finit() );
 
-  _.arrayRemoveOnceStrictly( operation.deedsArray, deed );
+  _.arrayRemoveOnceStrictly( operation.deedArray, deed );
+  _.arrayRemoveOnceStrictly( operator.deedArray, deed );
 
-  deed.formed = 0;
+  deed.id = -1;
+  return deed;
 }
 
 //
@@ -77,26 +74,134 @@ function form()
   let deed = this;
   let operation = deed.operation;
   let mission = operation.mission;
-  let operator = mission.operator;
+  let operator = operation.operator;
 
   _.assert( operation instanceof _.files.operator.Operation );
-  _.assert( mission instanceof _.files.operator.Mission );
+  _.assert( mission === null || mission instanceof _.files.operator.Mission );
   _.assert( operator instanceof _.files.operator.Operator );
+  _.assert( deed.id === null );
 
-  _.arrayAppendOnceStrictly( operation.deedsArray, deed );
+  deed.id = operator.idAllocate();
+  deed.fileSet.forEach( ( usage ) => usage.file.deedOn( usage ) );
 
-  deed.formed = 1;
+  _.arrayAppendOnceStrictly( operation.deedArray, deed );
+  _.arrayAppendOnceStrictly( operator.deedArray, deed );
+
+  return deed;
+}
+
+//
+
+function reform2()
+{
+  let deed = this;
+  let operation = deed.operation;
+  let mission = operation.mission;
+  let operator = operation.operator;
+  // let files = [];
+  //
+  // _.set.each( deed.src, ( file ) => files.push(  ) );
+  // _.set.each( deed.dst, ( file ) => file.reval() );
+
+  // _.set.each( deed.src, ( file ) => file.account( deed, 'reading' ) );
+  // _.set.each( deed.dst, ( file ) => file.account( deed, deed.facetSet ) );
+
+}
+
+//
+
+function use( file )
+{
+  let deed = this;
+  _.assert( arguments.length === 1 );
+  _.assert( file instanceof _.files.operator.File );
+  let usage = _.files.operator.FileUsage({ file, deed });
+  return usage;
+}
+
+//
+
+function actionSet( src )
+{
+  let deed = this;
+  _.assert( src === null || deed.Action[ src ] !== undefined );
+  deed[ actionSymbol ] = src;
+}
+
+//
+
+function fileSetSet( src )
+{
+  let deed = this;
+  let symbol = fileSetSymbol;
+
+  if( deed[ symbol ] === undefined )
+  {
+    deed[ symbol ] = src;
+  }
+  else
+  {
+    deed[ symbol ].clear();
+    _.set.appendContainer( deed[ symbol ], src );
+  }
+
+}
+
+//
+
+function facetSetSet( src )
+{
+  let deed = this;
+  let symbol = facetSetSymbol;
+
+  if( deed[ symbol ] === undefined )
+  {
+    deed[ symbol ] = src;
+  }
+  else
+  {
+    deed[ symbol ].clear();
+    _.set.appendContainer( deed[ symbol ], src );
+    if( Config.debug )
+    _.set.each( deed[ symbol ], ( attribute ) => _.assert( !!deed.Attribute[ attribute ] ) );
+  }
+
 }
 
 // --
 // relations
 // --
 
+let actionSymbol = Symbol.for( 'action' );
+let fileSetSymbol = Symbol.for( 'fileSet' );
+let facetSetSymbol = Symbol.for( 'facetSet' );
+
+let Action =
+{
+  'third' : 'third',
+  'fileDelete' : 'fileDelete',
+  'dirMake' : 'dirMake',
+  'fileCopy' : 'fileCopy',
+  'softLink' : 'softLink',
+  'hardLink' : 'hardLink',
+  'textLink' : 'textLink',
+}
+
+let Attribute =
+{
+  'producing' : 'producing',
+  'deleting' : 'deleting',
+  'third' : 'third',
+  'editing' : 'editing',
+  'reading' : 'reading',
+}
+
 let Composes =
 {
-  dst : _.define.own( new Set ),
-  src : _.define.own( new Set ),
+  action : null,
   status : null,
+  fileSet : _.define.own( new Set ),
+  facetSet : _.define.own( new Set ),
 }
 
 let Aggregates =
@@ -105,16 +210,25 @@ let Aggregates =
 
 let Associates =
 {
-  mission : null,
+  id : null,
+  operation : null,
 }
 
 let Restricts =
 {
-  formed : 0,
 }
 
 let Statics =
 {
+  Action,
+  Attribute,
+}
+
+let Accessors =
+{
+  action : { set : actionSet },
+  fileSet : { set : fileSetSet },
+  facetSet : { set : facetSetSet },
 }
 
 // --
@@ -128,6 +242,16 @@ let Extension =
   init,
   unform,
   form,
+  reform2,
+
+  use,
+  actionSet,
+  facetSetSet,
+
+  //
+
+  Action,
+  Attribute,
 
   // relations
 
@@ -136,6 +260,7 @@ let Extension =
   Associates,
   Restricts,
   Statics,
+  Accessors,
 
 }
 

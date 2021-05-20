@@ -245,6 +245,7 @@ module:
           - ../proto/wtools/amid/l4_files/l7_operator/l3
           - ../proto/wtools/amid/l4_files/l7_operator/l3/Deed.s
           - ../proto/wtools/amid/l4_files/l7_operator/l3/File.s
+          - ../proto/wtools/amid/l4_files/l7_operator/l3/FileUsage.s
           - ../proto/wtools/amid/l4_files/l7_operator/l3/Mission.s
           - ../proto/wtools/amid/l4_files/l7_operator/l3/Operation.s
           - ../proto/wtools/amid/l4_files/l7_operator/l3/Operator.s

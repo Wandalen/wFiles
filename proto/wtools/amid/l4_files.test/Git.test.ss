@@ -102,8 +102,6 @@ function filesReflectTrivial( test )
     let expected =
     [
       '.',
-      './.ex.will.yml',
-      './.im.will.yml',
       './License',
       './package.json',
       './Readme.md',
@@ -112,9 +110,10 @@ function filesReflectTrivial( test )
       './out/wPathBasic.out.will.yml',
       './proto',
       './sample',
-    ]
+      './will.yml',
+    ];
 
-    test.true( _.arraySetContainAll_( files, expected ) )
+    test.true( _.arraySetContainAll_( files, expected ) );
     return got;
   })
 
@@ -141,8 +140,6 @@ function filesReflectTrivial( test )
     let expected =
     [
       '.',
-      './.ex.will.yml',
-      './.im.will.yml',
       './License',
       './package.json',
       './Readme.md',
@@ -151,7 +148,8 @@ function filesReflectTrivial( test )
       './out/wPathBasic.out.will.yml',
       './proto',
       './sample',
-    ]
+      './will.yml',
+    ];
 
     test.true( _.arraySetContainAll_( files, expected ) )
     return got;
@@ -180,8 +178,6 @@ function filesReflectTrivial( test )
     let expected =
     [
       '.',
-      './.ex.will.yml',
-      './.im.will.yml',
       './License',
       './package.json',
       './Readme.md',
@@ -190,7 +186,8 @@ function filesReflectTrivial( test )
       './out/wPathBasic.out.will.yml',
       './proto',
       './sample',
-    ]
+      './will.yml',
+    ];
 
     test.true( _.arraySetContainAll_( files, expected ) )
     return got;
@@ -250,8 +247,6 @@ function filesReflectTrivial( test )
     let expected =
     [
       '.',
-      './.ex.will.yml',
-      './.im.will.yml',
       './License',
       './package.json',
       './Readme.md',
@@ -260,6 +255,7 @@ function filesReflectTrivial( test )
       './out/wPathBasic.out.will.yml',
       './proto',
       './sample',
+      './will.yml',
     ]
 
     test.true( _.arraySetContainAll_( files, expected ) )
@@ -299,8 +295,6 @@ function filesReflectTrivial( test )
     let expected =
     [
       '.',
-      './.ex.will.yml',
-      './.im.will.yml',
       './License',
       './package.json',
       './Readme.md',
@@ -309,6 +303,7 @@ function filesReflectTrivial( test )
       './out/wPathBasic.out.will.yml',
       './proto',
       './sample',
+      './will.yml',
     ]
 
     test.true( _.arraySetContainAll_( files, expected ) )
@@ -731,9 +726,7 @@ function filesReflectTrivial( test )
 
     test.true( _.arraySetContainAll_( files, expected ) );
     return got;
-  })
-
-  //
+  });
 
   /* */
 
@@ -765,7 +758,9 @@ function filesReflectTrivial( test )
     let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git/!master2';
     let con = system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal } });
     return test.shouldThrowErrorAsync( con );
-  })
+  });
+
+  /* - */
 
   return con;
 }

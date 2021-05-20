@@ -16500,7 +16500,7 @@ function filesReflectOutputFormat( test )
 
   var found = provider.filesReflect( o );
   var srcAbs = _.select( found, '*/src/absolute' );
-  var expected = abs( 'src', [ '.', './file', './dir', './dir/file' ] );
+  var expected = abs( 'src', [] );
   test.identical( srcAbs, expected );
 
   /* */

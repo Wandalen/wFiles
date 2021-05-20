@@ -15292,6 +15292,7 @@ function filesReflectTrivial( test )
     },
     srcDeleting : 1,
     dstDeleting : 1,
+    outputFormat : 'record',
   }
   var extract = new _.FileProvider.Extract({ filesTree : tree });
   var records = extract.filesReflect( o );
@@ -15338,6 +15339,7 @@ function filesReflectTrivial( test )
     },
     srcDeleting : 1,
     dstDeleting : 1,
+    outputFormat : 'record',
   }
 
   var extract = new _.FileProvider.Extract({ filesTree : tree });
@@ -15373,6 +15375,7 @@ function filesReflectTrivial( test )
     },
     srcDeleting : 0,
     dstDeleting : 0,
+    outputFormat : 'record',
   }
   var extract = new _.FileProvider.Extract({ filesTree : tree });
   var records = extract.filesReflect( o );
@@ -15429,6 +15432,7 @@ function filesReflectTrivial( test )
     },
     srcDeleting : 1,
     dstDeleting : 1,
+    outputFormat : 'record',
   }
   var extract = new _.FileProvider.Extract({ filesTree : tree });
   var records = extract.filesReflect( o );
@@ -15477,6 +15481,7 @@ function filesReflectTrivial( test )
     },
     srcDeleting : 1,
     dstDeleting : 0,
+    outputFormat : 'record',
   }
   var extract = new _.FileProvider.Extract({ filesTree : tree });
   test.mustNotThrowError( () => extract.filesReflect( o ) );
@@ -15508,6 +15513,7 @@ function filesReflectTrivial( test )
     },
     srcDeleting : 0,
     dstDeleting : 1,
+    outputFormat : 'record',
   }
   var extract = new _.FileProvider.Extract({ filesTree : tree });
   test.mustNotThrowError( () => extract.filesReflect( o ) );
@@ -15539,6 +15545,7 @@ function filesReflectTrivial( test )
     },
     srcDeleting : 0,
     dstDeleting : 1,
+    outputFormat : 'record',
   }
   var extract = new _.FileProvider.Extract({ filesTree : tree });
   test.mustNotThrowError( () => extract.filesReflect( o ) );
@@ -15570,6 +15577,7 @@ function filesReflectTrivial( test )
     },
     srcDeleting : 0,
     dstDeleting : 1,
+    outputFormat : 'record',
   }
   var extract = new _.FileProvider.Extract({ filesTree : tree });
   var records = extract.filesReflect( o );
@@ -15622,6 +15630,7 @@ function filesReflectTrivial( test )
     },
     srcDeleting : 1,
     dstDeleting : 0,
+    outputFormat : 'record',
   }
   var extract = new _.FileProvider.Extract({ filesTree : tree });
   test.mustNotThrowError( () => extract.filesReflect( o ) );
@@ -15653,6 +15662,7 @@ function filesReflectTrivial( test )
     },
     srcDeleting : 0,
     dstDeleting : 0,
+    outputFormat : 'record',
   }
   var extract = new _.FileProvider.Extract({ filesTree : tree });
   test.mustNotThrowError( () => extract.filesReflect( o ) );
@@ -15684,6 +15694,7 @@ function filesReflectTrivial( test )
     },
     srcDeleting : 0,
     dstDeleting : 0,
+    outputFormat : 'record',
   }
   var extract = new _.FileProvider.Extract({ filesTree : tree });
   test.mustNotThrowError( () => extract.filesReflect( o ) );
@@ -15715,6 +15726,7 @@ function filesReflectTrivial( test )
     },
     srcDeleting : 0,
     dstDeleting : 0,
+    outputFormat : 'record',
   }
   var extract = new _.FileProvider.Extract({ filesTree : tree });
   test.mustNotThrowError( () => extract.filesReflect( o ) );
@@ -15742,6 +15754,7 @@ function filesReflectTrivial( test )
     },
     srcDeleting : 0,
     dstDeleting : 0,
+    outputFormat : 'record',
   }
   var extract = new _.FileProvider.Extract({ filesTree : tree });
   test.mustNotThrowError( () => extract.filesReflect( o ) );
@@ -15781,6 +15794,7 @@ function filesReflectTrivial( test )
     src : { ends : '.a' },
     srcDeleting : 1,
     dstDeleting : 0,
+    outputFormat : 'record',
   }
   var extract = new _.FileProvider.Extract({ filesTree : tree });
   test.mustNotThrowError( () => extract.filesReflect( o ) );
@@ -15829,6 +15843,7 @@ function filesReflectTrivial( test )
     srcDeleting : 1,
     dstDeleting : 0,
     includingDst : 1,
+    outputFormat : 'record',
   }
   var extract = new _.FileProvider.Extract({ filesTree : tree });
   extract.filesReflect( o )
@@ -15879,6 +15894,7 @@ function filesReflectTrivial( test )
     srcDeleting : 1,
     dstDeleting : 1,
     includingDst : 1,
+    outputFormat : 'record',
   }
   var extract = new _.FileProvider.Extract({ filesTree : tree });
   extract.filesReflect( o )
@@ -15929,7 +15945,8 @@ function filesReflectTrivial( test )
     dstRewriting : 1,
     dstDeleting : 0,
     srcDeleting : 1,
-    dstRewritingByDistinct : 0
+    dstRewritingByDistinct : 0,
+    outputFormat : 'record',
   }
   var records = extract.filesReflect( o );
 
@@ -16017,7 +16034,8 @@ function filesReflectTrivial( test )
     dstRewriting : 1,
     dstDeleting : 0,
     srcDeleting : 1,
-    dstRewritingByDistinct : 0
+    dstRewritingByDistinct : 0,
+    outputFormat : 'record',
   }
   var records = extract.filesReflect( o );
 
@@ -16118,6 +16136,7 @@ function filesReflectTrivial( test )
     filter : { recursive : 2 },
     writing : 1,
     srcDeleting : 0,
+    outputFormat : 'record',
     // linkingAction : 'nop'
   }
 
@@ -16143,7 +16162,6 @@ function filesReflectTrivial( test )
 
   function onWriteDstUp1( record )
   {
-    debugger;
     if( !record.dst.isDir )
     record.dst.factory.system.fileWrite( record.dst.absolute, 'onWriteDstUp' );
     return record;
@@ -16160,7 +16178,8 @@ function filesReflectTrivial( test )
     dstDeleting : 0,
     dstRewriting : 1,
     srcDeleting : 0,
-    linkingAction : 'nop'
+    linkingAction : 'nop',
+    outputFormat : 'record',
   }
 
   extract.filesReflect( o )
@@ -16215,7 +16234,8 @@ function filesReflectTrivial( test )
     dstDeleting : 0,
     dstRewriting : 1,
     srcDeleting : 0,
-    linkingAction : 'nop'
+    linkingAction : 'nop',
+    outputFormat : 'record',
   }
 
   extract.filesReflect( o )

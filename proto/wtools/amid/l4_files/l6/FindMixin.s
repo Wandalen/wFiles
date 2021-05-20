@@ -4069,7 +4069,8 @@ _.props.extend( defaults, filesReflectAdvancedDefaults );
 
 defaults.filter = null;
 defaults.reflectMap = null;
-defaults.outputFormat = 'record';
+// defaults.outputFormat = 'record';
+defaults.outputFormat = 'nothing';
 
 let filesReflect = _.routine.uniteCloning_replaceByUnite( filesReflect_head, filesReflect_body );
 

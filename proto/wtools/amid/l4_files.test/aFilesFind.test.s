@@ -23658,14 +23658,15 @@ function filesReflectOnlyPreservingMultipleSrc( test )
       prefixPath : srcPath,
       filePath : { 'c' : dstPath2, 'd' : dstPath },
     },
-    dstRewritingOnlyPreserving : 0
-  }
+    dstRewritingOnlyPreserving : 0,
+    outputFormat : 'record',
+  };
   var records = provider.filesReflect( o );
   var expectedTree =
   {
     src : { srcDir : { a : 'src/a', b : 'src/b' }, srcDir2 : { e : 'src/e' }, c : 'src/c', d : 'src/d' },
     dst : 'src/d',
-  }
+  };
   var dst = provider.filesExtract( routinePath );
   dstTreeTransform();
   test.identical( dst.filesTree, expectedTree );

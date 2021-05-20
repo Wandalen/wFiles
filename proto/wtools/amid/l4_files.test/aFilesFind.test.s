@@ -20524,6 +20524,7 @@ function filesReflectorBasic( test )
   ({
     src : { system : src },
     dst : { system : dst, prefixPath : routinePath },
+    outputFormat : 'record',
   });
 
   test.case = 'negative + dst + src base path';

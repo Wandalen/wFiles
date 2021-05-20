@@ -17590,7 +17590,6 @@ function filesReflectWithFilter( test )
     prepare : prepareSingle,
   }
 
-  debugger;
   _filesReflectWithFilter.call( context, test, o );
 
   /* */
@@ -17632,6 +17631,7 @@ function _filesReflectWithFilter( test, o )
         effectiveProvider : p.dst,
         hasExtension : 'js',
       },
+      outputFormat : 'record',
     };
     return o1;
   }

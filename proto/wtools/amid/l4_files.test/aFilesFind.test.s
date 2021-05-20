@@ -21306,6 +21306,7 @@ function filesReflectDeducing( test )
   var o =
   {
     filter : { filePath : { '/src/srcDir' : '/dst/dstDir2' } },
+    outputFormat : 'record',
   }
 
   var provider = new _.FileProvider.Extract({ filesTree : tree });
@@ -21351,6 +21352,7 @@ function filesReflectDeducing( test )
     {
       prefixPath : '/dst/dstDir2',
     },
+    outputFormat : 'record',
   }
 
   var provider = new _.FileProvider.Extract({ filesTree : tree });
@@ -21396,6 +21398,7 @@ function filesReflectDeducing( test )
     {
       prefixPath : '/dst/dstDir2',
     },
+    outputFormat : 'record',
   }
 
   var provider = new _.FileProvider.Extract({ filesTree : tree });
@@ -21441,6 +21444,7 @@ function filesReflectDeducing( test )
     {
       filePath : '/dst/dstDir2',
     },
+    outputFormat : 'record',
   }
 
   var provider = new _.FileProvider.Extract({ filesTree : tree });
@@ -21487,6 +21491,7 @@ function filesReflectDeducing( test )
     {
       prefixPath : '/dst',
     },
+    outputFormat : 'record',
   }
 
   var provider = new _.FileProvider.Extract({ filesTree : tree });
@@ -21532,6 +21537,7 @@ function filesReflectDeducing( test )
     {
       filePath : [ '/dst/dstDir', '/dst/dstDir2' ]
     },
+    outputFormat : 'record',
   }
 
   var provider = new _.FileProvider.Extract({ filesTree : tree });
@@ -21577,6 +21583,7 @@ function filesReflectDeducing( test )
     {
       filePath : [ 'extract:///dst/dstDir', 'extract:///dst/dstDir2' ]
     },
+    outputFormat : 'record',
   }
 
   var provider = new _.FileProvider.Extract({ filesTree : tree, protocol : 'extract' });
@@ -21624,6 +21631,7 @@ function filesReflectDeducing( test )
       filePath : '.',
       basePath : { '.' : '.' },
     },
+    outputFormat : 'record',
   }
 
   var provider = new _.FileProvider.Extract({ filesTree : tree, protocol : 'extract' });
@@ -21669,6 +21677,7 @@ function filesReflectDeducing( test )
       filePath : '.',
       basePath : { '.' : '.' },
     },
+    outputFormat : 'record',
   }
 
   var provider = new _.FileProvider.Extract({ filesTree : tree, protocol : 'extract' });
@@ -21715,6 +21724,7 @@ function filesReflectDeducing( test )
       basePath : { '.' : '.' },
       filePath : '.',
     },
+    outputFormat : 'record',
   }
 
   var provider = new _.FileProvider.Extract({ filesTree : tree, protocol : 'extract' });
@@ -21758,6 +21768,7 @@ function filesReflectDeducing( test )
     {
       prefixPath : '/dst',
     },
+    outputFormat : 'record',
   }
 
   var provider = new _.FileProvider.Extract({ filesTree : tree, protocol : 'extract' });
@@ -21802,6 +21813,7 @@ function filesReflectDeducing( test )
       prefixPath : '/dst',
       filePath : '.',
     },
+    outputFormat : 'record',
   }
 
   var provider = new _.FileProvider.Extract({ filesTree : tree, protocol : 'extract' });
@@ -21847,6 +21859,7 @@ function filesReflectDeducing( test )
       filePath : '.',
       basePath : { '.' : '.' },
     },
+    outputFormat : 'record',
   }
 
   var provider = new _.FileProvider.Extract({ filesTree : tree, protocol : 'extract' });

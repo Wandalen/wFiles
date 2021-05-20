@@ -16,11 +16,13 @@ Further commands should be entered from the directory to which you've to cloned 
 ### Prerequisites
 
 You need utility willbe to build the project. To installl willbe use npm:
+
 ```bash
 npm install -g willbe@delta
 ```
 
 You need utility wTesting to test the project. To installl wTesting use npm:
+
 ```bash
 npm install -g wTesting@delta
 ```
@@ -30,7 +32,7 @@ npm install -g wTesting@delta
 To build the project run
 
 ```bash
-will .npm.intall
+will .npm.install
 ```
 
 To check build was successful run tests.
@@ -68,7 +70,6 @@ node proto/wtools/amid/l4_files.test/HardDrive.test.ss routine:readWriteBasic
 ```
 
 Will run test routine `readWriteBasic`. But better combination of options for running specific test routine is:
-
 
 ```bash
 node proto/wtools/amid/l4_files.test/HardDrive.test.ss verbosity:5 silencing:0 routine:readWriteBasic

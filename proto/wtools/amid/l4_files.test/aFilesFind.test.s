@@ -19753,6 +19753,7 @@ function filesReflectOverlap( test )
   {
     src : abs( './dir' ),
     dst : abs( './dir/dst' ),
+    outputFormat : 'record',
   }
 
   var records = provider.filesReflect( _.props.extend( null, o1 ) );
@@ -19831,7 +19832,8 @@ function filesReflectOverlap( test )
         [ abs( './dir/proto/File.s' ) ] : abs( './dir/out2' ),
       },
       basePath : abs( './dir/proto' ),
-    }
+    },
+    outputFormat : 'record',
   }
 
   var records = provider.filesReflect( _.props.extend( null, o1 ) );
@@ -19865,7 +19867,8 @@ function filesReflectOverlap( test )
         [ abs( './dir/proto/File.s' ) ] : abs( './dir/out2' ),
       },
       basePath : abs( './dir/proto' ),
-    }
+    },
+    outputFormat : 'record',
   }
 
   test.shouldThrowErrorSync( () => provider.filesReflect( _.props.extend( null, o1 ) ) );
@@ -19882,7 +19885,6 @@ function filesReflectOverlap( test )
     inherit :
       reflector::files3"
   */
-
 }
 
 //

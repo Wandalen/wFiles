@@ -422,7 +422,7 @@ function filesReflectSingle_body( o )
       let args = arg.sessions;
       _.assert( args.length === 2 );
       localChanges = _.strHasAny( args[ 0 ].output, [ 'Changes to be committed', 'Changes not staged for commit' ] );
-      mergeIsNeeded = !_.strHasAny( args[ 0 ].output, [ 'Your branch is up to date', 'Your branch is up-to-date' ] );
+      mergeIsNeeded = mergeIsNeededCheck( args[ 0 ].output );
       if( parsed.tag )
       tagIsBranchName = _.strHas( args[ 1 ].output, parsed.tag );
       return localChanges;
@@ -453,17 +453,32 @@ function filesReflectSingle_body( o )
 
     ready.then( () => gitCheckout() )
 
-    if( mergeIsNeeded && tagIsBranchName )
+    if( !mergeIsNeeded )
+    ready.then( () =>
     {
-      if( localChanges && !o.extra.stashing )
+      return shellAll({ execPath : 'git status', ready : null })
+      .ifNoErrorThen( ( arg ) =>
       {
-        let err = _.err( 'Failed to merge remote-tracking branch in repository at', _.strQuote( dstPath ), ', repository has local changes and stashing is disabled.' );
-        con.error( err );
-        throw err;
-      }
+        mergeIsNeeded = mergeIsNeededCheck( arg.output );
+        return null;
+      })
+    })
 
-      ready.then( () => gitMerge() )
-    }
+    ready.then( () =>
+    {
+      if( mergeIsNeeded && tagIsBranchName )
+      {
+        if( localChanges && !o.extra.stashing )
+        {
+          let err = _.err( 'Failed to merge remote-tracking branch in repository at', _.strQuote( dstPath ), ', repository has local changes and stashing is disabled.' );
+          con.error( err );
+          throw err;
+        }
+
+        return gitMerge();
+      }
+      return null;
+    })
 
     if( localChanges )
     if( o.extra.stashing )
@@ -489,6 +504,13 @@ function filesReflectSingle_body( o )
   });
 
   return con;
+
+  /* */
+
+  function mergeIsNeededCheck( statusOutput )
+  {
+    return !_.strHasAny( statusOutput, [ 'Your branch is up to date', 'Your branch is up-to-date' ] );
+  }
 
   /* */
 

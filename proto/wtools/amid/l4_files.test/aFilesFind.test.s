@@ -19908,15 +19908,14 @@ function filesReflectGrab( test )
     '/dir**' : true,
   }
 
-  debugger;
   var records = system.filesReflect
   ({
     reflectMap : recipe,
     src : { system : src },
     dst : { system : provider, prefixPath : routinePath },
     mandatory : 0,
+    outputFormat : 'record',
   });
-  debugger;
   var found = provider.filesFindRecursive( routinePath );
   src.finit();
   provider.filesDelete( routinePath );
@@ -19961,6 +19960,7 @@ function filesReflectGrab( test )
     src : { system : src },
     dst : { system : provider },
     mandatory : 0,
+    outputFormat : 'record',
   });
   var found = provider.filesFindRecursive( routinePath );
   src.finit();
@@ -20006,6 +20006,7 @@ function filesReflectGrab( test )
     reflectMap : recipe,
     src : { system : src, basePath : '/' },
     dst : { system : provider, prefixPath : routinePath },
+    outputFormat : 'record',
   });
 
   var found = provider.filesFindRecursive( routinePath );
@@ -20046,14 +20047,13 @@ function filesReflectGrab( test )
     './src2/d/**' : true,
   }
 
-  debugger;
   var records = system.filesReflect
   ({
     reflectMap : recipe,
     src : { system : src, basePath : '/' },
     dst : { system : provider, prefixPath : routinePath },
+    outputFormat : 'record',
   });
-  debugger;
 
   var found = provider.filesFindRecursive( routinePath );
 
@@ -20100,6 +20100,7 @@ function filesReflectGrab( test )
     reflectMap : recipe,
     src : { system : src, prefixPath : '/' },
     dst : { system : provider, prefixPath : routinePath },
+    outputFormat : 'record',
   });
   var found = provider.filesFindRecursive( routinePath );
   src.finit();
@@ -20146,6 +20147,7 @@ function filesReflectGrab( test )
     reflectMap : recipe,
     src : { system : src, prefixPath : '/' },
     dst : { system : provider, prefixPath : routinePath },
+    outputFormat : 'record',
   });
   var found = provider.filesFindRecursive( routinePath );
   src.finit();
@@ -20191,6 +20193,7 @@ function filesReflectGrab( test )
     reflectMap : recipe,
     src : { basePath : '/' },
     dst : { prefixPath : 'current://' + routinePath },
+    outputFormat : 'record',
   });
   src.finit();
   provider.filesDelete( routinePath );
@@ -20236,6 +20239,7 @@ function filesReflectGrab( test )
     reflectMap : recipe,
     src : { system : src, basePath : '/' },
     dst : { system : provider, prefixPath : routinePath },
+    outputFormat : 'record',
   });
   src.finit();
   provider.filesDelete( routinePath );
@@ -20281,6 +20285,7 @@ function filesReflectGrab( test )
     reflectMap : recipe,
     src : { system : src, prefixPath : '/', basePath : '/' },
     dst : { system : provider, prefixPath : routinePath },
+    outputFormat : 'record',
   });
   src.finit();
   provider.filesDelete( routinePath );
@@ -20326,6 +20331,7 @@ function filesReflectGrab( test )
     reflectMap : recipe,
     src : { system : src, basePath : '/' },
     dst : { system : provider, prefixPath : routinePath },
+    outputFormat : 'record',
   });
 
   src.finit();
@@ -20372,6 +20378,7 @@ function filesReflectGrab( test )
     reflectMap : recipe,
     src : { system : src, basePath : '/' },
     dst : { system : provider, prefixPath : routinePath, basePath : routinePath },
+    outputFormat : 'record',
   });
   src.finit();
   provider.filesDelete( routinePath );
@@ -20417,6 +20424,7 @@ function filesReflectGrab( test )
     reflectMap : recipe,
     src : { system : src, basePath : '/' },
     dst : { system : provider, prefixPath : routinePath },
+    outputFormat : 'record',
   });
   var found = provider.filesFindRecursive( routinePath );
   src.finit();
@@ -20464,6 +20472,7 @@ function filesReflectGrab( test )
   var records = system.filesReflect
   ({
     reflectMap : recipe,
+    outputFormat : 'record',
   });
   var found = provider.filesFindRecursive( routinePath );
   src.finit();
@@ -20492,7 +20501,6 @@ function filesReflectGrab( test )
   test.identical( action, expectedAction );
   test.identical( allow, expectedAllow );
   test.identical( preserve, expectedPreserve );
-
 }
 
 //

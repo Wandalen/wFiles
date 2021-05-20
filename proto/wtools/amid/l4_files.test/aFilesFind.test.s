@@ -18031,7 +18031,13 @@ function filesReflect( test )
       },
     });
 
-    return { src : tree, dst : tree, system : tree };
+    var o =
+    {
+      src : tree,
+      dst : tree,
+      system : tree,
+    };
+    return o;
   }
 
   /* */
@@ -18061,7 +18067,14 @@ function filesReflect( test )
     dst.originPath = 'extract+dst://';
     system.providerRegister( src );
     system.providerRegister( dst );
-    return { src, dst, system };
+    var o =
+    {
+      src,
+      dst,
+      system,
+    };
+
+    return o;
   }
 
   /* */
@@ -18081,7 +18094,8 @@ function filesReflect( test )
         reflectMap : { '/src' : '/dst' },
         src : { effectiveProvider : p.src },
         dst : { effectiveProvider : p.dst },
-      }
+        outputFormat : 'record',
+      };
       return options;
     }
 

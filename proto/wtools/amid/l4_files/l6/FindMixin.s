@@ -4227,6 +4227,7 @@ function filesReflectTo_body( o )
     o.dst = dst.recordFilter( o.dst );
 
     let o2 = _.mapOnly_( null, o, filesReflect.defaults );
+    o2.outputFormat = 'record'; /* Dmytro : maybe can be removed and changed tests */
 
     // o2.reflectMap = filePath;
     // delete o2.src;

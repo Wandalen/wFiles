@@ -1880,6 +1880,7 @@ function reflect( test )
     reflectMap : { 'src' : 'dst' },
     src : { prefixPath : '/' },
     dst : { prefixPath : '/' },
+    outputFormat : 'record',
   });
 
   var expSrc = [ '/src', '/src/f1', '/src/d', '/src/d/f2', '/src/d/f3' ];
@@ -1898,6 +1899,7 @@ function reflect( test )
   ({
     reflectMap : { 'src' : '/dst' },
     src : { prefixPath : '/' },
+    outputFormat : 'record',
   });
 
   var expSrc = [ '/src', '/src/f1', '/src/d', '/src/d/f2', '/src/d/f3' ];
@@ -1916,6 +1918,7 @@ function reflect( test )
   ({
     reflectMap : { '/src' : 'dst' },
     dst : { prefixPath : '/' },
+    outputFormat : 'record',
   });
 
   var expSrc = [ '/src', '/src/f1', '/src/d', '/src/d/f2', '/src/d/f3' ];
@@ -1938,6 +1941,7 @@ function reflect( test )
     provider.filesReflect
     ({
       reflectMap : { 'src' : 'dst' },
+      outputFormat : 'record',
     });
   });
 
@@ -1947,6 +1951,7 @@ function reflect( test )
     ({
       reflectMap : { 'src' : 'dst' },
       src : { prefixPath : '/' },
+      outputFormat : 'record',
     });
   });
 
@@ -1956,9 +1961,9 @@ function reflect( test )
     ({
       reflectMap : { 'src' : 'dst' },
       dst : { prefixPath : '/' },
+      outputFormat : 'record',
     });
   });
-
 }
 
 //

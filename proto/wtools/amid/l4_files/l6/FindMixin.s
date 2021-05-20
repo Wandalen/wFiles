@@ -4033,16 +4033,17 @@ function filesReflect_body( o )
     {
       const resultForm =
       {
-        'src.absolute' : pathForm,
-        'dst.absolute' : pathForm,
-        'src.relative' : pathForm,
-        'dst.relative' : pathForm,
+        'src.absolute' : pathsForm,
+        'dst.absolute' : pathsForm,
+        'src.relative' : pathsForm,
+        'dst.relative' : pathsForm,
         'nothing' : nothingForm,
       };
       if( !( o.outputFormat in resultForm ) )
       _.assert( 0, `Unknown output format : ${ o.outputFormat }` );
       else
       result = resultForm[ o.outputFormat ]( o.result, o.outputFormat );
+
       // if( o.outputFormat === 'src.relative' )
       // {
       //   for( let r = 0 ; r < o.result.length ; r++ )
@@ -4075,7 +4076,7 @@ function filesReflect_body( o )
 
   /* */
 
-  function pathForm( src, format )
+  function pathsForm( src, format )
   {
     format = format.split( '.' );
     for( let i = 0 ; i < src.length ; i++ )

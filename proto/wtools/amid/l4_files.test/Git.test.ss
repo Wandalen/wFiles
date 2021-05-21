@@ -726,7 +726,7 @@ function filesReflectTrivial( test )
 
     test.true( _.arraySetContainAll_( files, expected ) );
     return got;
-  });
+  })
 
   /* */
 
@@ -1864,6 +1864,136 @@ filesReflectFetchingTags.timeOut = 60000;
 
 //
 
+function filesReflectUpdateSwitchToOutdatedBranch( test )
+{
+  let context = this;
+  let providerSrc = context.providerSrc;
+  let providerDst = context.providerDst;
+  let system = context.system;
+  let path = context.providerDst.path;
+  let a = test.assetFor( false );
+  let repoPath = a.abs( 'repo' );
+  let localPath = a.abs( 'clone' );
+  let clonePathGlobal = providerDst.path.globalFromPreferred( localPath );
+  let remotePath = `git+hd://${repoPath}`;
+
+  a.shellSync = _.process.starter
+  ({
+    currentPath : a.abs( '.' ),
+    outputCollecting : 1,
+    outputGraying : 1,
+    throwingExitCode : 0,
+    sync : 1,
+    deasync : 0,
+    ready : null
+  })
+
+  a.init = ( o ) =>
+  {
+    o = o || {}
+
+    a.ready.then( () =>
+    {
+      a.fileProvider.filesDelete( a.abs( '.' ) );
+      a.reflect();
+      a.fileProvider.dirMake( repoPath );
+      a.shellSync( 'git -C repo init' );
+      a.shellSync( 'git -C repo commit --allow-empty -m initial' );
+      a.shellSync( 'git -C repo branch second' );
+      a.shellSync( 'git -C repo checkout master' );
+
+      return null;
+    })
+
+    a.ready.then( () =>
+    {
+      return system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 })
+    })
+
+    return a.ready;
+  }
+
+  /* */
+
+  a.init()
+  a.shell( 'git -C clone checkout second' )
+  a.shell( 'git -C repo commit --allow-empty -m new' )
+  .then( () =>
+  {
+    test.case = 'local master is stale, switching to master, fetchin is off';
+    let extra = { fetching : 0, fetchingTags : 0 }
+    test.case = `first download, remote has a tag ${_.entity.exportJs( extra ) }`
+    let remotePathToMaster = `${remotePath}/!master`
+    return system.filesReflect({ reflectMap : { [ remotePathToMaster ] : clonePathGlobal }, verbosity : 5, extra })
+    .then( () =>
+    {
+      let currentBranch = _.git.localVersion( repoPath );
+      test.identical( currentBranch, 'master' );
+
+      let remoteVersion = getHead( repoPath );
+      let cloneVersion = getHead( localPath );
+
+      console.log( 'remote:', remoteVersion )
+      console.log( 'updated clone:', cloneVersion )
+
+      test.notIdentical( remoteVersion, cloneVersion );
+
+      return null;
+    })
+  })
+
+  /* */
+
+  a.init()
+  a.shell( 'git -C clone checkout second' )
+  a.shell( 'git -C repo commit --allow-empty -m new' )
+  .then( () =>
+  {
+    test.case = 'local master is stale, switching to master, fetchin is on';
+    let extra = { fetching : 1, fetchingTags : 0 }
+    test.case = `first download, remote has a tag ${_.entity.exportJs( extra ) }`
+    let remotePathToMaster = `${remotePath}/!master`
+    return system.filesReflect({ reflectMap : { [ remotePathToMaster ] : clonePathGlobal }, verbosity : 5, extra })
+    .then( () =>
+    {
+      let currentBranch = _.git.localVersion( repoPath );
+      test.identical( currentBranch, 'master' );
+
+      let remoteVersion = getHead( repoPath );
+      let cloneVersion = getHead( localPath );
+
+      console.log( 'remote:', remoteVersion )
+      console.log( 'updated clone:', cloneVersion )
+
+      test.identical( remoteVersion, cloneVersion );
+
+      return null;
+    })
+  })
+
+  /* - */
+
+  return a.ready;
+
+  function getHead( localPath, branch )
+  {
+    if( !branch )
+    branch = 'master';
+
+    let result = a.shellSync
+    ({
+      execPath : `git show-ref refs/heads/${branch} --hash`,
+      currentPath : localPath,
+      outputPiping : 0,
+      inputMirroring : 0,
+      outputCollecting : 1
+    })
+    return result.output.trim();
+  }
+}
+
+//
+
 // function filesReflectPerformance( test )
 // {
 //   let context = this;
@@ -2097,6 +2227,7 @@ const Proto =
     filesReflectDownloadThrowing,
     filesReflectEol,
     filesReflectFetchingTags,
+    filesReflectUpdateSwitchToOutdatedBranch,
     filesReflectPerformance,
   },
 

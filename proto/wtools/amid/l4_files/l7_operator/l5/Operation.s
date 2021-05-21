@@ -5,7 +5,7 @@
 
 const _global = _global_;
 const _ = _global_.wTools;
-const Parent = null;
+const Parent = _.files.operator.AbstractResource;
 const Self = wOperatorOperation;
 function wOperatorOperation( o )
 {
@@ -118,17 +118,24 @@ function form2()
   let operation = this;
   let files = new HashMap;
 
-  // xxx
-  // operation.deedArray.forEach( ( deed ) =>
-  // {
-  //   _.set.each( deed.src, ( file ) => files.set( file.globalPath, file ) );
-  //   _.set.each( deed.dst, ( file ) => files.set( file.globalPath, file ) );
-  // });
-  //
-  // _.map.each( files, ( file ) =>
-  // {
-  //   file.reform2();
-  // });
+  debugger;
+  logger.log( operation.exportString().result );
+  debugger;
+
+  debugger;
+  operation.deedArray.forEach( ( deed ) =>
+  {
+    debugger;
+    _.set.each( deed.fileSet, ( usage ) => files.set( usage.file.globalPath, usage.file ) );
+  });
+
+  debugger;
+  _.hashMap.each( files, ( file ) =>
+  {
+    debugger;
+    file.reform2();
+  });
+  debugger;
 
 }
 
@@ -319,6 +326,61 @@ function thirdRedo( o )
 }
 
 // --
+// exporter
+// --
+
+function exportStructure()
+{
+  let operation = this;
+
+  o = _.routine.options( exportStructure, o || null );
+  o.it = o.it || { verbosity : 2, result : Object.create( null ) };
+
+  return o;
+}
+
+exportStructure.defaults =
+{
+  format : 'diagnostic',
+  withName : 1,
+  it : null,
+}
+
+//
+
+function exportString( o )
+{
+  let operation = this;
+
+  o = _.routine.options( exportString, o || null );
+  o.it = o.it || { verbosity : 2 }
+  o.it = _.stringer.it( o.it );
+  o.it.opts = o;
+
+  if( o.withName )
+  o.it.iterator.result += operation.lname;
+
+  if( o.it.verbosity >= 2 )
+  operation.deedArray.forEach( ( deed ) =>
+  {
+    let o2 = { it : o.it.up() };
+    if( o.it.verbosity === 2 )
+    o2.withName = 0;
+    deed.exportString( o2 );
+    o2.it.down();
+  });
+
+  return o.it;
+}
+
+exportString.defaults =
+{
+  format : 'diagnostic',
+  withName : 1,
+  it : null,
+}
+
+// --
 // relations
 // --
 
@@ -355,6 +417,10 @@ let Statics =
 {
 }
 
+let Accessors =
+{
+}
+
 // --
 // declare
 // --
@@ -375,6 +441,11 @@ let Extension =
   thirdBoot,
   thirdRedo,
 
+  // exporter
+
+  exportStructure,
+  exportString,
+
   // relations
 
   Composes,
@@ -382,6 +453,7 @@ let Extension =
   Associates,
   Restricts,
   Statics,
+  Accessors,
 
 }
 
@@ -394,7 +466,6 @@ _.classDeclare
   extend : Extension,
 });
 
-_.Copyable.mixin( Self );
 _.files.operator[ Self.shortName ] = Self;
 
 })();

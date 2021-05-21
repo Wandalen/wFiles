@@ -5,7 +5,7 @@
 
 const _global = _global_;
 const _ = _global_.wTools;
-const Parent = null;
+const Parent = _.files.operator.AbstractResource;
 const Self = wOperatorMission;
 function wOperatorMission( o )
 {
@@ -115,8 +115,8 @@ function filesReflect( o )
     mission,
     options : o,
     action : 'filesReflect',
-    src,
     dst,
+    src,
   });
 
   return operation;
@@ -211,7 +211,6 @@ _.classDeclare
   extend : Extension,
 });
 
-_.Copyable.mixin( Self );
 _.files.operator[ Self.shortName ] = Self;
 
 })();

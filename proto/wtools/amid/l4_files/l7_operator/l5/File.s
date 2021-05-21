@@ -5,7 +5,7 @@
 
 const _global = _global_;
 const _ = _global_.wTools;
-const Parent = null;
+const Parent = _.files.operator.AbstractResource;
 const Self = wOperatorFile;
 function wOperatorFile( o )
 {
@@ -88,6 +88,39 @@ function reform2()
 {
   let file = this;
   let operator = file.operator;
+
+  debugger;
+  if( file.deedArray.length >= 2 )
+  debugger;
+
+  file.firstEffectiveDeed = null;
+  _.array.whileRight( file.deedArray, ( deed ) =>
+  {
+    if( deed.facetSet.size > 0 )
+    if( !deed.facetSet.has( 'reading' ) && !deed.facetSet.has( 'editing' ) )
+    {
+      file.firstEffectiveDeed = deed;
+      return false;
+    }
+    return true;
+  });
+
+  if( file.firstEffectiveDeed )
+  debugger;
+
+  file.firstReadingDeed = null;
+  _.array.whileLeft( file.deedArray, ( deed ) =>
+  {
+    if( deed.facetSet.has( 'reading' ) )
+    {
+      file.firstReadingDeed = deed;
+      return false;
+    }
+    return true;
+  });
+
+  if( file.firstReadingDeed )
+  debugger;
 
   // if( isDst )
   // if( file.firstEffectiveDeed === null )
@@ -176,6 +209,7 @@ let Aggregates =
 {
   deedArray : _.define.own([]),
   firstEffectiveDeed : null,
+  firstReadingDeed : null,
 }
 
 let Associates =
@@ -227,7 +261,6 @@ _.classDeclare
   extend : Extension,
 });
 
-_.Copyable.mixin( Self );
 _.files.operator[ Self.shortName ] = Self;
 
 })();

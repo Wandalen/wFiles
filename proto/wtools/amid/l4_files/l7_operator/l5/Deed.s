@@ -5,7 +5,7 @@
 
 const _global = _global_;
 const _ = _global_.wTools;
-const Parent = null;
+const Parent = _.files.operator.AbstractResource;
 const Self = wOperatorDeed;
 function wOperatorDeed( o )
 {
@@ -168,6 +168,73 @@ function facetSetSet( src )
 
 }
 
+//
+
+function exportString( o )
+{
+  let deed = this;
+
+  o = _.routine.options( exportString, o || null );
+  o.it = o.it || { verbosity : 2 };
+  debugger;
+  o.it = _.stringer.it( o.it );
+  o.it.opts = o;
+
+  if( o.it.verbosity <= 0 )
+  return;
+
+  if( o.withName )
+  o.it.iterator.result += deed.lname;
+
+  debugger;
+  let dst = [ ... _.set.map( null, deed.dstGet(), ( file ) => file.localPath ) ][ 0 ] || null;
+  let src = [ ... _.set.map( null, deed.srcGet(), ( file ) => file.localPath ) ][ 0 ] || null;
+  if( o.it.verbosity > 1 )
+  o.it.lineWrite( _.path.moveTextualReport( dst, src ) );
+  else
+  o.it.write( _.path.moveTextualReport( dst, src ) );
+  debugger;
+
+  // debugger;
+  // if( o.it.verbosity >= 2 )
+  // deed.deedArray.forEach( ( deed ) =>
+  // {
+  //   debugger;
+  //   let o2 = { it : o.it.up() };
+  //   if( o.it.verbosity === 2 )
+  //   o2.withName = 0;
+  //   deed.exportString( o2 );
+  //   o2.it.down();
+  // });
+
+  return o.it;
+}
+
+exportString.defaults =
+{
+  format : 'diagnostic',
+  withName : 1,
+  it : null,
+}
+
+//
+
+function dstGet()
+{
+  let deed = this;
+  let result = _.set.filter( null, deed.fileSet, ( usage ) => usage.facetSet.has( 'reading' ) ? undefined : usage.file );
+  return result;
+}
+
+//
+
+function srcGet()
+{
+  let deed = this;
+  let result = _.set.filter( null, deed.fileSet, ( usage ) => usage.facetSet.has( 'reading' ) ? usage.file : undefined );
+  return result;
+}
+
 // --
 // relations
 // --
@@ -248,6 +315,13 @@ let Extension =
   actionSet,
   facetSetSet,
 
+  dstGet,
+  srcGet,
+
+  // exporter
+
+  exportString,
+
   //
 
   Action,
@@ -273,7 +347,6 @@ _.classDeclare
   extend : Extension,
 });
 
-_.Copyable.mixin( Self );
 _.files.operator[ Self.shortName ] = Self;
 
 })();

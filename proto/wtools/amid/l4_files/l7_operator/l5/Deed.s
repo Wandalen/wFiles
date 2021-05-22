@@ -175,39 +175,44 @@ function exportString( o )
   let deed = this;
 
   o = _.routine.options( exportString, o || null );
-  o.it = o.it || { verbosity : 2 };
-  debugger;
-  o.it = _.stringer.it( o.it );
-  o.it.opts = o;
+  let it = o.it = _.stringer.it( o.it || { verbosity : 2 } );
+  it.opts = o;
 
-  if( o.it.verbosity <= 0 )
+  if( it.verbosity <= 0 )
   return;
 
   if( o.withName )
-  o.it.iterator.result += deed.lname;
+  {
+    it.iterator.result += deed.lname;
+    it.levelUp();
+  }
 
-  debugger;
   let dst = [ ... _.set.map( null, deed.dstGet(), ( file ) => file.localPath ) ][ 0 ] || null;
   let src = [ ... _.set.map( null, deed.srcGet(), ( file ) => file.localPath ) ][ 0 ] || null;
-  if( o.it.verbosity > 1 )
-  o.it.lineWrite( _.path.moveTextualReport( dst, src ) );
+  let mtr = _.path.moveTextualReport( dst, src );
+  debugger;
+  if( it.verbosity >= 2 )
+  it.lineWrite( mtr );
   else
-  o.it.write( _.path.moveTextualReport( dst, src ) );
+  it.iterator.result += mtr;
   debugger;
 
-  // debugger;
-  // if( o.it.verbosity >= 2 )
-  // deed.deedArray.forEach( ( deed ) =>
-  // {
-  //   debugger;
-  //   let o2 = { it : o.it.up() };
-  //   if( o.it.verbosity === 2 )
-  //   o2.withName = 0;
-  //   deed.exportString( o2 );
-  //   o2.it.down();
-  // });
+  if( it.verbosity >= 2 )
+  {
+    if( deed.action !== null )
+    it.lineWrite( `action : ${deed.action}` );
+    if( deed.status !== null )
+    it.lineWrite( `status : ${deed.status}` );
+    if( deed.facetSet.size )
+    it.lineWrite( `facetSet : ${_.entity.exportString( deed.facetSet )}` );
+  }
 
-  return o.it;
+  if( o.withName )
+  {
+    it.levelDown();
+  }
+
+  return it;
 }
 
 exportString.defaults =
@@ -268,7 +273,7 @@ let Composes =
   action : null,
   status : null,
   fileSet : _.define.own( new Set ),
-  facetSet : _.define.own( new Set ),
+  facetSet : _.define.own( new Set ), /* xxx : remove? */
 }
 
 let Aggregates =

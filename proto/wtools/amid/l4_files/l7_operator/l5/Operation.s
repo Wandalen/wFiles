@@ -118,24 +118,19 @@ function form2()
   let operation = this;
   let files = new HashMap;
 
-  debugger;
-  logger.log( operation.exportString().result );
-  debugger;
+  // logger.log( operation.exportString().result );
 
-  debugger;
   operation.deedArray.forEach( ( deed ) =>
   {
-    debugger;
     _.set.each( deed.fileSet, ( usage ) => files.set( usage.file.globalPath, usage.file ) );
   });
 
-  debugger;
   _.hashMap.each( files, ( file ) =>
   {
-    debugger;
     file.reform2();
   });
-  debugger;
+
+  logger.log( operation.exportString({ format : 'files.status' }).result );
 
 }
 
@@ -351,26 +346,31 @@ exportStructure.defaults =
 function exportString( o )
 {
   let operation = this;
+  let Format = new Set([ 'diagnostic', 'files.status' ]);
 
   o = _.routine.options( exportString, o || null );
-  o.it = o.it || { verbosity : 2 }
-  o.it = _.stringer.it( o.it );
-  o.it.opts = o;
+  _.assert( Format.has( o.format ) );
+
+  let verbosity = o.format === 'files.status' ? 3 : 2;
+  let it = o.it = _.stringer.it( o.it || { verbosity } );
+  it.opts = o;
 
   if( o.withName )
-  o.it.iterator.result += operation.lname;
+  it.iterator.result += operation.lname;
 
-  if( o.it.verbosity >= 2 )
-  operation.deedArray.forEach( ( deed ) =>
+  if( it.verbosity >= 2 )
+  operation.deedArray.forEach( ( deed, c ) =>
   {
-    let o2 = { it : o.it.up() };
-    if( o.it.verbosity === 2 )
+    let o2 = { it : it.itUp() };
+    if( it.verbosity === 2 )
     o2.withName = 0;
+    o2.it.nlWrite();
+    o2.it.write( o2.it.tab );
     deed.exportString( o2 );
-    o2.it.down();
+    o2.it.itDown();
   });
 
-  return o.it;
+  return it;
 }
 
 exportString.defaults =

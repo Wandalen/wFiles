@@ -89,9 +89,8 @@ function reform2()
   let file = this;
   let operator = file.operator;
 
-  debugger;
-  if( file.deedArray.length >= 2 )
-  debugger;
+  // if( file.deedArray.length >= 2 )
+  // debugger;
 
   file.firstEffectiveDeed = null;
   _.array.whileRight( file.deedArray, ( deed ) =>
@@ -119,8 +118,8 @@ function reform2()
     return true;
   });
 
-  if( file.firstReadingDeed )
-  debugger;
+  // if( file.firstReadingDeed )
+  // debugger;
 
   // if( isDst )
   // if( file.firstEffectiveDeed === null )

@@ -324,8 +324,16 @@ function readWriteOptionWriteMode( test )
   var filePath = a.abs( 'file1.txt' );
   var writeMode = 'append';
 
-  /* qqq : for junior : implement please */
-  // test.true( false );
+  //checking append mode for new(empty) file
+  a.fileProvider.fileWrite({ filePath, data, writeMode });
+  var got = a.fileProvider.fileRead( filePath );
+  test.identical(got, data);
+
+  //checking append mode for existed(non-empty) file
+  a.fileProvider.fileWrite({ filePath, data, writeMode });
+  var got = a.fileProvider.fileRead( filePath );
+  test.notIdentical(got, data);
+
 
   /* */
 

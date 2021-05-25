@@ -93,8 +93,11 @@ function reform2()
   // debugger;
 
   file.firstEffectiveDeed = null;
+  // debugger;
   _.array.whileRight( file.deedArray, ( deed ) =>
   {
+    // if( deed.facetSet.size > 0 )
+    // debugger;
     if( deed.facetSet.size > 0 )
     if( !deed.facetSet.has( 'reading' ) && !deed.facetSet.has( 'editing' ) )
     {
@@ -104,8 +107,9 @@ function reform2()
     return true;
   });
 
-  if( file.firstEffectiveDeed )
-  debugger;
+  // debugger;
+  // if( file.firstEffectiveDeed )
+  // debugger;
 
   file.firstReadingDeed = null;
   _.array.whileLeft( file.deedArray, ( deed ) =>
@@ -194,6 +198,51 @@ function reform2()
 //
 // }
 
+//
+
+function nameGet()
+{
+  let file = this;
+  return `#${file.id} ${file.globalPath}`;
+}
+
+//
+
+function exportString( o )
+{
+  let file = this;
+
+  o = _.routine.options( exportString, o || null );
+
+  let it = o.it = _.stringer.it( o.it || { verbosity : 2 } );
+  it.opts = o;
+
+  if( o.withName === null )
+  o.withName = 1;
+
+  if( o.withName )
+  it.iterator.result += file.clname;
+
+  if( it.verbosity >= 2 )
+  {
+    it.levelUp();
+    if( file.firstEffectiveDeed )
+    it.lineWrite( `firstEffectiveDeed : ${file.firstEffectiveDeed.deed.clname}` );
+    if( file.firstReadingDeed )
+    it.lineWrite( `firstReadingDeed : ${file.firstReadingDeed.deed.clname}` );
+    it.levelDown();
+  }
+
+  return it;
+}
+
+exportString.defaults =
+{
+  format : 'diagnostic',
+  withName : 1,
+  it : null,
+}
+
 // --
 // relations
 // --
@@ -223,6 +272,12 @@ let Restricts =
 
 let Statics =
 {
+  // OwnerName : 'operator',
+}
+
+let Accessors =
+{
+  name : { get : nameGet, set : false, combining : 'rewrite' },
 }
 
 // --
@@ -241,6 +296,10 @@ let Extension =
   // deedOff,
   // deedOn,
 
+  nameGet,
+
+  exportString,
+
   // relations
 
   Composes,
@@ -248,6 +307,7 @@ let Extension =
   Associates,
   Restricts,
   Statics,
+  Accessors,
 
 }
 

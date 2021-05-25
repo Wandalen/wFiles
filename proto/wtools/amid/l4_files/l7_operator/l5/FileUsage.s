@@ -106,6 +106,40 @@ function facetSetSet( src )
 
 }
 
+//
+
+function exportString( o )
+{
+  let usage = this;
+
+  o = _.routine.options( exportString, o || null );
+
+  let it = o.it = _.stringer.it( o.it || { verbosity : 2 } );
+  it.opts = o;
+
+  if( it.verbosity <= 0 )
+  return it;
+
+  usage.file.exportString( o );
+
+  if( it.verbosity >= 2 )
+  {
+    it.levelUp();
+    if( usage.facetSet !== null && usage.facetSet.size )
+    it.lineWrite( `facetSet : ${ [ ... usage.facetSet ].join( ' ' ) }` );
+    it.levelDown();
+  }
+
+  return it;
+}
+
+exportString.defaults =
+{
+  format : 'diagnostic',
+  withName : null,
+  it : null,
+}
+
 // --
 // relations
 // --
@@ -134,6 +168,7 @@ let Restricts =
 
 let Statics =
 {
+  OwnerName : 'deed',
 }
 
 let Accessors =
@@ -154,6 +189,8 @@ let Extension =
   form,
 
   facetSetSet,
+
+  exportString,
 
   // relations
 

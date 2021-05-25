@@ -147,80 +147,26 @@ function fileSetSet( src )
 
 }
 
+// //
 //
-
-function facetSetSet( src )
-{
-  let deed = this;
-  let symbol = facetSetSymbol;
-
-  if( deed[ symbol ] === undefined )
-  {
-    deed[ symbol ] = src;
-  }
-  else
-  {
-    deed[ symbol ].clear();
-    _.set.appendContainer( deed[ symbol ], src );
-    if( Config.debug )
-    _.set.each( deed[ symbol ], ( attribute ) => _.assert( !!deed.Attribute[ attribute ] ) );
-  }
-
-}
-
+// function facetSetSet( src )
+// {
+//   let deed = this;
+//   let symbol = facetSetSymbol;
 //
-
-function exportString( o )
-{
-  let deed = this;
-
-  o = _.routine.options( exportString, o || null );
-  let it = o.it = _.stringer.it( o.it || { verbosity : 2 } );
-  it.opts = o;
-
-  if( it.verbosity <= 0 )
-  return;
-
-  if( o.withName )
-  {
-    it.iterator.result += deed.lname;
-    it.levelUp();
-  }
-
-  let dst = [ ... _.set.map( null, deed.dstGet(), ( file ) => file.localPath ) ][ 0 ] || null;
-  let src = [ ... _.set.map( null, deed.srcGet(), ( file ) => file.localPath ) ][ 0 ] || null;
-  let mtr = _.path.moveTextualReport( dst, src );
-  debugger;
-  if( it.verbosity >= 2 )
-  it.lineWrite( mtr );
-  else
-  it.iterator.result += mtr;
-  debugger;
-
-  if( it.verbosity >= 2 )
-  {
-    if( deed.action !== null )
-    it.lineWrite( `action : ${deed.action}` );
-    if( deed.status !== null )
-    it.lineWrite( `status : ${deed.status}` );
-    if( deed.facetSet.size )
-    it.lineWrite( `facetSet : ${_.entity.exportString( deed.facetSet )}` );
-  }
-
-  if( o.withName )
-  {
-    it.levelDown();
-  }
-
-  return it;
-}
-
-exportString.defaults =
-{
-  format : 'diagnostic',
-  withName : 1,
-  it : null,
-}
+//   if( deed[ symbol ] === undefined )
+//   {
+//     deed[ symbol ] = src;
+//   }
+//   else
+//   {
+//     deed[ symbol ].clear();
+//     _.set.appendContainer( deed[ symbol ], src );
+//     if( Config.debug )
+//     _.set.each( deed[ symbol ], ( attribute ) => _.assert( !!deed.Attribute[ attribute ] ) );
+//   }
+//
+// }
 
 //
 
@@ -241,12 +187,66 @@ function srcGet()
 }
 
 // --
+// exporter
+// --
+
+function exportString( o )
+{
+  let deed = this;
+
+  o = _.routine.options( exportString, o || null );
+  let it = o.it = _.stringer.it( o.it || { verbosity : 2 } );
+  it.opts = o;
+
+  if( it.verbosity <= 0 )
+  return;
+
+  if( o.withName )
+  {
+    it.iterator.result += deed.clname;
+    it.levelUp();
+  }
+
+  let dst = [ ... _.set.map( null, deed.dstGet(), ( file ) => file.localPath ) ][ 0 ] || null;
+  let src = [ ... _.set.map( null, deed.srcGet(), ( file ) => file.localPath ) ][ 0 ] || null;
+  let mtr = _.path.moveTextualReport( dst, src );
+  if( it.verbosity >= 2 )
+  it.lineWrite( mtr );
+  else
+  it.iterator.result += mtr;
+
+  if( it.verbosity >= 2 )
+  {
+    if( deed.action !== null )
+    it.lineWrite( `action : ${deed.action}` );
+    if( deed.status !== null )
+    it.lineWrite( `status : ${deed.status}` );
+    // if( deed.facetSet.size )
+    // it.lineWrite( `facetSet : ${_.entity.exportString( deed.facetSet )}` );
+  }
+
+  if( o.withName )
+  {
+    it.levelDown();
+  }
+
+  return it;
+}
+
+exportString.defaults =
+{
+  format : 'diagnostic',
+  withName : 1,
+  it : null,
+}
+
+// --
 // relations
 // --
 
 let actionSymbol = Symbol.for( 'action' );
 let fileSetSymbol = Symbol.for( 'fileSet' );
-let facetSetSymbol = Symbol.for( 'facetSet' );
+// let facetSetSymbol = Symbol.for( 'facetSet' );
 
 let Action =
 {
@@ -273,7 +273,7 @@ let Composes =
   action : null,
   status : null,
   fileSet : _.define.own( new Set ),
-  facetSet : _.define.own( new Set ), /* xxx : remove? */
+  // facetSet : _.define.own( new Set ), /* xxx : remove? */
 }
 
 let Aggregates =
@@ -294,13 +294,14 @@ let Statics =
 {
   Action,
   Attribute,
+  OwnerName : 'operation',
 }
 
 let Accessors =
 {
   action : { set : actionSet },
   fileSet : { set : fileSetSet },
-  facetSet : { set : facetSetSet },
+  // facetSet : { set : facetSetSet },
 }
 
 // --
@@ -318,7 +319,7 @@ let Extension =
 
   use,
   actionSet,
-  facetSetSet,
+  // facetSetSet,
 
   dstGet,
   srcGet,

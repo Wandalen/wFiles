@@ -116,21 +116,16 @@ function form()
 function form2()
 {
   let operation = this;
-  let files = new HashMap;
+  let usages = operation.usageHashmapGet();
 
   // logger.log( operation.exportString().result );
 
-  operation.deedArray.forEach( ( deed ) =>
+  _.hashMap.each( usages, ( usage ) =>
   {
-    _.set.each( deed.fileSet, ( usage ) => files.set( usage.file.globalPath, usage.file ) );
+    usage.file.reform2();
   });
 
-  _.hashMap.each( files, ( file ) =>
-  {
-    file.reform2();
-  });
-
-  logger.log( operation.exportString({ format : 'files.status' }).result );
+  // logger.log( operation.exportString({ format : 'files.status' }).result );
 
 }
 
@@ -146,6 +141,20 @@ function deedMake( o )
   })
 }
 
+//
+
+function usageHashmapGet()
+{
+  let operation = this;
+  let files = new HashMap;
+
+  operation.deedArray.forEach( ( deed ) =>
+  {
+    _.set.each( deed.fileSet, ( usage ) => files.set( usage.file.globalPath, usage ) );
+  });
+
+  return files;
+}
 
 //
 
@@ -203,21 +212,21 @@ function reflectBoot( o )
     let dst = operator.fileFor( record.dst.absoluteGlobal, record.dst.absolute );
     let src = operator.fileFor( record.src.absoluteGlobal, record.src.absolute );
     record.deed = operation.deedMake();
-    let srcUsage = record.deed.use( src );
-    srcUsage.facetSet = 'reading';
-    record.deed.use( dst );
+    record.srcUsage = record.deed.use( src );
+    record.srcUsage.facetSet = 'reading';
+    record.dstUsage = record.deed.use( dst );
 
     if( record.dst.stat )
     if( dst.firstEffectiveDeed === null )
     {
       record.thirdDeed = mission.thirdOperation.deedMake
       ({
-        facetSet : [ 'third' ],
+        // facetSet : [ 'third' ],
         action : 'third',
         status : 'uptodate',
       });
       var dstUsage = record.thirdDeed.use( dst );
-      dstUsage.facetSet = 'reading';
+      dstUsage.facetSet = 'third';
     }
 
   }
@@ -243,27 +252,12 @@ function reflectBoot( o )
       return;
     }
 
-    // deed.srcAttributes = [ 'reading' ];
-    deed.facetSet = [ 'producing' ];
-    // deed.attributesUpdateDone();
-
     // let dst = [ ... deed.dst ][ 0 ];
-    // let src = [ ... deed.src ][ 0 ];
+    if( record.action === 'fileDelete' )
+    record.dstUsage.facetSet = [ 'deleting' ];
+    else
+    record.dstUsage.facetSet = [ 'producing' ];
 
-    // dst.producerArray.push( deed );
-
-    // if( record.dst.stat )
-    // {
-    //   debugger;
-    // }
-    // else
-    // {
-    //   dst.producerArray.push( deed );
-    //   debugger;
-    // }
-
-    // if( deed.action === 'dirMake' )
-    // debugger;
   }
 
   /* */
@@ -356,7 +350,10 @@ function exportString( o )
   it.opts = o;
 
   if( o.withName )
-  it.iterator.result += operation.lname;
+  {
+    it.iterator.result += operation.clname;
+    // it.levelUp();
+  }
 
   if( it.verbosity >= 2 )
   operation.deedArray.forEach( ( deed, c ) =>
@@ -364,11 +361,25 @@ function exportString( o )
     let o2 = { it : it.itUp() };
     if( it.verbosity === 2 )
     o2.withName = 0;
-    o2.it.nlWrite();
-    o2.it.write( o2.it.tab );
+    o2.it.nlWrite().tabWrite();
     deed.exportString( o2 );
     o2.it.itDown();
   });
+
+  if( it.verbosity >= 2 )
+  {
+    let usages = operation.usageHashmapGet();
+    _.hashMap.each( usages, ( usage ) =>
+    {
+      let o2 = { it : it.itUp() };
+      // if( it.verbosity === 2 )
+      // o2.withName = 0;
+      o2.it.nlWrite().tabWrite();
+      usage.exportString( o2 );
+      o2.it.itDown();
+    });
+
+  }
 
   return it;
 }
@@ -415,6 +426,7 @@ let Restricts =
 
 let Statics =
 {
+  OwnerName : 'mission',
 }
 
 let Accessors =
@@ -435,6 +447,7 @@ let Extension =
   form2,
   deedMake,
 
+  usageHashmapGet,
   redo,
   reflectBoot,
   reflectRedo,

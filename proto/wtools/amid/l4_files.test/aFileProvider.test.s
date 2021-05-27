@@ -351,9 +351,10 @@ function readWriteOptionWriteMode( test )
   test.identical(got, data);
 
   //checking prepend mode for existed(non-empty) file
+  var  initialContent = a.fileProvider.fileRead(filePath);
   a.fileProvider.fileWrite({ filePath, data, writeMode });
   var got = a.fileProvider.fileRead( filePath );
-  test.notIdentical(got, data);
+  test.identical(got, (data+initialContent));
 
 
   /* */

@@ -925,7 +925,7 @@ function _timeWriteAct( o )
 
     extra.birthtime = null;
 
-    _.assert( o.atime && o.mtime && o.ctime );
+    _.assert( !!o.atime && !!o.mtime && !!o.ctime );
     _.assert( o.atime === o.mtime && o.mtime === o.ctime );
 
     o.filePath = dirPath;

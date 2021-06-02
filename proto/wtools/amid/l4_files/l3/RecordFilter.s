@@ -203,8 +203,8 @@ function _formMasks()
     if( filter.basePath )
     filter.basePathEach( ( filePath, basePath ) =>
     {
-      _.assert( filter.src || filter.filePath[ filePath ] !== undefined, () => 'Not found file path ' + _.strQuote( filePath ) );
-      _.assert( path.isAbsolute( basePath ), () => 'Expects absolute base path, but ' + _.strQuote( basePath ) + ' is not' );
+      _.assert( !!filter.src || filter.filePath[ filePath ] !== undefined, () => `Not found file path ${_.strQuote( filePath )}` );
+      _.assert( path.isAbsolute( basePath ), () => `Expects absolute base path, but ${_.strQuote( basePath )} is not` );
     });
 
   }
@@ -514,7 +514,7 @@ function _pathsAmmend( o )
     let prefixPath = o.src.prefixPath;
     o.src.prefixesApply({ filePathDeducingFromFixes, booleanFallingBack });
     filter.prefixesApply({ filePathDeducingFromFixes, booleanFallingBack });
-    _.assert( !_.mapIs( filter.filePath ) || !!_.props.keys( filter.filePath ).length );
+    _.assert( !_.mapIs( filter.filePath ) || _.props.keys( filter.filePath ).length > 0 );
   }
 
   if( o.src.prefixPath && ( o.src.filePath || o.src.basePath ) )
@@ -1237,9 +1237,14 @@ function prefixesRelative( prefixPath )
         if( !_.strIs( filePath ) || filePath === '' )
         return filePath;
 
-        _.assert( path.isGlobal( prefixPath ) ^ path.isGlobal( filePath ) ^ true );
+        // _.assert( path.isGlobal( prefixPath ) ^ path.isGlobal( filePath ) ^ true );
+        //
+        // if( path.isAbsolute( prefixPath ) ^ path.isAbsolute( filePath ) )
+        // return filePath;
 
-        if( path.isAbsolute( prefixPath ) ^ path.isAbsolute( filePath ) )
+        _.assert( path.isGlobal( prefixPath ) === path.isGlobal( filePath ) );
+
+        if( path.isAbsolute( prefixPath ) !== path.isAbsolute( filePath ) )
         return filePath;
 
         return path.relative( prefixPath, filePath );

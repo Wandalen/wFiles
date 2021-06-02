@@ -11,7 +11,7 @@
 const _global = _global_;
 const _ = _global_.wTools;
 _.files = _.files || Object.create( null );
-const Self = _.files.encoder = _.files.encoder || Object.create( null );
+_.files.encoder = _.files.encoder || Object.create( null );
 
 // --
 // encoder
@@ -116,7 +116,7 @@ register.defaults =
 function _fromGdf( gdf )
 {
 
-  _.assert( gdf.ext.length );
+  _.assert( gdf.ext.length > 0 );
   _.assert( gdf instanceof _.gdf.Encoder );
 
   let encoder = Object.create( null );
@@ -200,7 +200,7 @@ function readerFromGdf( gdf )
 
 function fromGdfs()
 {
-  _.assert( _.Gdf, 'module::Gdf is required to generate encoders!' );
+  _.assert( _.routine.is( _.Gdf ), 'module::Gdf is required to generate encoders!' );
   _.assert( _.mapIs( _.gdf.inMap ) );
   _.assert( _.mapIs( _.gdf.outMap ) );
 
@@ -225,7 +225,7 @@ function fromGdfs()
   writeGdf.forEach( ( gdf ) =>
   {
     let encoder = _.files.encoder.writerFromGdf( gdf );
-    _.assert( gdf.ext.length );
+    _.assert( gdf.ext.length > 0 );
     _.each( gdf.ext, ( ext ) =>
     {
       // debugger;
@@ -239,7 +239,7 @@ function fromGdfs()
   readGdf.forEach( ( gdf ) =>
   {
     let encoder = _.files.encoder.readerFromGdf( gdf );
-    _.assert( gdf.ext.length );
+    _.assert( gdf.ext.length > 0 );
     _.each( gdf.ext, ( ext ) =>
     {
       // debugger;
@@ -417,7 +417,6 @@ function _for( o )
       returning : 'encoder',
       single : 1,
     });
-    debugger;
     _.assert( _.strDefined( o.encoder.name ) );
     o.encoding = o.encoder.name;
     return o;
@@ -473,7 +472,7 @@ let Extension =
 
 }
 
-_.props.supplement( Self, Extension );
+_.props.supplement( _.files.encoder, Extension );
 
 // --
 // export

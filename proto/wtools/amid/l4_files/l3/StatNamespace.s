@@ -206,6 +206,6 @@ let StatExtension =
 
 }
 
-_.props.extend( _.files.stat, StatExtension );
+/* _.props.extend */Object.assign( _.files.stat, StatExtension );
 
 })();

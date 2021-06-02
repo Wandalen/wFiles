@@ -2671,7 +2671,7 @@ function isTerminal_body( o )
   let self = this;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( _.routine.assertOptions( isTerminal_body, arguments ) );
+  _.routine.assertOptions( isTerminal_body, arguments );
   _.assert( _.boolLike( o.resolvingSoftLink ) || _.numberIs( o.resolvingSoftLink ) );
   _.assert( _.boolLike( o.resolvingTextLink ) || _.numberIs( o.resolvingTextLink ) );
 
@@ -2753,7 +2753,7 @@ function isDir_body( o )
   let self = this;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( _.routine.assertOptions( isDir_body, arguments ) );
+  _.routine.assertOptions( isDir_body, arguments );
   _.assert( _.boolLike( o.resolvingSoftLink ) || _.numberIs( o.resolvingSoftLink ) );
   _.assert( _.boolLike( o.resolvingTextLink ) || _.numberIs( o.resolvingTextLink ) );
 
@@ -2846,7 +2846,7 @@ function isHardLink_body( o )
   let self = this;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( _.routine.assertOptions( isHardLink_body, arguments ) );
+  _.routine.assertOptions( isHardLink_body, arguments );
   _.assert( _.boolLike( o.resolvingSoftLink ) || _.numberIs( o.resolvingSoftLink ) );
   _.assert( _.boolLike( o.resolvingTextLink ) || _.numberIs( o.resolvingTextLink ) );
 
@@ -2917,7 +2917,7 @@ function isSoftLink_body( o )
   let self = this;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( _.routine.assertOptions( isSoftLink_body, arguments ) );
+  _.routine.assertOptions( isSoftLink_body, arguments );
   _.assert( _.boolLike( o.resolvingTextLink ) || _.numberIs( o.resolvingTextLink ) );
 
 
@@ -2971,7 +2971,7 @@ function isTextLink_body( o )
   let self = this;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( _.routine.assertOptions( isTextLink_body, arguments ) );
+  _.routine.assertOptions( isTextLink_body, arguments );
   _.assert( _.boolLike( o.resolvingSoftLink ) || _.numberIs( o.resolvingSoftLink ) );
 
   let o2 =
@@ -5523,7 +5523,7 @@ function fileDelete_body( o )
     catch( err )
     {
       log( 0 );
-      _.assert( o.sync );
+      _.assert( !!o.sync );
       if( o.throwing )
       throw _.err( err );
       return null;

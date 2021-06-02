@@ -1474,7 +1474,7 @@ let LinkerExtension =
 
 }
 
-_.props.extend( _.files.linker, LinkerExtension )
+/* _.props.extend */Object.assign( _.files.linker, LinkerExtension )
 
 //
 

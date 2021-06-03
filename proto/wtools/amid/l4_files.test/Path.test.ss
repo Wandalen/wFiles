@@ -1249,7 +1249,7 @@ function tempCloseAfter( test )
   .then( ( op ) =>
   {
     test.identical( _.strCount( op.output, 'tempDirCreated' ), 1 );
-    test.identical( _.strCount( op.output, '= Message of error' ), 1 );
+    test.identical( _.strCount( op.output, '= Message of Error' ), 1 );
     test.true( _.strHas( op.output, 'Not found temp dir for path' ) );
     return null;
   });

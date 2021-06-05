@@ -17,6 +17,35 @@ _.files.encoder = _.files.encoder || Object.create( null );
 // encoder
 // --
 
+function is( encoder )
+{
+  if( !encoder )
+  return false;
+  if( !encoder.feature )
+  return false;
+  if( !encoder.exts )
+  return false;
+  return true;
+}
+
+//
+
+function finit( encoder )
+{
+  _.assert( _.files.encoder.is( encoder ) );
+  let collectionMap = encoder.feature.reader ? _.files.ReadEncoders : _.files.WriteEncoders;
+
+  for( let k in collectionMap )
+  {
+    if( collectionMap[ k ] === encoder )
+    delete collectionMap[ k ];
+  }
+
+  Object.freeze( encoder );
+}
+
+//
+
 function _normalize( o )
 {
 
@@ -121,7 +150,7 @@ _registerWithExt.defaults =
 function gdfRegister( gdf )
 {
   let result = Object.create( null );
-  _.assert( gdf.ext.length > 0 );
+  // _.assert( gdf.ext.length > 0 );
   _.assert( gdf instanceof _.gdf.Encoder );
 
   if( gdf.inFormat.includes( 'structure' ) )
@@ -129,6 +158,27 @@ function gdfRegister( gdf )
 
   if( gdf.outFormat.includes( 'structure' ) )
   result.reader = _.files.encoder.readerFromGdf( gdf );
+
+  if( result.reader && result.writer )
+  debugger;
+  return result;
+}
+
+//
+
+function withGdf( gdf )
+{
+  let result = Object.create( null );
+  // _.assert( gdf.ext.length > 0 );
+  _.assert( gdf instanceof _.gdf.Encoder );
+
+  if( gdf.inFormat.includes( 'structure' ) )
+  if( _writerFromGdfCache.has( gdf ) )
+  result.writer = _writerFromGdfCache.get( gdf );
+
+  if( gdf.outFormat.includes( 'structure' ) )
+  if( _readerFromGdfCache.has( gdf ) )
+  result.reader = _readerFromGdfCache.get( gdf );
 
   if( result.reader && result.writer )
   debugger;
@@ -148,7 +198,7 @@ function _fromGdf( gdf )
   encoder.exts = gdf.ext.slice();
 
   encoder.feature = Object.create( null );
-  if( gdf.feature.config )
+  if( gdf.feature.config ) /* xxx : remove the feature */
   encoder.feature.config = true;
   if( gdf.feature.default )
   encoder.feature.default = true;
@@ -180,7 +230,6 @@ function writerFromGdf( gdf )
 
   _.each( gdf.ext, ( ext ) =>
   {
-    // if( !WriteEndoders[ ext ] || gdf.feature.default )
     _.files.encoder._registerWithExt( encoder, ext );
   })
 
@@ -217,8 +266,6 @@ function readerFromGdf( gdf )
 
   _.each( gdf.ext, ( ext ) =>
   {
-    // debugger;
-    // if( !ReadEncoders[ ext ] || gdf.feature.default )
     _.files.encoder._registerWithExt( encoder, ext );
   })
 
@@ -322,7 +369,13 @@ function gdfsWatch()
 
   _.gdf.on( 'gdf.unform', ( e ) =>
   {
-    _.assert( 0, 'not implemented' );
+    debugger;
+    let r = _.files.encoder.withGdf( e.gdf );
+    if( r.writer )
+    _.files.encoder.finit( r.writer );
+    if( r.reader )
+    _.files.encoder.finit( r.reader );
+    // _.assert( 0, 'not implemented' );
   });
 
 }
@@ -504,9 +557,12 @@ let Extension =
 
   // encoder
 
+  is,
+  finit,
   _normalize,
   _registerWithExt,
   gdfRegister,
+  withGdf,
   _fromGdf,
   writerFromGdf,
   readerFromGdf,

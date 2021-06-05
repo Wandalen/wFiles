@@ -50900,13 +50900,12 @@ function encodersFromGdfs( test )
     onEncode : function( op )
     {
       op.out.data = _.entity.exportString( op.out.data, { levels : 99 } );
-      // op.out.format = 'string';
     }
   }
   var gdf = _.Gdf([ testConverter ])[ 0 ];
 
   test.will = 'encoder should not exist';
-  test.true( !_.files.WriteEncoders[ 'testEncoder' ] );
+  test.true( _.aux.is( _.files.WriteEncoders[ 'testEncoder' ] ) );
 
   test.will = 'update encoders, encoder should exist';
   _.files.encoder.fromGdfs();
@@ -50917,7 +50916,7 @@ function encodersFromGdfs( test )
 
   test.will = 'finit gdf, encoder should exist';
   gdf.finit();
-  test.true( _.mapIs( _.files.WriteEncoders[ 'testEncoder' ] ) );
+  test.true( _.files.WriteEncoders[ 'testEncoder' ] === undefined );
   _.files.encoder.fromGdfs();
   test.will = 'update encoders, encoder should not exist';
   test.true( !_.files.WriteEncoders[ 'testEncoder' ] );
@@ -50927,30 +50926,34 @@ function encodersFromGdfs( test )
   test.case = 'adjust gdf exts'
   var testConverter =
   {
-    ext : [ 'testEncoder' ],
+    ext : [ 'testExt1', 'testExt2' ],
     inFormat : [ 'structure' ],
     outFormat : [ 'string.utf8' ],
     feature : {},
     onEncode : function( op )
     {
       op.out.data = _.entity.exportString( op.out.data, { levels : 99 } );
-      // op.out.format = 'string';
     }
   }
   var gdf = _.Gdf([ testConverter ])[ 0 ];
-  var ext = 'testExt';
-  let originalExt = gdf.ext.slice();
-  gdf.ext = [ ext ];
-  test.true( !_.mapIs( _.files.WriteEncoders[ ext ] ) );
+  // var ext = 'testExt';
+  // let originalExt = gdf.ext.slice();
+  // gdf.ext = [ ext ];
+  test.true( _.aux.is( _.files.WriteEncoders[ 'testExt1' ] ) );
+  test.true( _.aux.is( _.files.WriteEncoders[ 'testExt2' ] ) );
+  test.true( _.files.WriteEncoders[ 'testExt1' ] === _.files.WriteEncoders[ 'testExt2' ] );
   _.files.encoder.fromGdfs();
-  var encoder = _.files.WriteEncoders[ ext ];
+  var encoder = _.files.WriteEncoders[ 'testExt1' ];
   test.true( _.mapIs( encoder ) );
   test.identical( encoder.exts, gdf.ext );
   test.identical( encoder.gdf, gdf );
-  gdf.ext = originalExt.slice();
+  // gdf.ext = originalExt.slice();
   gdf.finit();
+  test.true( _.files.WriteEncoders[ 'testExt1' ] === undefined );
+  test.true( _.files.WriteEncoders[ 'testExt2' ] === undefined );
   _.files.encoder.fromGdfs();
-  test.true( !_.mapIs( _.files.WriteEncoders[ ext ] ) );
+  test.true( _.files.WriteEncoders[ 'testExt1' ] === undefined );
+  test.true( _.files.WriteEncoders[ 'testExt2' ] === undefined );
 
   /* - */
 

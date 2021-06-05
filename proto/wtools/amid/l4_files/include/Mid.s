@@ -31,6 +31,7 @@ if( typeof module !== 'undefined' )
   require( './MixinFind.s' );
   require( './MixinConfig.s' );
   require( './MixinSecondary.s' );
+  require( './MixinTemp.s' );
 
   module[ 'exports' ] = _;
 }

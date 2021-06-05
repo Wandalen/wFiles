@@ -1243,7 +1243,7 @@ function tempCloseAfter( test )
 // `
 
   // a.fileProvider.fileWrite( a.abs( 'Program.js' ), programSourceCode );
-  let programPath = a.program( program );
+  let programPath = a.program( program ).programPath;
   // a.appStartNonThrowing({ execPath : a.abs( 'Program.js' ) })
   a.appStartNonThrowing({ execPath : programPath })
   .then( ( op ) =>

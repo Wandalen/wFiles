@@ -154,12 +154,13 @@ let readBufferRaw =
 _.files.ReadEncoders = _.files.ReadEncoders || Object.create( null );
 _.files.WriteEncoders = _.files.WriteEncoders || Object.create( null );
 
-_.files.encoder.register( readJsSmart );
-_.files.encoder.register( readJsNode );
-_.files.encoder.register( readBufferBytes );
-_.files.encoder.register( readBufferRaw );
-// _.files.encoder.register( readOriginalType );
+_.files.encoder._registerWithExt( readJsSmart );
+_.files.encoder._registerWithExt( readJsNode );
+_.files.encoder._registerWithExt( readBufferBytes );
+_.files.encoder._registerWithExt( readBufferRaw );
+// _.files.encoder._registerWithExt( readOriginalType );
 _.files.encoder.fromGdfs(); /* xxx : review and probably remove! */
+_.files.encoder.gdfsWatch();
 
 // --
 // export

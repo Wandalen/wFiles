@@ -181,12 +181,16 @@ function configFind_body( o )
 
   let exts = Object.create( null );
 
+  // debugger;
+  // let encoders = _.files.encoder.deduce({ feature : { reader : true }, single : 0 });
+  // debugger;
+
   for( let e in _.files.ReadEncoders )
   {
     let encoder = _.files.ReadEncoders[ e ];
     if( encoder === null )
     continue;
-    _.assert( _.object.isBasic( encoder ), `Read encoder ${e} is missing` );
+    _.assert( _.object.is( encoder ), `Read encoder ${e} is missing` );
     if( encoder.exts )
     {
       for( let s = 0 ; s < encoder.exts.length ; s++ )

@@ -239,6 +239,7 @@ module:
           - ../proto/wtools/amid/l4_files/l7
           - ../proto/wtools/amid/l4_files/l7/ConfigMixin.s
           - ../proto/wtools/amid/l4_files/l7/SecondaryMixin.s
+          - ../proto/wtools/amid/l4_files/l7/TempMixin.s
           - ../proto/wtools/amid/l4_files/l7_operator
           - ../proto/wtools/amid/l4_files/l7_operator/l1
           - ../proto/wtools/amid/l4_files/l7_operator/l1/Namespace.s

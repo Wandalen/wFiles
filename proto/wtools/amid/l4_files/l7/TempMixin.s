@@ -223,6 +223,13 @@ function tempMake_body( o )
     if( !self.fileExists( o.tempPath ) )
     self.dirMake( o.tempPath );
 
+    if( o.resolving )
+    o.tempPath = self.pathResolveLinkFull
+    ({
+      filePath : o.tempPath,
+      resolvingSoftLink : 1,
+    }).absolutePath;
+
     if( o.srcPath === null )
     tempCollection.wild.add( o );
     else

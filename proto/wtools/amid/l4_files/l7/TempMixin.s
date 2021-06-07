@@ -223,7 +223,7 @@ function tempMake_body( o )
     if( !self.fileExists( o.tempPath ) )
     self.dirMake( o.tempPath );
 
-    if( o.resolving )
+    if( o.resolving ) /* xxx : qqq : cover the option please */
     o.tempPath = self.pathResolveLinkFull
     ({
       filePath : o.tempPath,

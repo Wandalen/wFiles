@@ -196,6 +196,102 @@ function createTestResources( cases, dir )
 // test
 // --
 
+function like( test )
+{
+  test.case = 'file record';
+  var src = _.fileProvider.record( process.env.HOME || process.env.USERPROFILE );
+  var expected = true;
+  var got = _.path.like( src );
+  test.identical( got, expected );
+
+  /* */
+
+  test.case = 'Empty string';
+  var expected = true;
+  var got = _.path.like( '' );
+  test.identical( got, expected );
+
+  test.case = 'Empty path';
+  var expected = true;
+  var got = _.path.like( '/' );
+  test.identical( got, expected );
+
+  test.case = 'Simple string';
+  var expected = true;
+  var got = _.path.like( 'hello' );
+  test.identical( got, expected );
+
+  test.case = 'Simple path string';
+  var expected = true;
+  var got = _.path.like( '/D/work/f' );
+  test.identical( got, expected );
+
+  test.case = 'Relative path';
+  var expected = true;
+  var got = _.path.like( '/home/user/dir1/dir2' );
+  test.identical( got, expected );
+
+  test.case = 'Absolute path';
+  var expected = true;
+  var got = _.path.like( 'C:/foo/baz/bar' );
+  test.identical( got, expected );
+
+  test.case = 'Other path';
+  var expected = true;
+  var got = _.path.like( 'c:\\foo\\' );
+  test.identical( got, expected );
+
+  /* */
+
+  test.case = 'No path - regexp';
+  var expected = false;
+  var got = _.path.like( /foo/ );
+  test.identical( got, expected );
+
+  test.case = 'No path - number';
+  var expected = false;
+  var got = _.path.like( 3 );
+  test.identical( got, expected );
+
+  test.case = 'No path - array';
+  var expected = false;
+  var got = _.path.like( [ '/C/', 'work/f' ] );
+  test.identical( got, expected );
+
+  test.case = 'No path - object';
+  var expected = false;
+  var got = _.path.like( { Path : 'C:/foo/baz/bar' } );
+  test.identical( got, expected );
+
+  test.case = 'No path - undefined';
+  var expected = false;
+  var got = _.path.like( undefined );
+  test.identical( got, expected );
+
+  test.case = 'No path - null';
+  var expected = false;
+  var got = _.path.like( null );
+  test.identical( got, expected );
+
+  test.case = 'No path - NaN';
+  var expected = false;
+  var got = _.path.like( NaN );
+  test.identical( got, expected );
+
+  /* - */
+
+  if( !Config.debug )
+  return;
+
+  test.case = 'No arguments';
+  test.shouldThrowErrorOfAnyKind( () => _.path.like( ) );
+
+  test.case = 'Two arguments';
+  test.shouldThrowErrorOfAnyKind( () => _.path.like( 'a', 'b' ) );
+}
+
+//
+
 function from( test )
 {
   var str1 = '/foo/bar/baz';
@@ -1885,6 +1981,8 @@ const Proto =
 
   tests :
   {
+
+    like,
 
     from,
     forCopy,

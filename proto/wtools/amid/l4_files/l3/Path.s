@@ -47,6 +47,19 @@ let vectorizeNone = _.files._.vectorizeNone;
 // implementation
 // --
 
+function like( path )
+{
+  _.assert( arguments.length === 1, 'Expects single argument' );
+  if( this.is( path ) )
+  return true;
+  if( _.files.FileRecord )
+  if( path instanceof _.files.FileRecord )
+  return true;
+  return false;
+}
+
+//
+
 /**
  * Returns absolute path to file. Accepts file record object. If as argument passed string, method returns it.
  * @example
@@ -223,6 +236,8 @@ function hasLocally( filePath )
 
 let Extension =
 {
+
+  like,
 
   from,
 

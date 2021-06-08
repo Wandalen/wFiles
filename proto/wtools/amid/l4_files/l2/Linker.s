@@ -1003,14 +1003,27 @@ function validateSize()
     let updateStat =  _.strBegins( dstPath, srcPath );
     let filePath = srcStat.filePath;
 
-    if( self instanceof _.FileProvider.System  )
-    filePath = self.providerForPath( srcPath ).path.globalFromPreferred( filePath );
+    if( self instanceof _.FileProvider.System )
+    {
+      filePath = self.providerForPath( srcPath ).path.globalFromPreferred( filePath );
+      dstPath = self.providerForPath( dstPath ).path.globalFromPreferred( dstPath )
+    }
 
-    if( !updateStat )
-    updateStat = _.strBegins( dstPath, filePath )
-
-    if( updateStat  )
+    if( updateStat || _.strBegins( dstPath, filePath ) )
     srcStat = c.onStat( filePath, 0 );
+
+    // let updateStat =  _.strBegins( dstPath, srcPath );
+    // let filePath = srcStat.filePath;
+    //
+    // if( self instanceof _.FileProvider.System  )
+    // filePath = self.providerForPath( srcPath ).path.globalFromPreferred( filePath );
+    //
+    // if( !updateStat )
+    // updateStat = _.strBegins( dstPath, filePath )
+    //
+    // if( _.strHas( srcPath, 'src/proto/dirLink1' ) )
+    // if( updateStat  )
+    // srcStat = c.onStat( filePath, 0 );
   }
 
   /* qqq: find better solution to check text links */
@@ -1479,3 +1492,4 @@ let LinkerExtension =
 //
 
 })()
+

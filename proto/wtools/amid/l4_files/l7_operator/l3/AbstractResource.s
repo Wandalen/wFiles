@@ -76,7 +76,7 @@ function exportString( o )
   o.it = o.it || { verbosity : 3, tab : '', dtab : '  ', result : '' };
 
   if( o.withName )
-  o.it.result += self.lname;
+  o.it.result += self.clname;
 
   return o;
 }
@@ -109,10 +109,19 @@ function qnameGet()
 function lnameGet()
 {
   let self = this;
-  let mission = self.mission;
-  if( mission )
-  return `${mission.lname} / ${self.qname}`;
+  let owner = self[ self.OwnerName ];
+  if( owner )
+  return `${owner.lname} / ${self.qname}`;
   return `${self.qname}`;
+}
+
+//
+
+function clnameGet()
+{
+  let self = this;
+  let result = self.lname;
+  return _.ct.format( result, 'entity' );
 }
 
 // --
@@ -146,6 +155,7 @@ let Accessors =
   name : { get : nameGet, set : false },
   qname : { get : qnameGet, set : false },
   lname : { get : lnameGet, set : false },
+  clname : { get : clnameGet, set : false },
 }
 
 // --

@@ -39,6 +39,6 @@ let OperatorExtension =
 
 }
 
-_.props.extend( _.files.operator, OperatorExtension );
+/* _.props.extend */Object.assign( _.files.operator, OperatorExtension );
 
 })();

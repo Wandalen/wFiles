@@ -5,9 +5,8 @@
 
 const _global = _global_;
 const _ = _global_.wTools;
-const Self = _global_.wTools.path;
 
-_.assert( _.object.isBasic( Self ) );
+_.assert( _.object.isBasic( _.path ) );
 
 // --
 // path
@@ -176,86 +175,7 @@ dirTempAt.defaults =
   packagePath : null
 }
 
-// //
 //
-// function dirTempAtOpen( packagePath, packageName )
-// {
-//   _.assert( !!this.fileProvider );
-//   packagePath = this.dirTempAt.apply( this, arguments );
-//   this.fileProvider.filesDelete({ filePath : packagePath, throwing : 0 });
-//   this.fileProvider.dirMake( packagePath );
-//   return packagePath;
-// }
-//
-// //
-//
-// function dirTempAtClose( filePath )
-// {
-//   _.assert( arguments.length === 1 );
-//   _.assert( !!this.fileProvider );
-//   _.assert( this.isAbsolute( filePath ) );
-//   _.sure( _.strHas( this.normalize( filePath ), '/tmp.tmp/' ), 'Path does not contain temporary directory:', filePath );
-//   this.fileProvider.filesDelete({ filePath : filePath, throwing : 0 });
-// }
-
-//
-
-/*
-filePath : /dir1/dir2/dir3
-
-/dir1/dir2/dir3
-/dir1/dir2
-/dir1
-/
-
-Unix
-/dir1 - device1
-/dir1/dir2 - device2
-
-*/
-
-// function tempOpen( o )
-// {
-//   let self = this;
-
-//   if( !_.mapIs( arguments[ 0 ] ) )
-//   o = { filePath : arguments[ 0 ] }
-//   if( arguments[ 1 ] !== undefined )
-//   o.name = arguments[ 1 ];
-//   o.filePath = self.resolve( o.filePath );
-
-//   _.routine.options_( tempOpen, o );
-//   _.assert( arguments.length === 1 || arguments.length === 2 );
-//   _.assert( !!self.fileProvider );
-//   _.assert( self.isAbsolute( o.filePath ) );
-
-//   // o.filePath = self.normalize( o.filePath );
-
-//   if( !self.pathDirTempForMap )
-//   self.pathDirTempForMap = Object.create( null );
-
-//   /* qqq : hacks */
-//   let devicePath = devicePathGet( o.filePath );
-
-//   if( self.pathDirTempForMap[ devicePath ] )
-//   return self.pathDirTempForMap[ devicePath ];
-
-//   let result = self.pathDirTempMake( o );
-
-//   self.pathDirTempForMap[ devicePath ] = result;
-
-//   return result;
-
-//   /* */
-
-//   /* qqq : please re */
-//   function devicePathGet( path )
-//   {
-//     return '/';
-//     // return path.substring( 0, path.indexOf( '/', 1 ) )
-//   }
-
-// }
 
 let PathDirTempForMap = Object.create( null );
 let PathDirTempCountMap = Object.create( null );
@@ -268,16 +188,18 @@ function tempOpen( o )
   o = { filePath : arguments[ 0 ] }
   if( arguments[ 1 ] !== undefined )
   o.name = arguments[ 1 ];
-  if( o.filePath === undefined )
+
+  if( o.filePath === undefined || o.filePath === null )
   o.filePath = self.current();
+  // o.filePath = null;
   else
   o.filePath = self.resolve( o.filePath );
 
-  _.routine.options_( tempOpen, o );
+  _.routine.options( tempOpen, o );
   _.assert( arguments.length <= 2 );
   _.assert( !!self.fileProvider );
-  _.assert( self.isAbsolute( o.filePath ) );
-  _.assert( self.isNormalized( o.filePath ) );
+  _.assert( o.filePath === null || self.isAbsolute( o.filePath ) );
+  _.assert( o.filePath === null || self.isNormalized( o.filePath ) );
 
   let id = self.fileProvider.id;
 
@@ -292,13 +214,13 @@ function tempOpen( o )
   let cache = PathDirTempForMap[ id ];
   let count = PathDirTempCountMap[ id ];
 
-  let result = cache[ o.filePath ];
-
+  let result = o.filePath !== null ? cache[ o.filePath ] : null;
   if( result )
   return end();
 
   let trace = self.traceToRoot( o.filePath );
 
+  if( o.filePath !== null )
   for( let i = trace.length - 1; i >= 0; i-- )
   {
     if( !cache[ trace[ i ] ] )
@@ -340,6 +262,8 @@ function tempOpen( o )
 
   function end()
   {
+
+    /* qqq : for Vova : bad! : ?? */
     if( o.resolving )
     result = self.fileProvider.pathResolveLinkFull
     ({
@@ -347,6 +271,7 @@ function tempOpen( o )
       resolvingSoftLink : 1
     }).absolutePath;
 
+    /* qqq : for Dmytro : ? */
     if( self.fileProvider instanceof _.FileProvider.Default ) /* xxx qqq : for Dmytro : find better way to fix problem */ /* Dmytro : it is hack, temporary */
     _.assert( !self.path.isGlobal( result ), 'Expects non-global path' );
     /* xxx : qqq : uncomment and fix */
@@ -360,6 +285,7 @@ function tempOpen( o )
 
     return result;
   }
+
 }
 
 tempOpen.defaults =
@@ -454,85 +380,7 @@ close /dir1
 
 */
 
-// function pathDirTempMake( o )
-// {
-//   let self = this;
-
-//   _.routine.options_( pathDirTempMake, arguments );
-//   _.assert( arguments.length === 1 );
-//   _.assert( !!self.fileProvider );
-//   _.assert( self.isAbsolute( o.filePath ) );
-//   _.assert( self.isNormalized( o.filePath ) );
-
-//   let filePath2;
-//   var osTempDir = self.dirTemp();
-
-//   if( !o.name )
-//   o.name = 'tmp';
-//   o.name = o.name + '-' + _.idWithDateAndTime() + '.tmp';
-
-//   if( devicePathGet( osTempDir ) === devicePathGet( o.filePath ) )
-//   {
-//     filePath2 = self.join( osTempDir, o.name );
-//     self.fileProvider.dirMake({ filePath : filePath2, sync : 1 });
-//     return end();
-//   }
-
-//   let dirsPath = self.traceToRoot( o.filePath );
-//   let err;
-//   let tempPath = 'temp/' + o.name;
-
-//   for( let i = 0, l = dirsPath.length - 1 || dirsPath.length ; i < l ; i++ )
-//   {
-//     filePath2 = dirsPath[ i ] + '/' + tempPath;
-
-//     if( self.fileProvider.fileExists( filePath2 ) )
-//     return end();
-
-//     try
-//     {
-//       self.fileProvider.dirMake( filePath2 );
-//       return end();
-//     }
-//     catch( e )
-//     {
-//       err = e;
-//       // self.fileProvider.logger.log( 'Can`t create temp directory at :', filePath2 );
-//     }
-//   }
-
-//   if( err )
-//   throw _.err( 'Can`t create temp directory for:', o.filePath, '\n', err )
-
-//   return end();
-
-//   /* */
-
-//   // function devicePathGet( filePath )
-//   // {
-//   //   return filePath.substring( 0, filePath.indexOf( '/', 1 ) )
-//   // }
-
-//   /* qqq : please redo properly */
-//   function devicePathGet( path )
-//   {
-//     return '/';
-//     // return path.substring( 0, path.indexOf( '/', 1 ) )
-//   }
-
-//   /* */
-
-//   function end()
-//   {
-//     _.appExitHandlerOnce( () =>
-//     {
-//       self.tempClose()
-//     });
-//     logger.log( ' . Open temp directory ' + filePath2 );
-//     return filePath2;
-//   }
-
-// }
+//
 
 function pathDirTempMake( o )
 {
@@ -646,89 +494,16 @@ function pathDirTempMake( o )
   {
 
     if( o.auto )
-    // _.process._exitHandlerOnce( () =>
-    // _.process.on( 'available', () => _.process.on( 'exit', () =>
-
-    // _.process.on( 'available', _.event.Name( 'exit' ), () =>
     _.process.on( _.event.Chain( 'available', 'exit' ), () =>
     {
       self.tempClose()
     });
 
-    // logger.log( ' . Open temp directory ' + filePath );
     return filePath;
   }
 }
 
 pathDirTempMake.defaults = Object.create( tempOpen.defaults );
-
-//
-
-// function tempClose( tempDirPath )
-// {
-//   let self = this;
-
-//   _.assert( arguments.length <= 1 );
-//   _.assert( !!self.fileProvider );
-
-//   if( !self.pathDirTempForMap )
-//   return;
-
-//   if( !arguments.length )
-//   {
-//     for( let d in self.pathDirTempForMap )
-//     {
-//       close( d );
-//     }
-//   }
-//   else
-//   {
-//     _.assert( self.isAbsolute( tempDirPath ) );
-//     _.assert( self.isNormalized( tempDirPath ) );
-
-//     let devicePath = devicePathGet( tempDirPath );
-
-//     if( !self.pathDirTempForMap[ devicePath ] )
-//     throw _.err( 'Not found temp dir for device ' + devicePath );
-
-//     if( self.pathDirTempForMap[ devicePath ] !== tempDirPath )
-//     throw _.err
-//     (
-//         'Registered temp directory', self.pathDirTempForMap[ devicePath ]
-//       , '\nAttempt to unregister temp directory', tempDirPath
-//     );
-
-//     close( devicePath );
-
-//     // self.fileProvider.filesDelete({ filePath : tempDirPath, safe : 0, throwing : 1 });
-//     // _.assert( !self.fileProvider.fileExists( tempDirPath ) );
-//     // delete self.pathDirTempForMap[ devicePath ];
-
-//   }
-
-//   function close( keyPath )
-//   {
-//     let tempPath = self.pathDirTempForMap[ keyPath ];
-//     self.fileProvider.filesDelete
-//     ({
-//       filePath : tempPath,
-//       safe : 0,
-//       throwing : 0,
-//     });
-//     delete self.pathDirTempForMap[ keyPath ];
-//     _.assert( !self.fileProvider.fileExists( tempPath ) );
-//     logger.log( ' . Close temp directory ' + tempPath );
-//     return tempPath;
-//   }
-
-//   /* qqq : please redo properly */
-//   function devicePathGet( path )
-//   {
-//     return '/';
-//     // return path.substring( 0, path.indexOf( '/', 1 ) )
-//   }
-
-// }
 
 //
 
@@ -785,7 +560,7 @@ function tempClose( filePath )
       return;
     }
 
-    _.assert( !count[ currentTempPath ].length );
+    _.assert( !count[ currentTempPath ].length > 0 );
 
     delete count[ currentTempPath ];
 
@@ -805,441 +580,10 @@ function tempClose( filePath )
     });
     delete cache[ filePath ];
     _.assert( !self.fileProvider.fileExists( tempPath ), 'Temp dir:', _.strQuote( tempPath ), 'was closed, but still exist in file system.' );
-    // logger.log( ' . Close temp directory ' + tempPath );
     return tempPath;
   }
+
 }
-
-/* Next pathDirTemp* */
-
-// let Index = Object.create( null );
-// let IndexPath = _.path.join( Os.homedir(), '.wFiles/TempFilesIndex' );
-// let IndexLockTimeOut = 30000;
-
-// function _loadIndex( syncLock )
-// {
-//   let self = this;
-//   if( !self.fileProvider.fileExists( self.IndexPath ) )
-//   {
-//     self.Index.namespace = Object.create( null );
-//     self.Index.tempDir = Object.create( null );
-//     self.Index.count = Object.create( null );
-//     self.fileProvider.fileWrite({ filePath : self.IndexPath, data : self.Index, encoding : 'json' });
-//   }
-
-//   let lockReady = self.fileProvider.fileLock
-//   ({
-//     filePath : self.IndexPath,
-//     sync : !!syncLock,
-//     throwing : 1,
-//     timeOut : self.IndexLockTimeOut,
-//     sharing : 'process',
-//     waiting : 1
-//   })
-//   if( !syncLock )
-//   {
-//     lockReady.deasync();
-//     lockReady.sync();
-//   }
-//   _.assert( self.fileProvider.fileIsLocked( self.IndexPath ) );
-
-//   let loadedIndex = self.fileProvider.fileRead({ filePath : self.IndexPath, encoding : 'json' });
-//   self.Index = _.mapSupplementRecursive( self.Index, loadedIndex );
-//   self.fileProvider.fileUnlock( self.IndexPath );
-//   _.assert( !self.fileProvider.fileIsLocked( self.IndexPath ) );
-// }
-
-// //
-
-// function _saveIndex( syncLock )
-// {
-//   let self = this;
-
-//   _.assert( _.object.isBasic( self.Index ) )
-
-//   let lockReady = self.fileProvider.fileLock
-//   ({
-//     filePath : self.IndexPath,
-//     sync : !!syncLock,
-//     throwing : 1,
-//     timeOut : self.IndexLockTimeOut,
-//     sharing : 'process',
-//     waiting : 1
-//   });
-//   if( !syncLock )
-//   {
-//     lockReady.deasync();
-//     lockReady.sync();
-//   }
-//   _.assert( self.fileProvider.fileIsLocked( self.IndexPath ) );
-//   let loadedIndex = self.fileProvider.fileRead({ filePath : self.IndexPath, encoding : 'json' });
-//   _.props.extend( loadedIndex, self.Index );
-//   self.fileProvider.fileWrite({ filePath : self.IndexPath, data : loadedIndex, encoding : 'json' });
-//   self.fileProvider.fileUnlock( self.IndexPath );
-// }
-
-// function _nextPathDirTempOpen( o )
-// {
-//   let self = this;
-
-//   if( !_.mapIs( arguments[ 0 ] ) )
-//   o = { filePath : arguments[ 0 ] }
-//   if( arguments[ 1 ] !== undefined )
-//   o.name = arguments[ 1 ];
-//   if( o.filePath === undefined )
-//   o.filePath = self.current();
-//   else
-//   o.filePath = self.resolve( o.filePath );
-
-//   _.routine.options_( _nextPathDirTempOpen, o );
-//   _.assert( arguments.length <= 2 );
-//   _.assert( !!self.fileProvider );
-//   _.assert( self.isAbsolute( o.filePath ) );
-//   _.assert( self.isNormalized( o.filePath ) );
-
-//   // let id = self.fileProvider.id;
-
-//   /* load cache */
-
-//   self._loadIndex();
-
-//   // let currentIndex = self.Index[ process.pid ];
-
-//   // let cache = currentIndex.cache[ id ];
-//   // let count = currentIndex.count[ id ];
-
-//   /* search in cache */
-
-//   let result = null;
-//   let namespace = o.name;
-
-//   let nameSpaceMap = self.Index.namespace;
-//   let tempDirMap = self.Index.tempDir;
-
-//   if( tempDirMap[ o.filePath ] )
-//   if( tempDirMap[ o.filePath ].namespace === namespace )
-//   {
-//     result = tempDirMap[ o.filePath ].tempPath;
-//     return end();
-//   }
-
-//   let trace = self.traceToRoot( o.filePath );
-
-//   for( let i = trace.length - 1; i >= 0; i-- )
-//   {
-//     if( !tempDirMap[ trace[ i ] ] )
-//     continue;
-//     if( tempDirMap[ trace[ i ] ].namespace !== namespace )
-//     continue;
-
-//     if( i !== trace.length - 1 )
-//     if( self.fileProvider.fileExists( trace[ i + 1 ] ) )
-//     {
-//       let currentStat = self.fileProvider.statReadAct
-//       ({
-//         filePath : trace[ i ],
-//         throwing : 1,
-//         sync : 1,
-//         resolvingSoftLink : 0,
-//       });
-//       let nextStat = self.fileProvider.statReadAct
-//       ({
-//         filePath : trace[ i + 1 ],
-//         throwing : 0,
-//         sync : 1,
-//         resolvingSoftLink : 0,
-//       });
-
-//       if( nextStat.dev !== currentStat.dev )
-//       break;
-//     }
-
-//     result = tempDirMap[ trace[ i ] ].tempPath;
-
-//     return end();
-//   }
-
-//   /* make */
-
-//   result = self._nextPathDirTempMake({ filePath : o.filePath, name : o.name });
-//   return end();
-
-//   /*  */
-
-//   function end()
-//   {
-//     if( !nameSpaceMap[ namespace ] )
-//     {
-//       nameSpaceMap[ namespace ] = Object.create( null );
-//       nameSpaceMap[ namespace ].tempDir = o.filePath;
-//       nameSpaceMap[ namespace ].tempPath = result;
-//     }
-
-//     if( !tempDirMap[ o.filePath ] )
-//     {
-//       tempDirMap[ o.filePath ] = Object.create( null );
-//       tempDirMap[ o.filePath ].namespace = namespace;
-//       tempDirMap[ o.filePath ].tempPath = result;
-//     }
-
-//     let countMap = self.Index.count;
-//     if( !countMap[ result ] )
-//     countMap[ result ] = [];
-//     countMap[ result ].push( o.filePath )
-
-//     self._saveIndex();
-
-//     return result;
-//   }
-// }
-
-// _nextPathDirTempOpen.defaults =
-// {
-//   filePath : null,
-//   name : null,
-//   auto : 1
-// }
-
-//
-
-// function _nextPathDirTempMake( o )
-// {
-//   let self = this;
-
-//   _.routine.options_( _nextPathDirTempMake, arguments );
-//   _.assert( arguments.length === 1 );
-//   _.assert( !!self.fileProvider );
-//   _.assert( self.isAbsolute( o.filePath ) );
-//   _.assert( self.isNormalized( o.filePath ) );
-
-//   let filePath = o.filePath;
-//   let err;
-
-//   let trace = self.traceToRoot( o.filePath );
-
-//   if( !trace.length )
-//   {
-//     _.assert( o.filePath === '/' );
-//     trace = [ o.filePath ];
-//   }
-
-//   if( !o.name )
-//   o.name = 'tmp';
-//   let namespace = o.name;
-//   o.name = o.name + '-' + _.idWithDateAndTime() + '.tmp';
-
-//   let osTempDir = self.dirTemp();
-
-//   let common = self.common( osTempDir, trace[ 0 ] )
-
-//   if( common === trace[ 0 ] )
-//   {
-//     filePath = self.join( osTempDir, o.name );
-//     self.fileProvider.dirMake( filePath );
-//     return end();
-//   }
-
-//   /* load cache */
-
-//   self._loadIndex();
-
-//   // let id = self.fileProvider.id;
-//   // let currentIndex = self.Index[ process.pid ];
-
-//   let tempDirMap = self.Index.tempDir;
-
-//   // let cache = currentIndex.cache[ id ];
-
-//   let fileStat;
-
-//   for( let i = 0; i < trace.length; i++ )
-//   {
-//     try
-//     {
-//       if( i !== trace.length - 1 )
-//       if( self.fileProvider.fileExists( trace[ i ] ) )
-//       {
-//         let currentStat = self.fileProvider.statReadAct
-//         ({
-//           filePath : trace[ i ],
-//           throwing : 1,
-//           sync : 1,
-//           resolvingSoftLink : 0,
-//         });
-
-//         if( fileStat === undefined )
-//         fileStat = self.fileProvider.statReadAct
-//         ({
-//           filePath : o.filePath,
-//           throwing : 0,
-//           sync : 1,
-//           resolvingSoftLink : 0,
-//         });
-
-//         if( fileStat )
-//         if( fileStat.dev != currentStat.dev )
-//         continue;
-//       }
-
-//       let tempDir = tempDirMap[ trace[ i ] ];
-//       if( tempDir && tempDir.namespace === namespace )
-//       {
-//         filePath = tempDir.tempPath;
-//       }
-//       else
-//       {
-//         filePath = self.join( trace[ i ], 'Temp', o.name );
-//         if( !self.fileProvider.fileExists( filePath ) )
-//         self.fileProvider.dirMake( filePath );
-//       }
-
-//       return end();
-//     }
-//     catch( e )
-//     {
-//       err = e;
-//     }
-//   }
-
-//   if( err )
-//   {
-//     filePath = _.path.join( osTempDir, o.name );
-//     self.fileProvider.dirMake( filePath );
-//   }
-
-//   return end();
-
-//   /* */
-
-//   function end()
-//   {
-//     if( o.auto )
-//     _.process._exitHandlerOnce( () =>
-//     {
-//       self._nextPathDirTempClose({ syncLock : 1 })
-//     });
-
-//     // logger.log( ' . Open temp directory ' + filePath );
-
-//     return filePath;
-//   }
-// }
-
-// _nextPathDirTempMake.defaults = Object.create( _nextPathDirTempOpen.defaults );
-
-//
-
-// function _nextPathDirTempClose( o )
-// {
-//   let self = this;
-
-//   if( arguments.length === 0 )
-//   o = Object.create( null );
-
-//   if( _.strIs( o ) )
-//   o = { filePath : o }
-
-//   _.assert( arguments.length <= 1 );
-//   _.assert( !!self.fileProvider );
-//   _.routine.options_( _nextPathDirTempClose, o );
-
-//   self._loadIndex( o.syncLock );
-
-//   // if( !self.PathDirTempForMap[ id ] )
-//   // return;
-
-//   // let currentIndex = self.Index[ process.pid ];
-//   // let id = self.fileProvider.id;
-
-//   // let cache = currentIndex.cache[ id ];
-//   // let count = currentIndex.count[ id ];
-
-//   let namespaceMap = self.Index.namespace;
-//   let tempDirMap = self.Index.tempDir;
-//   let countMap = self.Index.count;
-//   let filePath = o.filePath;
-
-//   if( filePath === null )
-//   {
-//     for( let path in tempDirMap )
-//     {
-//       let tempDir = tempDirMap[ path ];
-//       delete namespaceMap[ tempDir.namespace ];
-//       delete countMap[ tempDir.tempPath ];
-//       close( path );
-//     }
-//   }
-//   else
-//   {
-//     _.assert( self.isAbsolute( filePath ) );
-//     _.assert( self.isNormalized( filePath ) );
-
-//     let currentTempPath = null;
-
-//     if( tempDirMap[ filePath ] )
-//     currentTempPath = tempDirMap[ filePath ].tempPath;
-
-//     /* reverse search for case when filePath is a temp path */
-//     if( !currentTempPath )
-//     for( let path in tempDirMap )
-//     if( tempDirMap[ path ].tempPath === filePath )
-//     {
-//       currentTempPath = filePath;
-//       filePath = path;
-//       break;
-//     }
-
-//     if( !currentTempPath )
-//     throw _.err( 'Not found temp dir for path: ' + filePath );
-
-//     let namespace = tempDirMap[ filePath ].namespace;
-
-//     _.arrayRemoveElementOnce( countMap[ currentTempPath ], filePath );
-
-//     /* if temp path is still in use */
-//     if( countMap[ currentTempPath ].length )
-//     {
-//       if( !_.longHas( countMap[ currentTempPath ], filePath ) )
-//       {
-//         delete namespaceMap[ namespace ];
-//         delete tempDirMap[ filePath ];
-//       }
-//     }
-//     else
-//     {
-//       _.assert( !countMap[ currentTempPath ].length );
-
-//       delete countMap[ currentTempPath ];
-
-//       close( filePath );
-//     }
-//   }
-
-//   self._saveIndex( o.syncLock );
-
-//   /*  */
-
-//   function close( filePath )
-//   {
-//     let tempPath = tempDirMap[ filePath ].tempPath;
-//     self.fileProvider.filesDelete
-//     ({
-//       filePath : tempPath,
-//       safe : 0,
-//       throwing : 0,
-//     });
-//     delete tempDirMap[ filePath ];
-//     _.assert( !self.fileProvider.fileExists( tempPath ), 'Temp dir:', _.strQuote( tempPath ), 'was closed, but still exist in file system.' );
-//     // logger.log( ' . Close temp directory ' + tempPath );
-//     return tempPath;
-//   }
-// }
-
-// _nextPathDirTempClose.defaults =
-// {
-//   filePath : null,
-//   syncLock : 0
-// }
 
 //
 
@@ -1398,16 +742,6 @@ firstAvailable.having.aspect = 'entry';
 // declare
 // --
 
-// let Fields =
-// {
-//   PathDirTempForMap,
-//   PathDirTempCountMap,
-//
-//   // Index,
-//   // IndexPath,
-//   // IndexLockTimeOut,
-// }
-
 let Extension =
 {
 
@@ -1443,13 +777,13 @@ let Extension =
 
 }
 
-_.props.extend( Self, Extension );
+Object.assign( _.path, Extension );
 
 // --
 // export
 // --
 
 if( typeof module !== 'undefined' )
-module[ 'exports' ] = Self;
+module[ 'exports' ] = _.path;
 
 })();

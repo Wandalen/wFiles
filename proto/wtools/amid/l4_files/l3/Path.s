@@ -5,9 +5,8 @@
 
 const _global = _global_;
 const _ = _global_.wTools;
-const Self = _global_.wTools.path;
 
-_.assert( _.object.isBasic( Self ) );
+_.assert( _.object.isBasic( _.path ) );
 
 let vectorizeKeysAndVals = _.files._.vectorizeKeysAndVals;
 let vectorize = _.files._.vectorize;
@@ -238,13 +237,13 @@ let Extension =
 
 }
 
-_.props.extend( Self, Extension );
+/* _.props.extend */Object.assign( _.path, Extension );
 
 // --
 // export
 // --
 
 if( typeof module !== 'undefined' )
-module[ 'exports' ] = Self;
+module[ 'exports' ] = _.path;
 
 })();

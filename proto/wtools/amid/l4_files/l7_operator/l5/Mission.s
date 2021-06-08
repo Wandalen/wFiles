@@ -148,6 +148,52 @@ redo.defaults =
 }
 
 // --
+// exporter
+// --
+
+function exportString( o )
+{
+  let mission = this;
+
+  o = _.routine.options( exportString, o || null );
+
+  let it = o.it = _.stringer.it( o.it || { verbosity : 2 } );
+  it.opts = o;
+
+  if( o.withName )
+  {
+    it.iterator.result += mission.clname;
+    // it.levelUp();
+  }
+
+  if( it.verbosity >= 2 )
+  mission.operationArray.forEach( ( operation, c ) =>
+  {
+    let o2 = { it : it.itUp() };
+    if( it.verbosity === 2 )
+    o2.withName = 0;
+    o2.it.nlWrite();
+    o2.it.write( o2.it.tab );
+    operation.exportString( o2 );
+    o2.it.itDown();
+  });
+
+  if( o.withName )
+  {
+    // it.levelDown();
+  }
+
+  return it;
+}
+
+exportString.defaults =
+{
+  format : 'diagnostic',
+  withName : 1,
+  it : null,
+}
+
+// --
 // relations
 // --
 
@@ -174,6 +220,7 @@ let Restricts =
 
 let Statics =
 {
+  // OwnerName : 'operator',
 }
 
 // --
@@ -191,6 +238,8 @@ let Extension =
   filesReflect,
 
   redo,
+
+  exportString,
 
   // relations
 

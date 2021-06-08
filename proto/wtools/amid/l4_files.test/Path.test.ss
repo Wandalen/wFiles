@@ -1243,13 +1243,13 @@ function tempCloseAfter( test )
 // `
 
   // a.fileProvider.fileWrite( a.abs( 'Program.js' ), programSourceCode );
-  let programPath = a.program( program );
+  let programPath = a.program( program ).programPath;
   // a.appStartNonThrowing({ execPath : a.abs( 'Program.js' ) })
   a.appStartNonThrowing({ execPath : programPath })
   .then( ( op ) =>
   {
     test.identical( _.strCount( op.output, 'tempDirCreated' ), 1 );
-    test.identical( _.strCount( op.output, '= Message of error' ), 1 );
+    test.identical( _.strCount( op.output, '= Message of Error' ), 1 );
     test.true( _.strHas( op.output, 'Not found temp dir for path' ) );
     return null;
   });

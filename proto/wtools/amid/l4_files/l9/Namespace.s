@@ -5,7 +5,7 @@
 
 const _global = _global_;
 const _ = _global_.wTools;
-const Self = _.files = _.files || Object.create( null );
+_.files = _.files || Object.create( null );
 
 // --
 // implementation
@@ -38,7 +38,7 @@ let Extension =
 
 }
 
-_.props.supplement( Self, Extension );
+_.props.supplement( _.files, Extension );
 
 _.files._Setup();
 

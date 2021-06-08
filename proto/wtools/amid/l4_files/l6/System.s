@@ -152,11 +152,24 @@ function providerRegister( fileProvider )
   let self = this;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( fileProvider instanceof _.FileProvider.Abstract, () => 'Expects file providers, but got ' + _.entity.strType( fileProvider ) );
+  _.assert
+  (
+    fileProvider instanceof _.FileProvider.Abstract,
+    () => `Expects file providers, but got ${_.entity.strType( fileProvider )}`
+  );
   _.assert( _.arrayIs( fileProvider.protocols ) );
-  _.assert( _.strDefined( fileProvider.protocol ), 'Cant register file provider without {-protocol-} defined', _.strQuote( fileProvider.qualifiedName ) );
+  _.assert
+  (
+    _.strDefined( fileProvider.protocol ),
+    () => `Cant register file provider without {-protocol-} defined ${fileProvider.qualifiedName}`
+  );
   _.assert( _.strDefined( fileProvider.originPath ) );
-  _.assert( fileProvider.protocols && fileProvider.protocols.length, 'Cant register file provider without protocols', _.strQuote( fileProvider.qualifiedName ) );
+  _.assert
+  (
+    fileProvider.protocols && fileProvider.protocols.length > 0,
+    () => `Cant register file provider without protocols "${fileProvider.qualifiedName}"`
+  );
+  /* qqq : make usre template string is used everywhere */
 
   let protocolMap = self.providersWithProtocolMap;
   for( let p = 0 ; p < fileProvider.protocols.length ; p++ )
@@ -1377,7 +1390,12 @@ function Init()
     missingMap[ r ] = 'Routines.' + r;
   }
 
-  _.assert( !_.props.keys( missingMap ).length, 'routine(s) were not written into Extension explicitly', '\n', _.entity.exportString( missingMap, { stringWrapper : '' } ) );
+  _.assert
+  (
+    !_.props.keys( missingMap ).length > 0,
+    () => 'Routine(s) were not written into Extension explicitly\n'
+    + _.entity.exportString( missingMap, { stringWrapper : '' } )
+  );
   _.assert( !FilteredRoutines.pathResolveLinkFull );
   _.assert( !( 'pathResolveLinkFull' in FilteredRoutines ) );
   _.map.assertHasNoUndefine( FilteredRoutines );

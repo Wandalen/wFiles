@@ -208,6 +208,7 @@ module:
           - ../proto/wtools/amid/l4_files/include/MixinConfig.s
           - ../proto/wtools/amid/l4_files/include/MixinFind.s
           - ../proto/wtools/amid/l4_files/include/MixinSecondary.s
+          - ../proto/wtools/amid/l4_files/include/MixinTemp.s
           - ../proto/wtools/amid/l4_files/include/Npm.ss
           - ../proto/wtools/amid/l4_files/include/Operator.s
           - ../proto/wtools/amid/l4_files/include/Reroot.s
@@ -239,6 +240,7 @@ module:
           - ../proto/wtools/amid/l4_files/l7
           - ../proto/wtools/amid/l4_files/l7/ConfigMixin.s
           - ../proto/wtools/amid/l4_files/l7/SecondaryMixin.s
+          - ../proto/wtools/amid/l4_files/l7/TempMixin.s
           - ../proto/wtools/amid/l4_files/l7_operator
           - ../proto/wtools/amid/l4_files/l7_operator/l1
           - ../proto/wtools/amid/l4_files/l7_operator/l1/Namespace.s

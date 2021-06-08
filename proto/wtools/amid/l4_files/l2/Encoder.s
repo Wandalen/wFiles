@@ -11,16 +11,45 @@
 const _global = _global_;
 const _ = _global_.wTools;
 _.files = _.files || Object.create( null );
-const Self = _.files.encoder = _.files.encoder || Object.create( null );
+_.files.encoder = _.files.encoder || Object.create( null );
 
 // --
 // encoder
 // --
 
-function normalize( o )
+function is( encoder )
+{
+  if( !encoder )
+  return false;
+  if( !encoder.feature )
+  return false;
+  if( !encoder.exts )
+  return false;
+  return true;
+}
+
+//
+
+function finit( encoder )
+{
+  _.assert( _.files.encoder.is( encoder ) );
+  let collectionMap = encoder.feature.reader ? _.files.ReadEncoders : _.files.WriteEncoders;
+
+  for( let k in collectionMap )
+  {
+    if( collectionMap[ k ] === encoder )
+    delete collectionMap[ k ];
+  }
+
+  Object.freeze( encoder );
+}
+
+//
+
+function _normalize( o )
 {
 
-  o = _.routine.options_( normalize, o );
+  o = _.routine.options_( _normalize, o );
   if( _.strIs( o.exts ) )
   o.exts = [ o.exts ];
   else if( o.exts === null )
@@ -57,7 +86,7 @@ function normalize( o )
 
 }
 
-normalize.defaults =
+_normalize.defaults =
 {
 
   name : null,
@@ -75,10 +104,10 @@ normalize.defaults =
 
 //
 
-function register( o, ext )
+function _registerWithExt( o, ext )
 {
 
-  o = _.files.encoder.normalize( o );
+  o = _.files.encoder._normalize( o );
 
   let collectionMap = o.feature.reader ? _.files.ReadEncoders : _.files.WriteEncoders;
   let name = ext ? ext : o.name;
@@ -90,11 +119,16 @@ function register( o, ext )
   {
     let encoder2 = collectionMap[ o.name ];
     if( encoder2 === o )
-    return o;
-    if( encoder2.feature.default )
-    return o;
+    return encoder2;
+    if( encoder2.gdf === o.gdf )
+    return encoder2;
     if( !o.feature.default )
-    return o;
+    return encoder2;
+    if( encoder2.feature.default )
+    {
+      debugger;
+      throw _.err( `Several ${name} GDF encoders set as default` );
+    }
   }
 
   // console.log( `Registered encoder::${name}` );
@@ -104,11 +138,51 @@ function register( o, ext )
   return o;
 }
 
-register.defaults =
+_registerWithExt.defaults =
 {
 
-  ... normalize.defaults,
+  ... _normalize.defaults,
 
+}
+
+//
+
+function gdfRegister( gdf )
+{
+  let result = Object.create( null );
+  // _.assert( gdf.ext.length > 0 );
+  _.assert( gdf instanceof _.gdf.Encoder );
+
+  if( gdf.inFormat.includes( 'structure' ) )
+  result.writer = _.files.encoder.writerFromGdf( gdf );
+
+  if( gdf.outFormat.includes( 'structure' ) )
+  result.reader = _.files.encoder.readerFromGdf( gdf );
+
+  if( result.reader && result.writer )
+  debugger;
+  return result;
+}
+
+//
+
+function withGdf( gdf )
+{
+  let result = Object.create( null );
+  // _.assert( gdf.ext.length > 0 );
+  _.assert( gdf instanceof _.gdf.Encoder );
+
+  if( gdf.inFormat.includes( 'structure' ) )
+  if( _writerFromGdfCache.has( gdf ) )
+  result.writer = _writerFromGdfCache.get( gdf );
+
+  if( gdf.outFormat.includes( 'structure' ) )
+  if( _readerFromGdfCache.has( gdf ) )
+  result.reader = _readerFromGdfCache.get( gdf );
+
+  if( result.reader && result.writer )
+  debugger;
+  return result;
 }
 
 //
@@ -116,20 +190,16 @@ register.defaults =
 function _fromGdf( gdf )
 {
 
-  _.assert( gdf.ext.length );
+  _.assert( gdf.ext.length > 0 );
   _.assert( gdf instanceof _.gdf.Encoder );
 
   let encoder = Object.create( null );
   encoder.gdf = gdf;
   encoder.exts = gdf.ext.slice();
 
-  // if( gdf.forConfig ) /* zzz : remove */
-  // encoder.forConfig = true;
-
   encoder.feature = Object.create( null );
-  if( gdf.feature.config )
+  if( gdf.feature.config ) /* xxx : remove the feature */
   encoder.feature.config = true;
-  // if( gdf.default )
   if( gdf.feature.default )
   encoder.feature.default = true;
 
@@ -158,6 +228,11 @@ function writerFromGdf( gdf )
     op.operation.encoding = encoded.out.format;
   }
 
+  _.each( gdf.ext, ( ext ) =>
+  {
+    _.files.encoder._registerWithExt( encoder, ext );
+  })
+
   _writerFromGdfCache.set( gdf, encoder );
   return encoder;
 }
@@ -173,10 +248,7 @@ function readerFromGdf( gdf )
 
   let encoder = _.files.encoder._fromGdf( gdf );
   encoder.feature.reader = true;
-  // let expectsString = _.longHas( gdf.inFormat, 'string' );
   let expectsString = gdf.inFormatSupports( 'string' );
-  // if( expectsString )
-  // debugger;
 
   encoder.onBegin = function( op )
   {
@@ -192,6 +264,11 @@ function readerFromGdf( gdf )
     op.data = decoded.out.data;
   }
 
+  _.each( gdf.ext, ( ext ) =>
+  {
+    _.files.encoder._registerWithExt( encoder, ext );
+  })
+
   _readerFromGdfCache.set( gdf, encoder );
   return encoder;
 }
@@ -200,7 +277,7 @@ function readerFromGdf( gdf )
 
 function fromGdfs()
 {
-  _.assert( _.Gdf, 'module::Gdf is required to generate encoders!' );
+  _.assert( _.routine.is( _.Gdf ), 'module::Gdf is required to generate encoders!' );
   _.assert( _.mapIs( _.gdf.inMap ) );
   _.assert( _.mapIs( _.gdf.outMap ) );
 
@@ -225,13 +302,12 @@ function fromGdfs()
   writeGdf.forEach( ( gdf ) =>
   {
     let encoder = _.files.encoder.writerFromGdf( gdf );
-    _.assert( gdf.ext.length );
-    _.each( gdf.ext, ( ext ) =>
-    {
-      // debugger;
-      if( !WriteEndoders[ ext ] || gdf.feature.default )
-      _.files.encoder.register( encoder, ext );
-    })
+    _.assert( gdf.ext.length > 0 );
+    // _.each( gdf.ext, ( ext ) =>
+    // {
+    //   if( !WriteEndoders[ ext ] || gdf.feature.default )
+    //   _.files.encoder._registerWithExt( encoder, ext );
+    // })
   })
 
   /* */
@@ -239,13 +315,13 @@ function fromGdfs()
   readGdf.forEach( ( gdf ) =>
   {
     let encoder = _.files.encoder.readerFromGdf( gdf );
-    _.assert( gdf.ext.length );
-    _.each( gdf.ext, ( ext ) =>
-    {
-      // debugger;
-      if( !ReadEncoders[ ext ] || gdf.feature.default )
-      _.files.encoder.register( encoder, ext );
-    })
+    _.assert( gdf.ext.length > 0 );
+    // _.each( gdf.ext, ( ext ) =>
+    // {
+    //   debugger;
+    //   if( !ReadEncoders[ ext ] || gdf.feature.default )
+    //   _.files.encoder._registerWithExt( encoder, ext );
+    // })
   })
 
   /* */
@@ -279,6 +355,29 @@ function fromGdfs()
 
   Object.assign( _.files.ReadEncoders, ReadEncoders );
   Object.assign( _.files.WriteEncoders, WriteEndoders );
+}
+
+//
+
+function gdfsWatch()
+{
+
+  _.gdf.on( 'gdf.form', ( e ) =>
+  {
+    _.files.encoder.gdfRegister( e.gdf );
+  });
+
+  _.gdf.on( 'gdf.unform', ( e ) =>
+  {
+    debugger;
+    let r = _.files.encoder.withGdf( e.gdf );
+    if( r.writer )
+    _.files.encoder.finit( r.writer );
+    if( r.reader )
+    _.files.encoder.finit( r.reader );
+    // _.assert( 0, 'not implemented' );
+  });
+
 }
 
 //
@@ -325,12 +424,16 @@ function deduce( o )
     for( let i2 = 0 ; i2 < typeMap[ type ].length ; i2++ )
     {
       let gdf = typeMap[ type ][ i2 ];
+      if( gdf.ext.length === 0 )
+      continue;
       let o2 = _.mapBut_( null, o, [ 'single', 'returning', 'feature', 'format' ] );
       if( o.feature.reader )
       o2.inFormat = o.format;
       else
       o2.outFormat = o.format;
       let supports = gdf.supports( o2 );
+      // if( supports )
+      // debugger;
       if( supports )
       _.arrayAppendOnce( result, _.files.encoder[ fromMethodName ]( gdf ) );
     }
@@ -340,9 +443,8 @@ function deduce( o )
 
   if( o.single )
   {
-
     if( result.length > 1 )
-    _.filter_( result, ( encoder ) => encoder.feature.default ? encoder : undefined );
+    _.entity.filter_( result, result, ( encoder ) => encoder.feature.default ? encoder : undefined );
 
     _.assert
     (
@@ -360,7 +462,6 @@ function deduce( o )
     return result[ 0 ];
   }
 
-  debugger;
   if( o.returning === 'name' )
   return result.map( ( encoder ) => encoder.name );
   else
@@ -417,7 +518,6 @@ function _for( o )
       returning : 'encoder',
       single : 1,
     });
-    debugger;
     _.assert( _.strDefined( o.encoder.name ) );
     o.encoding = o.encoder.name;
     return o;
@@ -457,12 +557,17 @@ let Extension =
 
   // encoder
 
-  normalize,
-  register,
+  is,
+  finit,
+  _normalize,
+  _registerWithExt,
+  gdfRegister,
+  withGdf,
   _fromGdf,
   writerFromGdf,
   readerFromGdf,
   fromGdfs,
+  gdfsWatch,
   deduce,
 
   for : _for,
@@ -473,7 +578,7 @@ let Extension =
 
 }
 
-_.props.supplement( Self, Extension );
+_.props.supplement( _.files.encoder, Extension );
 
 // --
 // export

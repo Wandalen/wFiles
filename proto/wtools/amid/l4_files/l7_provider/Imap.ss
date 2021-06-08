@@ -285,7 +285,9 @@ function fileReadAct( o )
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.routine.assertOptions( fileReadAct, o );
   _.assert( _.strIs( o.encoding ) );
-  o.advanced = _.routine.options_( null, o.advanced || Object.create( null ), fileReadAct.advanced );
+  // o.advanced = _.routine.options_( null, o.advanced || Object.create( null ), fileReadAct.advanced );
+  o.advanced = _.mapSupplementAssigning( o.advanced || Object.create( null ), fileReadAct.advanced );
+  _.map.assertHasOnly( o.advanced, fileReadAct.advanced );
 
   let parsed = self.pathParse( o.filePath );
   parsed.dirPath = path.unabsolute( parsed.dirPath );
@@ -465,7 +467,7 @@ function attachmentsGet( o )
 
   function _attachmentsGet()
   {
-    let ready = self.ready.split();
+    let ready = _.take( null );
 
     if( !self.fileExists( o.filePath ) )
     return ready.take( null );
@@ -897,7 +899,9 @@ function fileWriteAct( o )
   _.routine.assertOptions( fileWriteAct, o );
   _.assert( self.path.isNormalized( o.filePath ) );
   _.assert( self.WriteMode.indexOf( o.writeMode ) !== -1 );
-  o.advanced = _.routine.options_( null, o.advanced || Object.create( null ), fileWriteAct.advanced );
+  // o.advanced = _.routine.options_( null, o.advanced || Object.create( null ), fileWriteAct.advanced );
+  o.advanced = _.mapSupplementAssigning( o.advanced || Object.create( null ), fileWriteAct.advanced );
+  _.map.assertHasOnly( o.advanced, fileWriteAct.advanced );
 
   /* data conversion */
 
@@ -1258,7 +1262,7 @@ function _fileCopyPrepare( o )
 
   if( o.srcProvider instanceof _.FileProvider.Imap || !o.srcProvider )
   {
-    _.assert( o.dstProvider, 'Expects destination provider {-dstProvider-}.' );
+    _.assert( !!o.dstProvider, 'Expects destination provider {-dstProvider-}.' );
 
     let numberOfLines = _.strLinesCount( read );
     if( numberOfLines === 1 )
@@ -1268,7 +1272,6 @@ function _fileCopyPrepare( o )
       o.options.context.srcResolvedStat.size = o.options.context.srcStat.size = o.data.length;
     }
   }
-  // else if( !( o.srcProvider instanceof _.FileProvider.Imap ) )
   else if( o.srcProvider instanceof _.FileProvider.Abstract )
   {
     _.assert( !o.dstProvider || o.dstProvider instanceof _.FileProvider.Imap, 'Expects provider Imap {-o.dstProvider-}.' );

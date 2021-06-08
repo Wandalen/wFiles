@@ -2338,14 +2338,14 @@ encoders[ 'buffer.raw' ] =
 
   onBegin : function( e )
   {
-    debugger;
+    // debugger;
     _.assert( e.operation.encoding === 'buffer.raw' );
     e.operation.encoding = 'buffer.node';
   },
 
   onEnd : function( e )
   {
-    debugger;
+    // debugger;
     if( e.stream )
     return;
     _.assert( _.bufferNodeIs( e.data ) || _.bufferTypedIs( e.data ) || _.bufferRawIs( e.data ) );

@@ -1762,7 +1762,7 @@ function _filesReflectPrepare( routine, args )
   _.assert( o.srcPath === undefined );
   _.assert( o.dstPath === undefined );
   _.assert( o.src.isPaired( o.dst ) );
-  _.assert( !o.dstDeleting || o.includingDst );
+  _.assert( !o.dstDeleting || !!o.includingDst );
   _.assert( o.onDstName === null || _.routineIs( o.onDstName ) );
   _.assert( _.boolLike( o.includingDst ) );
   _.assert( _.boolLike( o.dstDeleting ) );
@@ -3346,7 +3346,6 @@ function filesReflectSingle_body( o )
   function writeSrcUp( record )
   {
 
-    debugger;
     if( o.onWriteSrcUp )
     {
       let onr = o.onWriteSrcUp.call( self, record, o );

@@ -2,7 +2,7 @@ if( typeof module !== 'undefined' )
 require( 'wFiles' )
 
 var _ = wTools;
-var waitSync = require( 'wait-sync' );
+// var waitSync = require( 'wait-sync' );
 
 function showStats( s, o )
 {
@@ -47,7 +47,8 @@ function fileWriteTest( delay )
   _.fileProvider.fileWrite( testFile, testFile );
   var ostats = _.fileProvider.statRead( testFile );
 
-  waitSync( delay * 2 );
+  // waitSync( delay * 2 );
+  _.time.out( delay * 2000 ).deasync();
 
   _.fileProvider.fileWrite({ filePath : testFile, data : 'dasd', writeMode : 'rewrite' });
 

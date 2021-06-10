@@ -392,11 +392,6 @@ submodule:
     enabled: 0
     criterion:
       development: 1
-  wait-sync:
-    path: 'npm:///wait-sync#1.0.1'
-    enabled: 0
-    criterion:
-      development: 1
   wTesting:
     path: 'npm:///wTesting'
     enabled: 0

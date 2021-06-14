@@ -3,8 +3,8 @@
 
 'use strict';
 
-/* xxx : qqq : use sleep instead of waitSync. remove waitSync */
-var waitSync;
+/* xxx : aaa : use sleep instead of waitSync. remove waitSync */ /* Dmytro : replaced */
+// var waitSync;
 
 if( typeof module !== 'undefined' )
 {
@@ -12,7 +12,7 @@ if( typeof module !== 'undefined' )
   if( !_global_.wTools.FileProvider )
   require( '../l4_files/entry/Files.s' );
   _.include( 'wTesting' );
-  waitSync = require( 'wait-sync' );
+  // waitSync = require( 'wait-sync' );
 }
 
 //
@@ -390,12 +390,15 @@ function filesNewer( test )
   var file3 = 'tmp.tmp/filesNewer/test3';
   var file4 = 'tmp.tmp/filesNewer/test4';
 
-  var delay = provider.systemBitrateTimeGet() / 1000;
+  var delay = provider.systemBitrateTimeGet() / 10;
+  // var delay = provider.systemBitrateTimeGet() / 1000;
 
   context.createTestFile( file1, 'test1' );
-  waitSync( delay );
+  // waitSync( delay );
+  _.time.sleep( delay );
   context.createTestFile( file2, 'test2' );
-  waitSync( delay );
+  // waitSync( delay );
+  _.time.sleep( delay );
   context.createTestFile( file3, 'test3' );
 
   file1 = context.mergePath( file1 );
@@ -459,6 +462,8 @@ function filesNewer( test )
   return con;
 }
 
+filesNewer.timeOut = 20000;
+
 //
 
 function filesOlder( test )
@@ -473,12 +478,15 @@ function filesOlder( test )
   var file3 = 'tmp.tmp/filesOlder/test3';
   var file4 = 'tmp.tmp/filesOlder/test4';
 
-  var delay = provider.systemBitrateTimeGet() / 1000;
+  var delay = provider.systemBitrateTimeGet() / 10;
+  // var delay = provider.systemBitrateTimeGet() / 1000;
 
   context.createTestFile( file1, 'test1' );
-  waitSync( delay );
+  // waitSync( delay );
+  _.time.sleep( delay );
   context.createTestFile( file2, 'test2' );
-  waitSync( delay );
+  // waitSync( delay );
+  _.time.sleep( delay );
   context.createTestFile( file3, 'test3' );
 
   file1 = context.mergePath( file1 );
@@ -541,6 +549,8 @@ function filesOlder( test )
 
   return con;
 }
+
+filesOlder.timeOut = 20000;
 
 //
 
@@ -1067,12 +1077,15 @@ function filesSize( test )
   var file3 = 'tmp.tmp/filesAreUpToDate/src/test3';
   var file4 = 'tmp.tmp/filesAreUpToDate/dst/test4';
 
-  var delay = provider.systemBitrateTimeGet() / 1000;
+  var delay = provider.systemBitrateTimeGet() / 10;
+  // var delay = provider.systemBitrateTimeGet() / 1000;
 
   context.createTestFile( file1, 'test1, any text' );
-  waitSync( delay );
+  // waitSync( delay );
+  _.time.sleep( delay );
   context.createTestFile( file2, 'test2' );
-  waitSync( delay );
+  // waitSync( delay );
+  _.time.sleep( delay );
   context.createTestFile( file3, 'test3' );
 
   file1 = context.mergePath( file1 );
@@ -1126,6 +1139,8 @@ function filesSize( test )
   test.shouldThrowErrorSync( () => provider.filesSize( 1 ) );
 }
 
+filesSize.timeOut = 20000;
+
 //
 
 function fileSize( test )
@@ -1139,10 +1154,12 @@ function fileSize( test )
   var file2 = 'tmp.tmp/fileSize/test2';
   var file3 = 'tmp.tmp/fileSize/test3';
 
-  var delay = provider.systemBitrateTimeGet() / 1000;
+  var delay = provider.systemBitrateTimeGet() / 10;
+  // var delay = provider.systemBitrateTimeGet() / 1000;
 
   context.createTestFile( file1, 'test1, any text' );
-  waitSync( delay );
+  // waitSync( delay );
+  _.time.sleep( delay );
   context.createTestFile( file2, 'test2' );
 
   file1 = context.mergePath( file1 );
@@ -1259,6 +1276,8 @@ function fileSize( test )
   // }
   // test.shouldThrowErrorSync( () => provider.fileSize( map ) );
 }
+
+fileSize.timeOut = 20000;
 
 //
 
@@ -3103,14 +3122,18 @@ function filesAreUpToDate2( test )
   var file3 = 'tmp.tmp/filesAreUpToDate/src/test3';
   var file4 = 'tmp.tmp/filesAreUpToDate/dst/test4';
 
-  var delay = provider.systemBitrateTimeGet() / 1000;
+  var delay = provider.systemBitrateTimeGet() / 10;
+  // var delay = provider.systemBitrateTimeGet() / 1000;
 
   context.createTestFile( file1, 'test1' );
-  waitSync( delay );
+  // waitSync( delay );
+  _.time.sleep( delay );
   context.createTestFile( file2, 'test2' );
-  waitSync( delay );
+  // waitSync( delay );
+  _.time.sleep( delay );
   context.createTestFile( file3, 'test3' );
-  waitSync( delay );
+  // waitSync( delay );
+  _.time.sleep( delay );
   context.createTestFile( file4, 'test4' );
 
   file1 = context.mergePath( file1 );
@@ -3194,7 +3217,9 @@ function filesAreUpToDate2( test )
   var map = { src : file1, dst : file2, newer : 1 };
   test.shouldThrowErrorSync( () => provider.filesAreUpToDate2( map ) );
 
-};
+}
+
+filesAreUpToDate2.timeOut = 20000;
 
 //
 

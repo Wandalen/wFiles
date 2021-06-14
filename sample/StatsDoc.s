@@ -3,7 +3,7 @@ if( typeof module !== 'undefined' )
 require( 'wFiles' )
 
 var _ = wTools;
-var waitSync = require( 'wait-sync' );
+// var waitSync = require( 'wait-sync' );
 
 function showStats( s, o )
 {
@@ -60,13 +60,15 @@ var stats = _.fileProvider.statRead( testFile );
 showStats( stats, ostats );
 
 console.log( '\n----> After read with 10ms delay :' );
-waitSync( 0.01 );
+// waitSync( 0.01 );
+_.time.out( 10 ).deasync();
 _.fileProvider.fileRead( testFile );
 var stats = _.fileProvider.statRead( testFile );
 showStats( stats, ostats );
 
 console.log( '\n----> After read with 1000ms delay :' );
-waitSync( 1 );
+// waitSync( 1 );
+_.time.sleep( 1 );
 _.fileProvider.fileRead( testFile );
 var stats = _.fileProvider.statRead( testFile );
 showStats( stats, ostats );
@@ -88,7 +90,8 @@ var stats = _.fileProvider.statRead( testFile );
 showStats( stats, ostats );
 
 console.log( '\n----> Stats of the file after content change, with 10 ms delay:' )
-waitSync( 0.01 )
+// waitSync( 0.01 )
+_.time.out( 10 ).deasync();
 _.fileProvider.fileWrite( testFile, 'dasd' );
 var stats = _.fileProvider.statRead( testFile );
 showStats( stats, ostats );
@@ -105,7 +108,8 @@ console.log( 'timeNow.getTime:', timeNow.getTime() );
 for( var i = 0; i < 2; i++ )
 {
   var filePath = _.path.join( testDir, 'file' + i );
-  waitSync( 0.010 );
+  // waitSync( 0.010 );
+  _.time.out( 10 ).deasync();
   _.fileProvider.fileWrite( filePath, filePath );
   var statsN = _.fileProvider.statRead( filePath );
   console.log( '\n----> Stats of the file #' + i + ':' );
@@ -119,7 +123,8 @@ console.log( '\n--> Copy file, rewriting dst:' )
 var testFile2 = _.path.join( testDir, 'file2' );
 _.fileProvider.filesDelete( testDir );
 _.fileProvider.fileWrite( testFile, 'abc' );
-waitSync( 0.1 )
+// waitSync( 0.1 )
+_.time.out( 10 ).deasync();
 _.fileProvider.fileWrite( testFile2, 'cda' );
 
 console.log( '\n----> Stats of src before copy:' )
@@ -130,7 +135,8 @@ console.log( '\n----> Stats of dst before copy:' )
 var ostatsDst = _.fileProvider.statRead( testFile2 );
 showStats( ostatsDst );
 
-waitSync( 0.01 )
+// waitSync( 0.01 )
+_.time.out( 10 ).deasync();
 
 var fs = require( 'fs' )
 fs.copyFileSync( _.fileProvider.path.nativize( testFile ), _.fileProvider.path.nativize( testFile2 ) );

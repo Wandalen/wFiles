@@ -349,10 +349,13 @@ function exportString( o )
   let it = o.it = _.stringer.it( o.it || { verbosity } );
   it.opts = o;
 
+  // debugger;
+
   if( o.withName )
   {
-    it.iterator.result += operation.clname;
-    // it.levelUp();
+    // it.iterator.result += operation.clname;
+    // it.iterator.resultStructure.push( operation.clname );
+    it.lineWrite( operation.clname );
   }
 
   if( it.verbosity >= 2 )
@@ -361,7 +364,7 @@ function exportString( o )
     let o2 = { it : it.itUp() };
     if( it.verbosity === 2 )
     o2.withName = 0;
-    o2.it.nlWrite().tabWrite();
+    // o2.it.eolWrite().tabWrite();
     deed.exportString( o2 );
     o2.it.itDown();
   });
@@ -372,13 +375,10 @@ function exportString( o )
     _.hashMap.each( usages, ( usage ) =>
     {
       let o2 = { it : it.itUp() };
-      // if( it.verbosity === 2 )
-      // o2.withName = 0;
-      o2.it.nlWrite().tabWrite();
+      // o2.it.eolWrite().tabWrite();
       usage.exportString( o2 );
       o2.it.itDown();
     });
-
   }
 
   return it;

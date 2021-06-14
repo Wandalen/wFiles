@@ -162,7 +162,8 @@ function exportString( o )
 
   if( o.withName )
   {
-    it.iterator.result += mission.clname;
+    it.write( mission.clname );
+    // it.iterator.result += mission.clname;
     // it.levelUp();
   }
 
@@ -172,7 +173,7 @@ function exportString( o )
     let o2 = { it : it.itUp() };
     if( it.verbosity === 2 )
     o2.withName = 0;
-    o2.it.nlWrite();
+    o2.it.eolWrite();
     o2.it.write( o2.it.tab );
     operation.exportString( o2 );
     o2.it.itDown();

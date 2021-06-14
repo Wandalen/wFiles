@@ -221,7 +221,8 @@ function exportString( o )
   o.withName = 1;
 
   if( o.withName )
-  it.iterator.result += file.clname;
+  it.lineWrite( file.clname );
+  // it.iterator.result += file.clname;
 
   if( it.verbosity >= 2 )
   {

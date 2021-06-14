@@ -203,17 +203,20 @@ function exportString( o )
 
   if( o.withName )
   {
-    it.iterator.result += deed.clname;
+    // it.iterator.result += deed.clname;
+    // it.iterator.resultStructure.push( deed.clname );
+    it.lineWrite( deed.clname );
     it.levelUp();
   }
 
   let dst = [ ... _.set.map( null, deed.dstGet(), ( file ) => file.localPath ) ][ 0 ] || null;
   let src = [ ... _.set.map( null, deed.srcGet(), ( file ) => file.localPath ) ][ 0 ] || null;
-  let mtr = _.path.moveTextualReport( dst, src );
+  let mtr = _.path.moveTextualReport( dst, src ); /* xxx */
   if( it.verbosity >= 2 )
   it.lineWrite( mtr );
   else
-  it.iterator.result += mtr;
+  it.lineWrite( mtr );
+  // it.iterator.result += mtr;
 
   if( it.verbosity >= 2 )
   {

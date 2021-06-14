@@ -3,8 +3,8 @@ root:
   - wFiles.out
 consistency:
   ../will.yml: &ref_0
-    hash: 15b1709f7aaf63684f7cd62e51a3fd9d
-    size: 9429
+    hash: 3e68fc77327ccf0ba915bb3b74266efc
+    size: 9330
 module:
   wFiles.out:
     about:
@@ -384,12 +384,6 @@ module:
           development: 1
       eslint:
         path: 'npm:///eslint#7.1.0'
-        autoExporting: 0
-        enabled: 0
-        criterion:
-          development: 1
-      wait-sync:
-        path: 'npm:///wait-sync#1.0.1'
         autoExporting: 0
         enabled: 0
         criterion:
@@ -1238,12 +1232,6 @@ module:
         enabled: 0
         criterion:
           development: 1
-      wait-sync:
-        path: 'npm:///wait-sync#1.0.1'
-        autoExporting: 0
-        enabled: 0
-        criterion:
-          development: 1
       wTesting:
         path: 'npm:///wTesting'
         autoExporting: 0
@@ -1782,5 +1770,5 @@ module:
           - 'build::npm'
     consistency:
       ../will.yml:
-        hash: 15b1709f7aaf63684f7cd62e51a3fd9d
-        size: 9429
+        hash: 3e68fc77327ccf0ba915bb3b74266efc
+        size: 9330

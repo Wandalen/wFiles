@@ -124,10 +124,10 @@ function exportString( o )
 
   if( it.verbosity >= 2 )
   {
-    it.levelUp();
+    it.tabLevelUp();
     if( usage.facetSet !== null && usage.facetSet.size )
     it.lineWrite( `facetSet : ${ [ ... usage.facetSet ].join( ' ' ) }` );
-    it.levelDown();
+    it.tabLevelDown();
   }
 
   return it;

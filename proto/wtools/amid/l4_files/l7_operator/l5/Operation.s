@@ -361,12 +361,12 @@ function exportString( o )
   if( it.verbosity >= 2 )
   operation.deedArray.forEach( ( deed, c ) =>
   {
-    let o2 = { it : it.itUp() };
+    let o2 = { it : it.verbosityUp() };
     if( it.verbosity === 2 )
     o2.withName = 0;
     // o2.it.eolWrite().tabWrite();
     deed.exportString( o2 );
-    o2.it.itDown();
+    o2.it.verbosityDown();
   });
 
   if( it.verbosity >= 2 )
@@ -374,10 +374,10 @@ function exportString( o )
     let usages = operation.usageHashmapGet();
     _.hashMap.each( usages, ( usage ) =>
     {
-      let o2 = { it : it.itUp() };
+      let o2 = { it : it.verbosityUp() };
       // o2.it.eolWrite().tabWrite();
       usage.exportString( o2 );
-      o2.it.itDown();
+      o2.it.verbosityDown();
     });
   }
 

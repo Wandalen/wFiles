@@ -164,24 +164,24 @@ function exportString( o )
   {
     it.write( mission.clname );
     // it.iterator.result += mission.clname;
-    // it.levelUp();
+    // it.tabLevelUp();
   }
 
   if( it.verbosity >= 2 )
   mission.operationArray.forEach( ( operation, c ) =>
   {
-    let o2 = { it : it.itUp() };
+    let o2 = { it : it.verbosityUp() };
     if( it.verbosity === 2 )
     o2.withName = 0;
     o2.it.eolWrite();
     o2.it.write( o2.it.tab );
     operation.exportString( o2 );
-    o2.it.itDown();
+    o2.it.verbosityDown();
   });
 
   if( o.withName )
   {
-    // it.levelDown();
+    // it.tabLevelDown();
   }
 
   return it;

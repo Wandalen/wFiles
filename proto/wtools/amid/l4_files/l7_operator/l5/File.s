@@ -226,12 +226,12 @@ function exportString( o )
 
   if( it.verbosity >= 2 )
   {
-    it.levelUp();
+    it.tabLevelUp();
     if( file.firstEffectiveDeed )
     it.lineWrite( `firstEffectiveDeed : ${file.firstEffectiveDeed.deed.clname}` );
     if( file.firstReadingDeed )
     it.lineWrite( `firstReadingDeed : ${file.firstReadingDeed.deed.clname}` );
-    it.levelDown();
+    it.tabLevelDown();
   }
 
   return it;

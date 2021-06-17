@@ -206,7 +206,7 @@ function exportString( o )
     // it.iterator.result += deed.clname;
     // it.iterator.resultStructure.push( deed.clname );
     it.lineWrite( deed.clname );
-    it.levelUp();
+    it.tabLevelUp();
   }
 
   let dst = [ ... _.set.map( null, deed.dstGet(), ( file ) => file.localPath ) ][ 0 ] || null;
@@ -230,7 +230,7 @@ function exportString( o )
 
   if( o.withName )
   {
-    it.levelDown();
+    it.tabLevelDown();
   }
 
   return it;

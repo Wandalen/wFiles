@@ -191,7 +191,6 @@ function tempOpen( o )
 
   if( o.filePath === undefined || o.filePath === null )
   o.filePath = self.current();
-  // o.filePath = null;
   else
   o.filePath = self.resolve( o.filePath );
 

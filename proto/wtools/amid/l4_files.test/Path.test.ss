@@ -1339,9 +1339,9 @@ function tempCloseAfter( test )
 // `
 
   // a.fileProvider.fileWrite( a.abs( 'Program.js' ), programSourceCode );
-  let programPath = a.program( program ).programPath;
+  let filePath/*programPath*/ = a.program( program ).filePath/*programPath*/;
   // a.appStartNonThrowing({ execPath : a.abs( 'Program.js' ) })
-  a.appStartNonThrowing({ execPath : programPath })
+  a.appStartNonThrowing({ execPath : filePath/*programPath*/ })
   .then( ( op ) =>
   {
     test.identical( _.strCount( op.output, 'tempDirCreated' ), 1 );

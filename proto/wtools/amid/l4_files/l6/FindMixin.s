@@ -5027,9 +5027,7 @@ function filesDeleteTerminals_body( o )
   if( _.arrayIs( o2.onDown ) )
   o2.onDown = _.routinesComposeReturningLast( o2.onDown );
 
-  debugger;
   let files = self.filesFind.body.call( self, o2 );
-  debugger;
 
   return files;
 
@@ -5037,7 +5035,6 @@ function filesDeleteTerminals_body( o )
 
   function handleDown( record )
   {
-    debugger;
     if( o.writing )
     if( record.isActual && !record.isDirectory && record.included )
     self.fileDelete

@@ -227,7 +227,6 @@ let buffer;
 //       {
 //         if( !result )
 //         {
-//           debugger;
 //           throw _.err
 //           (
 //             'Cant resolve : ' + o.visited[ 0 ] +
@@ -374,7 +373,6 @@ function pathResolveSoftLinkAct( o )
 
     result = File.readlinkSync( self.path.nativize( o.filePath ) );
 
-    // debugger;
     /* qqq : why? add experiment please? */
     /* aaa : makes path relative to link instead of directory where link is located */
     if( !path.isAbsolute( path.normalize( result ) ) )
@@ -391,7 +389,6 @@ function pathResolveSoftLinkAct( o )
   }
   catch( err )
   {
-    debugger;
     throw _.err( 'Error resolving softLink', o.filePath, '\n', err );
   }
 
@@ -595,7 +592,6 @@ function fileReadAct( o )
     if( o.encoder && o.encoder.onError )
     try
     {
-      debugger;
       err = o.encoder.onError.call( self, { error : err, operation : o, encoder : o.encoder })
     }
     catch( err2 )
@@ -676,7 +672,6 @@ function streamReadAct( o )
   function handleError( err )
   {
 
-    debugger;
     err = _._err
     ({
       args : [ '\nfileReadAct( ', o.filePath, ' )\n', err ],
@@ -688,7 +683,6 @@ function streamReadAct( o )
     if( o.encoder && o.encoder.onError )
     try
     {
-      debugger;
       err = o.encoder.onError.call( self, { error : err, operation : o, encoder : o.encoder });
     }
     catch( err2 )
@@ -1322,7 +1316,8 @@ function fileDeleteAct( o )
         return File.unlinkSync( filePath );
       }
 
-      File.unlink( tempPath, ( err ) =>
+      // File.unlink( tempPath, ( err ) => /* Dmytro : we should use sync methods in sync branch */
+      File.unlinkSync( tempPath, ( err ) =>
       {
         if( err )
         throw err;
@@ -1376,9 +1371,10 @@ function fileDeleteAct( o )
   {
     let fileName = self.path.name({ path : o.filePath, full : 1 });
     let tempName = fileName + '-' + _.idWithGuid() + '.tmp';
-    let tempDirPath = self.path.tempOpen( o.filePath );
-    let tempPath = self.path.join( tempDirPath, tempName );
-    tempPath = self.path.nativize( tempPath );
+    // let tempDirPath = self.path.tempOpen( o.filePath ); /* Dmytro : opening and closing ( missed ) of temp path is overhead for simple renaming, we can modify path to get unical name */
+    // let tempPath = self.path.join( tempDirPath, tempName );
+	let tempPath = _.strRemoveEnd( self.path.normalize( o.filePath ), '/' ); /* Dmytro : maybe, normalizing is overhead */
+    tempPath = self.path.nativize( tempPath+tempName );
     return tempPath;
   }
 
@@ -1420,7 +1416,6 @@ function dirMakeAct( o )
     }
     catch( err )
     {
-      debugger;
       throw _.err( err );
     }
 
@@ -1600,7 +1595,6 @@ function fileIsLockedAct( o )
 
   let con = _.Consequence.Try( () =>
   {
-    debugger
     if( o.sync )
     {
       return LockFile.checkSync( nativizedFilePath );
@@ -2338,14 +2332,12 @@ encoders[ 'buffer.raw' ] =
 
   onBegin : function( e )
   {
-    // debugger;
     _.assert( e.operation.encoding === 'buffer.raw' );
     e.operation.encoding = 'buffer.node';
   },
 
   onEnd : function( e )
   {
-    // debugger;
     if( e.stream )
     return;
     _.assert( _.bufferNodeIs( e.data ) || _.bufferTypedIs( e.data ) || _.bufferRawIs( e.data ) );

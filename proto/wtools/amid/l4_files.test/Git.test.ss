@@ -1992,6 +1992,8 @@ function filesReflectUpdateSwitchToOutdatedBranch( test )
   }
 }
 
+filesReflectUpdateSwitchToOutdatedBranch.timeOut = 30000;
+
 //
 
 // function filesReflectPerformance( test )

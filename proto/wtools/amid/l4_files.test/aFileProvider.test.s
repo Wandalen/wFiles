@@ -8255,6 +8255,8 @@ function fileCopySoftLinkResolving( test )
   test.close( 'links to same file' );
 }
 
+fileCopySoftLinkResolving.timeOut = 120000;
+
 //
 
 function fileCopyLinks( test )
@@ -38691,9 +38693,9 @@ function isTerminal( test )
 
   provider.fieldPop( 'usingTextLink', 1 );
 
-};
+}
 
-isTerminal.timeOut = 60000;
+isTerminal.timeOut = 120000;
 
 //
 
@@ -40826,7 +40828,7 @@ function isHardLink( test )
   provider.fieldPop( 'usingTextLink', 1 );
 }
 
-isHardLink.timeOut = 60000;
+isHardLink.timeOut = 120000;
 
 //
 
@@ -42283,7 +42285,7 @@ function isLink( test )
   provider.fieldPop( 'usingTextLink', 1 );
 }
 
-isLink.timeOut = 60000;
+isLink.timeOut = 120000;
 
 //
 

@@ -39295,6 +39295,8 @@ function isSoftLink( test )
 
 }
 
+isSoftLink.timeOut = 60000;
+
 //
 
 //
@@ -39631,7 +39633,9 @@ function isTextLink( test )
   test.identical( got.isLink(), false );
 
   provider.fieldPop( 'usingTextLink', 1 )
-};
+}
+
+isTextLink.timeOut = 60000;
 
 //
 

@@ -24743,6 +24743,8 @@ function softLinkRelativePath( test )
   test.close( 'allowingMissed off, same path' );
 }
 
+softLinkRelativePath.timeOut = 120000;
+
 //
 
 function fileReadAsync( test )
@@ -45561,6 +45563,8 @@ function pathResolveLinkTailChain( test )
   provider.fieldPop( 'usingTextLink', true );
 }
 
+pathResolveLinkTailChain.timeOut = 60000;
+
 //
 
 function pathResolveLinkFullBasic( test )
@@ -49532,6 +49536,8 @@ function pathResolveLinkFullResult( test )
 
   test.close( 'text links' );
 }
+
+pathResolveLinkFullResult.timeOut = 60000;
 
 //
 

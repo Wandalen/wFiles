@@ -45,224 +45,224 @@ function filesReflectTrivial( test )
 {
   let context = this;
   let a = test.assetFor( false );
-  let providerSrc = context.providerSrc;
   let providerDst = context.providerDst;
   let system = context.system;
-  let path = context.providerDst.path;
-  let installPathGlobal = providerDst.path.globalFromPreferred( a.abs( 'wPathBasic' ) );
-
+  let installPathGlobal = providerDst.path.globalFromPreferred( a.abs( 'wModuleForTesting1' ) );
   a.fileProvider.dirMake( a.routinePath );
+
+  /* - */
+
   a.shell({ execPath : 'npm i pacote --no-package-lock' });
 
   a.ready.then( () =>
   {
     test.case = 'no hash, no trailing /';
-    providerDst.filesDelete( a.abs( 'wPathBasic' ) );
-    let remotePath = 'npm:///wpathbasic';
+    providerDst.filesDelete( a.abs( 'wModuleForTesting1' ) );
+    let remotePath = 'npm:///wmodulefortesting1';
     return system.filesReflect({ reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 });
-  })
-  .then( ( got ) =>
+  });
+  a.ready.then( ( got ) =>
   {
-    let files = providerDst.dirRead( a.abs( 'wPathBasic' ) );
+    let files = providerDst.dirRead( a.abs( 'wModuleForTesting1' ) );
     let expected =
     [
-      'LICENSE',
+      'License',
       'package.json',
-      'README.md',
+      'Readme.md',
       'proto',
-      'node_modules',
-    ]
+      'out',
+    ];
     test.contains( files.sort(), expected.sort() );
     return got;
-  })
-  a.shell( './node_modules/.bin/pacote manifest wpathbasic' )
+  });
+  a.shell( './node_modules/.bin/pacote manifest wmodulefortesting1' )
   .then( ( op ) =>
   {
     test.identical( op.exitCode, 0 );
-    test.identical( _.strCount( op.output, '"_from": "wpathbasic@"' ), 1 );
+    test.identical( _.strCount( op.output, '"_from": "wmodulefortesting1@"' ), 1 );
     return null;
-  })
+  });
 
   /*  */
 
-  .then( () =>
+  a.ready.then( () =>
   {
     test.case = 'no hash, with trailing /';
-    providerDst.filesDelete( a.abs( 'wPathBasic' ) );
-    let remotePath = 'npm:///wpathbasic/'
+    providerDst.filesDelete( a.abs( 'wModuleForTesting1' ) );
+    let remotePath = 'npm:///wmodulefortesting1/';
     return system.filesReflect({ reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 });
-  })
-  .then( ( got ) =>
+  });
+  a.ready.then( ( got ) =>
   {
-    let files = providerDst.dirRead( a.abs( 'wPathBasic' ) );
+    let files = providerDst.dirRead( a.abs( 'wModuleForTesting1' ) );
     let expected =
     [
-      'LICENSE',
+      'License',
       'package.json',
-      'README.md',
+      'Readme.md',
       'proto',
-      'node_modules',
-    ]
+      'out',
+    ];
     test.identical( files.sort(), expected.sort() );
     return got;
-  })
+  });
 
   /*  */
 
-  .then( () =>
+  a.ready.then( () =>
   {
     test.case = 'already exists';
-    providerDst.filesDelete( a.abs( 'wPathBasic' ) );
-    let remotePath = 'npm:///wpathbasic';
+    providerDst.filesDelete( a.abs( 'wModuleForTesting1' ) );
+    let remotePath = 'npm:///wmodulefortesting1';
     let o = { reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 };
-    system.filesReflect( _.cloneJust( o ) )
+    system.filesReflect( _.cloneJust( o ) );
     return system.filesReflect( _.cloneJust( o ) );
-  })
-  .then( ( got ) =>
+  });
+  a.ready.then( ( got ) =>
   {
-    let files = providerDst.dirRead( a.abs( 'wPathBasic' ) );
+    let files = providerDst.dirRead( a.abs( 'wModuleForTesting1' ) );
     let expected =
     [
-      'LICENSE',
+      'License',
       'package.json',
-      'README.md',
+      'Readme.md',
       'proto',
-      'node_modules',
-    ]
+      'out',
+    ];
     test.identical( files.sort(), expected.sort() );
     return got;
-  })
+  });
 
   /*  */
 
-  .then( () =>
+  a.ready.then( () =>
   {
     test.case = 'specific version';
-    providerDst.filesDelete( a.abs( 'wPathBasic' ) );
-    let remotePath = 'npm:///wpathbasic#0.7.1'
+    providerDst.filesDelete( a.abs( 'wModuleForTesting1' ) );
+    let remotePath = 'npm:///wmodulefortesting1#0.0.100';
     return system.filesReflect({ reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 });
-  })
-  .then( ( got ) =>
+  });
+  a.ready.then( ( got ) =>
   {
-    let files = providerDst.dirRead( a.abs( 'wPathBasic' ) );
+    let files = providerDst.dirRead( a.abs( 'wModuleForTesting1' ) );
     let expected =
     [
       'LICENSE',
       'README.md',
-      'node_modules',
       'package.json',
-      'proto'
-    ]
+      'proto',
+      'out',
+    ];
     test.identical( files.sort(), expected.sort() );
-    var packagePath = providerDst.path.join( a.abs( 'wPathBasic' ), 'package.json' );
+    var packagePath = providerDst.path.join( a.abs( 'wModuleForTesting1' ), 'package.json' );
     var packageRead = providerDst.fileRead({ filePath : packagePath, encoding : 'json' });
-    test.identical( packageRead.version, '0.7.1' )
+    test.identical( packageRead.version, '0.0.100' )
     return got;
-  })
-  a.shell( './node_modules/.bin/pacote manifest wpathbasic@0.7.1' )
+  });
+  a.shell( './node_modules/.bin/pacote manifest wmodulefortesting1@0.0.100' )
   .then( ( op ) =>
   {
     test.identical( op.exitCode, 0 );
-    test.identical( _.strCount( op.output, '"_from": "wpathbasic@0.7.1"' ), 1 );
+    test.identical( _.strCount( op.output, '"_from": "wmodulefortesting1@0.0.100"' ), 1 );
     return null;
-  })
+  });
 
   /*  */
 
   a.ready.then( () =>
   {
     test.case = 'specific tag';
-    providerDst.filesDelete( a.abs( 'wPathBasic' ) );
-    let remotePath = 'npm:///wpathbasic!latest'
+    providerDst.filesDelete( a.abs( 'wModuleForTesting1' ) );
+    let remotePath = 'npm:///wmodulefortesting1!latest';
     return system.filesReflect({ reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 });
-  })
-  .then( ( got ) =>
+  });
+  a.ready.then( ( got ) =>
   {
-    let files = providerDst.dirRead( a.abs( 'wPathBasic' ) );
+    let files = providerDst.dirRead( a.abs( 'wModuleForTesting1' ) );
     let expected =
     [
-      'LICENSE',
+      'License',
       'package.json',
-      'README.md',
+      'Readme.md',
       'proto',
-      'node_modules',
+      'out',
     ];
     test.identical( files.sort(), expected.sort() );
-    var packagePath = providerDst.path.join( a.abs( 'wPathBasic' ), 'package.json' );
+    var packagePath = providerDst.path.join( a.abs( 'wModuleForTesting1' ), 'package.json' );
     var packageRead = providerDst.fileRead({ filePath : packagePath, encoding : 'json' });
     if( packageRead._requested )
     test.identical( packageRead._requested.fetchSpec, 'latest' )
     return got;
-  })
-  a.shell( 'node_modules/.bin/pacote manifest wpathbasic@latest' )
+  });
+  a.shell( 'node_modules/.bin/pacote manifest wmodulefortesting1@latest' )
   .then( ( op ) =>
   {
     test.identical( op.exitCode, 0 );
-    test.identical( _.strCount( op.output, '"_from": "wpathbasic@latest"' ), 1 );
+    test.identical( _.strCount( op.output, '"_from": "wmodulefortesting1@latest"' ), 1 );
     return null;
-  })
+  });
 
   /*  */
 
-  .then( () =>
+  a.ready.then( () =>
   {
     test.case = 'specific tag';
-    providerDst.filesDelete( a.abs( 'wPathBasic' ) );
-    let remotePath = 'npm:///wpathbasic!beta'
+    providerDst.filesDelete( a.abs( 'wModuleForTesting1' ) );
+    let remotePath = 'npm:///wmodulefortesting1!gamma';
     return system.filesReflect({ reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 });
-  })
-  .then( ( got ) =>
+  });
+  a.ready.then( ( got ) =>
   {
-    let files = providerDst.dirRead( a.abs( 'wPathBasic' ) );
+    let files = providerDst.dirRead( a.abs( 'wModuleForTesting1' ) );
     let expected =
     [
-      'LICENSE',
+      'License',
       'package.json',
-      'README.md',
+      'Readme.md',
       'proto',
-      'node_modules',
-    ]
+      'out',
+    ];
     test.identical( files.sort(), expected.sort() );
-    var packagePath = providerDst.path.join( a.abs( 'wPathBasic' ), 'package.json' );
+    var packagePath = providerDst.path.join( a.abs( 'wModuleForTesting1' ), 'package.json' );
     var packageRead = providerDst.fileRead({ filePath : packagePath, encoding : 'json' });
     if( packageRead._requested )
-    test.identical( packageRead._requested.fetchSpec, 'beta' )
+    test.identical( packageRead._requested.fetchSpec, 'gamma' )
     return got;
   })
-  a.shell( 'node_modules/.bin/pacote manifest wpathbasic@beta' )
+  a.shell( 'node_modules/.bin/pacote manifest wmodulefortesting1@gamma' )
   .then( ( op ) =>
   {
     test.identical( op.exitCode, 0 );
-    test.identical( _.strCount( op.output, '"_from": "wpathbasic@beta"' ), 1 );
+    test.identical( _.strCount( op.output, '"_from": "wmodulefortesting1@gamma"' ), 1 );
     return null;
-  })
+  });
 
   /*  */
 
-  .then( () =>
+  a.ready.then( () =>
   {
     test.case = 'path is occupied';
-    providerDst.filesDelete( a.abs( 'wPathBasic' ) );
-    providerDst.fileWrite( a.abs( 'wPathBasic' ), a.abs( 'wPathBasic' ) );
-    let remotePath = 'npm:///wpathbasic';
+    providerDst.filesDelete( a.abs( 'wModuleForTesting1' ) );
+    providerDst.fileWrite( a.abs( 'wModuleForTesting1' ), a.abs( 'wModuleForTesting1' ) );
+    let remotePath = 'npm:///wmodulefortesting1';
     return test.shouldThrowErrorSync
     (
       () => system.filesReflect( { reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 } )
     );
-  })
-  .then( () =>
+  });
+  a.ready.then( () =>
   {
-    test.true( providerDst.isTerminal( a.abs( 'wPathBasic' ) ) );
+    test.true( providerDst.isTerminal( a.abs( 'wModuleForTesting1' ) ) );
     return null;
-  })
+  });
 
   /*  */
 
-  .then( () =>
+  a.ready.then( () =>
   {
     test.case = 'wrong package name';
-    providerDst.filesDelete( a.abs( 'wPathBasic' ) );
-    let remotePath = 'npm:///wpathbasicc';
+    providerDst.filesDelete( a.abs( 'wModuleForTesting1' ) );
+    let remotePath = 'npm:///wmodulefortesting111';
     return test.shouldThrowErrorSync
     (
       () => system.filesReflect({ reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 })
@@ -270,7 +270,7 @@ function filesReflectTrivial( test )
   })
   .then( () =>
   {
-    test.true( !providerDst.fileExists( a.abs( 'wPathBasic' ) ) );
+    test.true( !providerDst.fileExists( a.abs( 'wModuleForTesting1' ) ) );
     return null;
   })
 

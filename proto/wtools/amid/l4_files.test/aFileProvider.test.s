@@ -45563,6 +45563,8 @@ function pathResolveLinkTailChain( test )
   provider.fieldPop( 'usingTextLink', true );
 }
 
+pathResolveLinkTailChain.timeOut = 60000;
+
 //
 
 function pathResolveLinkFullBasic( test )
@@ -49534,6 +49536,8 @@ function pathResolveLinkFullResult( test )
 
   test.close( 'text links' );
 }
+
+pathResolveLinkFullResult.timeOut = 60000;
 
 //
 

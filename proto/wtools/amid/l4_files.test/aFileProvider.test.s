@@ -24743,6 +24743,8 @@ function softLinkRelativePath( test )
   test.close( 'allowingMissed off, same path' );
 }
 
+softLinkRelativePath.timeOut = 120000;
+
 //
 
 function fileReadAsync( test )

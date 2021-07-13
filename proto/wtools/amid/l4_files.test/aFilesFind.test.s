@@ -36110,7 +36110,7 @@ function filesDeleteEscapedPath( test )
 
   /* */
 
-  test.case = 'provider';
+  test.case = 'provider, escaped dirs';
   a.reflect();
   var srcPath = a.abs( '"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"/"?a8"/File1.txt' );
   if( a.fileProvider.pathAllowedAct( srcPath ) )
@@ -36130,7 +36130,7 @@ function filesDeleteEscapedPath( test )
       './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"',
       './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"/"?a8"',
       './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"/"?a8"/File1.txt'
-    ]
+    ];
     var found = a.fileProvider.filesDelete
     ({
       filePath : a.abs( '.' ),
@@ -36141,16 +36141,13 @@ function filesDeleteEscapedPath( test )
   }
   else
   {
-    test.shouldThrowErrorSync( () =>
-    {
-      a.fileProvider.fileWrite( srcPath, 'File1.txt' );
-    })
+    test.shouldThrowErrorSync( () => a.fileProvider.fileWrite( srcPath, 'File1.txt' ) );
   }
   test.true( !a.fileProvider.fileExists( srcPath ) );
 
   /* */
 
-  test.case = 'system';
+  test.case = 'system, escaped dirs';
   a.reflect();
   var srcPath = a.abs( '"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"/"?a8"/File1.txt' );
   test.true( a.path.isGlobal( a.global( srcPath ) ) );
@@ -36171,7 +36168,7 @@ function filesDeleteEscapedPath( test )
       './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"',
       './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"/"?a8"',
       './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"/"?a8"/File1.txt'
-    ]
+    ];
     var found2 = a.system.filesDelete
     ({
       filePath : a.global( '.' ),
@@ -36182,10 +36179,72 @@ function filesDeleteEscapedPath( test )
   }
   else
   {
-    test.shouldThrowErrorSync( () => a.system.fileWrite( a.global( srcPath ), 'File1.txt' ) )
+    test.shouldThrowErrorSync( () => a.system.fileWrite( a.global( srcPath ), 'File1.txt' ) );
   }
   test.true( !a.system.fileExists( a.global( srcPath ) ) );
 
+  /* */
+
+  test.case = 'provider, escaped terminal';
+  a.reflect();
+  var srcPath = a.abs( 'dir1/dir2/File@1.txt' );
+  if( a.fileProvider.pathAllowedAct( srcPath ) )
+  {
+    a.fileProvider.fileWrite( srcPath, 'File@1.txt' );
+    test.true( a.fileProvider.fileExists( srcPath ) );
+
+    var exp =
+    [
+      '.',
+      './dir1',
+      './dir1/dir2',
+      './dir1/dir2/"File@1.txt"',
+    ];
+    var found = a.fileProvider.filesDelete
+    ({
+      filePath : a.abs( '.' ),
+      outputFormat : 'relative',
+      withDirs : 1,
+    });
+    test.identical( found, exp );
+  }
+  else
+  {
+    test.shouldThrowErrorSync( () => a.fileProvider.fileWrite( srcPath, 'File@1.txt' ) );
+  }
+  test.true( !a.fileProvider.fileExists( srcPath ) );
+
+  /* */
+
+  test.case = 'system, escaped terminal';
+  a.reflect();
+  var srcPath = a.abs( 'dir1/dir2/File@1.txt' );
+  test.true( a.path.isGlobal( a.global( srcPath ) ) );
+  if( a.system.pathAllowedAct( a.global( srcPath ) ) )
+  {
+    a.system.fileWrite( a.global( srcPath ), 'File@1.txt' );
+    test.true( a.system.fileExists( a.global( srcPath ) ) );
+
+    var exp2 =
+    [
+      '.',
+      './dir1',
+      './dir1/dir2',
+      './dir1/dir2/"File@1.txt"',
+    ];
+    var found2 = a.system.filesDelete
+    ({
+      filePath : a.global( '.' ),
+      outputFormat : 'relative',
+      withDirs : 1,
+    });
+    test.identical( found2, exp2 );
+  }
+  else
+  {
+    test.shouldThrowErrorSync( () => a.system.fileWrite( a.global( srcPath ), 'File@1.txt' ) );
+  }
+  test.true( !a.system.fileExists( a.global( srcPath ) ) );
 }
 
 //

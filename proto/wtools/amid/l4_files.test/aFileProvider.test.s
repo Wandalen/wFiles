@@ -36341,6 +36341,7 @@ function hardLinkBreaking( test )
 
 }
 
+hardLinkBreaking.timeOut = 60000;
 hardLinkBreaking.description =
 `
 - check breaking happens on the right side
@@ -36904,7 +36905,7 @@ total : 36
 
 }
 
-hardLinkReturnSync.timeOut = 60000;
+hardLinkReturnSync.timeOut = 120000;
 
 //
 

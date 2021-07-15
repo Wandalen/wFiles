@@ -38,7 +38,7 @@ about:
     - chrome >= 60.0.0
     - firefox >= 60.0.0
   npm.scripts:
-    test: wtest .run proto/**
+    test: wtest .run "proto/**" rapidity:-3
     test2: >-
       wtest .run proto/**/wtools/amid/file.test/Provider.HardDrive.test.ss
       routine : linkHardSyncRunner
@@ -319,53 +319,8 @@ submodule:
   wTools:
     path: 'npm:///wTools'
     enabled: 0
-  wstringer:
-    path: 'npm:///wstringer'
-    enabled: 0
-  wstringsextra:
-    path: 'npm:///wstringsextra'
-    enabled: 0
-  wConsequence:
-    path: 'npm:///wConsequence'
-    enabled: 0
-  wCopyable:
-    path: 'npm:///wCopyable'
-    enabled: 0
-  wgdf:
-    path: 'npm:///wgdf'
-    enabled: 0
-  wintrospectorbasic:
-    path: 'npm:///wintrospectorbasic'
-    enabled: 0
-  wpathbasic:
-    path: 'npm:///wpathbasic'
-    enabled: 0
-  wpathtools:
-    path: 'npm:///wpathtools'
-    enabled: 0
-  wuribasic:
-    path: 'npm:///wuribasic'
-    enabled: 0
-  wweburibasic:
-    path: 'npm:///wweburibasic'
-    enabled: 0
-  wprocess:
-    path: 'npm:///wprocess'
-    enabled: 0
-  wfieldsstack:
-    path: 'npm:///wfieldsstack'
-    enabled: 0
-  wRegexpObject:
-    path: 'npm:///wRegexpObject'
-    enabled: 0
-  wselector:
-    path: 'npm:///wselector'
-    enabled: 0
-  wverbal:
-    path: 'npm:///wverbal'
-    enabled: 0
-  wLogger:
-    path: 'npm:///wLogger'
+  wfilesimap:
+    path: 'npm:///wfilesimap'
     enabled: 0
   wgittools:
     path: 'npm:///wgittools'
@@ -373,20 +328,6 @@ submodule:
   wnpmtools:
     path: 'npm:///wnpmtools'
     enabled: 0
-  tar:
-    path: 'npm:///tar#6.0.2'
-    enabled: 0
-  proper-lockfile:
-    path: 'npm:///proper-lockfile#4.1.1'
-    enabled: 0
-  needle:
-    path: 'npm:///needle#2.5.0'
-    enabled: 0
-  wFiles:
-    path: 'hd://.'
-    enabled: 0
-    criterion:
-      development: 1
   eslint:
     path: 'npm:///eslint#7.1.0'
     enabled: 0

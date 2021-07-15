@@ -132,7 +132,6 @@ function fileReadAct( o )
   function handleError( err )
   {
 
-    debugger;
     err = _._err
     ({
       // args : [ stack, '\nfileReadAct( ', o.filePath, ' )\n', err ],
@@ -203,8 +202,6 @@ function fileReadAct( o )
   self.streamReadAct({ filePath :  o.filePath })
   .give( function( err, response )
   {
-    debugger;
-
     if( err )
     return handleError( err );
 
@@ -224,7 +221,6 @@ function fileReadAct( o )
     response.on( 'data', onData );
     response.on( 'end', onEnd );
     response.on( 'error', handleError );
-    debugger;
 
   });
 
@@ -328,7 +324,6 @@ function filesReflectSingle_body( o )
   // logger.log( 'srcPath', srcPath );
   // logger.log( 'dstPath', dstPath );
   // logger.log( '' );
-  // debugger;
 
   /* */
 
@@ -363,14 +358,12 @@ function filesReflectSingle_body( o )
   function recordsMake()
   {
     /* qqq : fast solution to return some records instead of empty arrray. find better solution */
-    debugger;
     if( o.outputFormat !== 'nothing' )
     o.result = dstFileProvider.filesReflectEvaluate
     ({
       src : { filePath : dstPath },
       dst : { filePath : dstPath },
     });
-    debugger;
     return o.result;
   }
 
@@ -378,7 +371,6 @@ function filesReflectSingle_body( o )
 
   function onError( err )
   {
-    debugger;
     try
     {
       dstFileProvider.fileDelete( dstPath );
@@ -589,7 +581,6 @@ WriteEncoders[ 'blob' ] =
 
   onBegin : function( e )
   {
-    debugger;
     throw _.err( 'not tested' );
     e.operation.encoding = 'blob';
   },
@@ -601,7 +592,6 @@ WriteEncoders[ 'document' ] =
 
   onBegin : function( e )
   {
-    debugger;
     throw _.err( 'not tested' );
     e.operation.encoding = 'document';
   },

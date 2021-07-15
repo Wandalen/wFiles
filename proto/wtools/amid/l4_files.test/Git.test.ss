@@ -31,7 +31,7 @@ function onSuiteBegin( test )
   context.system = _.FileProvider.System({ providers : [ context.providerSrc, context.providerDst ] });
   context.system.defaultProvider = context.providerDst;
 
-  context.suiteTempPath = context.providerDst.path.tempOpen( context.providerDst.path.join( __dirname, '../..'  ), 'FileProviderGit' );
+  context.suiteTempPath = context.providerDst.path.tempOpen( context.providerDst.path.join( __dirname, '../..' ), 'FileProviderGit' );
 
   if( RunningInsideTestContainer )
   {
@@ -2089,8 +2089,6 @@ function filesReflectPerformance( test )
   let localPath = a.abs( 'clone' );
   let clonePathGlobal = a.fileProvider.path.globalFromPreferred( localPath );
   let start;
-
-  debugger
 
   /* - */
 

@@ -464,7 +464,6 @@ function filesReflectSingle_body( o )
 
   function occupiedErr( msg )
   {
-    debugger;
     return _.err( 'Cant download NPM package ' + _.color.strFormat( parsed.remoteVcsLongerPath, 'path' ) + ' to ' + _.color.strFormat( dstPath, 'path' ) + ( msg || '' ) )
   }
 

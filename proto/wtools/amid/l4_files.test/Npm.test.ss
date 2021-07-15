@@ -26,7 +26,7 @@ function onSuiteBegin( test )
   context.providerDst = _.FileProvider.HardDrive();
   context.system = _.FileProvider.System({ providers : [ context.providerSrc, context.providerDst ] });
 
-  context.suiteTempPath = _.fileProvider.path.tempOpen( _.fileProvider.path.join( __dirname, '../..'  ), 'FileProviderNpm' );
+  context.suiteTempPath = _.fileProvider.path.tempOpen( _.fileProvider.path.join( __dirname, '../..' ), 'FileProviderNpm' );
 }
 
 //

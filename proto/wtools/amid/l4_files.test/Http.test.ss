@@ -27,7 +27,7 @@ function onSuiteBegin( test )
   context.system = _.FileProvider.System({ providers : [ context.providerSrc, context.providerDst ] });
   context.system.defaultProvider = context.providerDst;
 
-  context.suiteTempPath = context.providerDst.path.tempOpen( context.providerDst.path.join( __dirname, '../..'  ), 'FileProviderHttp' );
+  context.suiteTempPath = context.providerDst.path.tempOpen( context.providerDst.path.join( __dirname, '../..' ), 'FileProviderHttp' );
 
 }
 

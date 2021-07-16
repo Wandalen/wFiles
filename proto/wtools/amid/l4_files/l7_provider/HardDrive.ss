@@ -1369,13 +1369,18 @@ function fileDeleteAct( o )
 
   function tempPathGet()
   {
-    let fileName = self.path.name({ path : o.filePath, full : 1 });
+    let tempPath = _.strRemoveEnd( self.path.normalize( o.filePath ), '/' ); /* Dmytro : maybe, normalizing is overhead */
+    tempPath = self.path.nativize( o.filePath );
+    let fileName = self.path.name({ path : tempPath, full : 1 });
     let tempName = fileName + '-' + _.idWithGuid() + '.tmp';
-    // let tempDirPath = self.path.tempOpen( o.filePath ); /* Dmytro : opening and closing ( missed ) of temp path is overhead for simple renaming, we can modify path to get unical name */
-    // let tempPath = self.path.join( tempDirPath, tempName );
-	let tempPath = _.strRemoveEnd( self.path.normalize( o.filePath ), '/' ); /* Dmytro : maybe, normalizing is overhead */
-    tempPath = self.path.nativize( tempPath+tempName );
-    return tempPath;
+    return tempPath + tempName;
+    // let fileName = self.path.name({ path : o.filePath, full : 1 });
+    // let tempName = fileName + '-' + _.idWithGuid() + '.tmp';
+    // // let tempDirPath = self.path.tempOpen( o.filePath ); /* Dmytro : opening and closing ( missed ) of temp path is overhead for simple renaming, we can modify path to get unique name */
+    // // let tempPath = self.path.join( tempDirPath, tempName );
+    // let tempPath = _.strRemoveEnd( self.path.normalize( o.filePath ), '/' ); /* Dmytro : maybe, normalizing is overhead */
+    // tempPath = self.path.nativize( tempPath+tempName );
+    // return tempPath;
   }
 
   /* */

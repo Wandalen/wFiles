@@ -9,10 +9,10 @@ if( typeof module !== 'undefined' )
 
   _.include( 'wTesting' );
 
-  require( '../l4_files/entry/Files.s' );
+  require( '../l4_files/entry/Git.ss' );
 }
 
-/* qqq : ues test modules instead of real modules */
+/* qqq : use test modules instead of real modules */
 
 //
 

@@ -3,8 +3,8 @@ root:
   - wFiles.out
 consistency:
   ../will.yml: &ref_0
-    hash: 3e68fc77327ccf0ba915bb3b74266efc
-    size: 9330
+    hash: d9e57b21cc8ec8f173c18f3f2c5c93f2
+    size: 8192
 module:
   wFiles.out:
     about:
@@ -49,7 +49,7 @@ module:
         - chrome >= 60.0.0
         - firefox >= 60.0.0
       npm.scripts: &ref_4
-        test: wtest .run proto/**
+        test: 'wtest .run "proto/**" rapidity:-3'
         test2: >-
           wtest .run proto/**/wtools/amid/file.test/Provider.HardDrive.test.ss
           routine : linkHardSyncRunner
@@ -188,59 +188,21 @@ module:
           - ../proto/wtools/amid
           - ../proto/wtools/amid/l4_files
           - ../proto/wtools/amid/l4_files/entry
-          - ../proto/wtools/amid/l4_files/entry/Basic.s
-          - ../proto/wtools/amid/l4_files/entry/Extract.s
+          - ../proto/wtools/amid/l4_files/entry/-Basic.s
           - ../proto/wtools/amid/l4_files/entry/Files.s
           - ../proto/wtools/amid/l4_files/entry/Git.ss
-          - ../proto/wtools/amid/l4_files/entry/HardDrive.ss
           - ../proto/wtools/amid/l4_files/entry/Http.s
           - ../proto/wtools/amid/l4_files/entry/Imap.ss
           - ../proto/wtools/amid/l4_files/entry/Npm.ss
           - ../proto/wtools/amid/l4_files/entry/Reroot.s
           - ../proto/wtools/amid/l4_files/include
-          - ../proto/wtools/amid/l4_files/include/Basic.s
-          - ../proto/wtools/amid/l4_files/include/Extract.s
           - ../proto/wtools/amid/l4_files/include/Git.ss
-          - ../proto/wtools/amid/l4_files/include/HardDrive.ss
           - ../proto/wtools/amid/l4_files/include/Http.s
           - ../proto/wtools/amid/l4_files/include/Imap.ss
-          - ../proto/wtools/amid/l4_files/include/Mid.s
-          - ../proto/wtools/amid/l4_files/include/MixinConfig.s
-          - ../proto/wtools/amid/l4_files/include/MixinFind.s
-          - ../proto/wtools/amid/l4_files/include/MixinSecondary.s
-          - ../proto/wtools/amid/l4_files/include/MixinTemp.s
           - ../proto/wtools/amid/l4_files/include/Npm.ss
           - ../proto/wtools/amid/l4_files/include/Operator.s
           - ../proto/wtools/amid/l4_files/include/Reroot.s
           - ../proto/wtools/amid/l4_files/include/Top.s
-          - ../proto/wtools/amid/l4_files/l1
-          - ../proto/wtools/amid/l4_files/l1/Namespace.s
-          - ../proto/wtools/amid/l4_files/l2
-          - ../proto/wtools/amid/l4_files/l2/Encoder.s
-          - ../proto/wtools/amid/l4_files/l2/Encoders.s
-          - ../proto/wtools/amid/l4_files/l2/Linker.s
-          - ../proto/wtools/amid/l4_files/l2/RecordContext.s
-          - ../proto/wtools/amid/l4_files/l3
-          - ../proto/wtools/amid/l4_files/l3/Path.s
-          - ../proto/wtools/amid/l4_files/l3/Path.ss
-          - ../proto/wtools/amid/l4_files/l3/Record.s
-          - ../proto/wtools/amid/l4_files/l3/RecordFactory.s
-          - ../proto/wtools/amid/l4_files/l3/RecordFilter.s
-          - ../proto/wtools/amid/l4_files/l3/StatClass.s
-          - ../proto/wtools/amid/l4_files/l3/StatNamespace.s
-          - ../proto/wtools/amid/l4_files/l4
-          - ../proto/wtools/amid/l4_files/l4/Abstract.s
-          - ../proto/wtools/amid/l4_files/l4/Carriage.s
-          - ../proto/wtools/amid/l4_files/l4/Carrier.s
-          - ../proto/wtools/amid/l4_files/l5
-          - ../proto/wtools/amid/l4_files/l5/Partial.s
-          - ../proto/wtools/amid/l4_files/l6
-          - ../proto/wtools/amid/l4_files/l6/FindMixin.s
-          - ../proto/wtools/amid/l4_files/l6/System.s
-          - ../proto/wtools/amid/l4_files/l7
-          - ../proto/wtools/amid/l4_files/l7/ConfigMixin.s
-          - ../proto/wtools/amid/l4_files/l7/SecondaryMixin.s
-          - ../proto/wtools/amid/l4_files/l7/TempMixin.s
           - ../proto/wtools/amid/l4_files/l7_operator
           - ../proto/wtools/amid/l4_files/l7_operator/l1
           - ../proto/wtools/amid/l4_files/l7_operator/l1/Namespace.s
@@ -254,9 +216,7 @@ module:
           - ../proto/wtools/amid/l4_files/l7_operator/l5/Mission.s
           - ../proto/wtools/amid/l4_files/l7_operator/l5/Operation.s
           - ../proto/wtools/amid/l4_files/l7_provider
-          - ../proto/wtools/amid/l4_files/l7_provider/Extract.s
           - ../proto/wtools/amid/l4_files/l7_provider/Git.ss
-          - ../proto/wtools/amid/l4_files/l7_provider/HardDrive.ss
           - ../proto/wtools/amid/l4_files/l7_provider/Http.js
           - ../proto/wtools/amid/l4_files/l7_provider/Http.ss
           - ../proto/wtools/amid/l4_files/l7_provider/Imap.ss
@@ -267,93 +227,17 @@ module:
           - ../proto/wtools/amid/l4_files/l9
           - ../proto/wtools/amid/l4_files/l9/Namespace.s
           - ../proto/wtools/amid/l4_files.test
-          - ../proto/wtools/amid/l4_files.test/aFileProvider.test.s
-          - ../proto/wtools/amid/l4_files.test/aFileProviderSystemDefault.test.s
-          - ../proto/wtools/amid/l4_files.test/aFilesFind.test.s
-          - ../proto/wtools/amid/l4_files.test/Extract.html
-          - ../proto/wtools/amid/l4_files.test/Extract.test.s
-          - ../proto/wtools/amid/l4_files.test/FilesFind.Extract.test.s
-          - ../proto/wtools/amid/l4_files.test/FilesFind.HardDrive.test.ss
-          - ../proto/wtools/amid/l4_files.test/FilesGraph.test.s
           - ../proto/wtools/amid/l4_files.test/Git.test.ss
-          - ../proto/wtools/amid/l4_files.test/HardDrive.test.ss
           - ../proto/wtools/amid/l4_files.test/Http.test.ss
           - ../proto/wtools/amid/l4_files.test/Npm.test.ss
-          - ../proto/wtools/amid/l4_files.test/Path.test.ss
-          - ../proto/wtools/amid/l4_files.test/Record.test.s
-          - ../proto/wtools/amid/l4_files.test/RecordFilter.test.s
-          - ../proto/wtools/amid/l4_files.test/Secondary.test.s
-          - ../proto/wtools/amid/l4_files.test/Secondary.test.ss
-          - ../proto/wtools/amid/l4_files.test/SystemDefaultExtract.test.s
-          - ../proto/wtools/amid/l4_files.test/SystemDefaultHardDrive.test.ss
           - ../proto/wtools/atop
     submodule:
       wTools:
         path: 'npm:///wTools'
         autoExporting: 0
         enabled: 0
-      wstringer:
-        path: 'npm:///wstringer'
-        autoExporting: 0
-        enabled: 0
-      wstringsextra:
-        path: 'npm:///wstringsextra'
-        autoExporting: 0
-        enabled: 0
-      wConsequence:
-        path: 'npm:///wConsequence'
-        autoExporting: 0
-        enabled: 0
-      wCopyable:
-        path: 'npm:///wCopyable'
-        autoExporting: 0
-        enabled: 0
-      wgdf:
-        path: 'npm:///wgdf'
-        autoExporting: 0
-        enabled: 0
-      wintrospectorbasic:
-        path: 'npm:///wintrospectorbasic'
-        autoExporting: 0
-        enabled: 0
-      wpathbasic:
-        path: 'npm:///wpathbasic'
-        autoExporting: 0
-        enabled: 0
-      wpathtools:
-        path: 'npm:///wpathtools'
-        autoExporting: 0
-        enabled: 0
-      wuribasic:
-        path: 'npm:///wuribasic'
-        autoExporting: 0
-        enabled: 0
-      wweburibasic:
-        path: 'npm:///wweburibasic'
-        autoExporting: 0
-        enabled: 0
-      wprocess:
-        path: 'npm:///wprocess'
-        autoExporting: 0
-        enabled: 0
-      wfieldsstack:
-        path: 'npm:///wfieldsstack'
-        autoExporting: 0
-        enabled: 0
-      wRegexpObject:
-        path: 'npm:///wRegexpObject'
-        autoExporting: 0
-        enabled: 0
-      wselector:
-        path: 'npm:///wselector'
-        autoExporting: 0
-        enabled: 0
-      wverbal:
-        path: 'npm:///wverbal'
-        autoExporting: 0
-        enabled: 0
-      wLogger:
-        path: 'npm:///wLogger'
+      wfilesimap:
+        path: 'npm:///wfilesimap'
         autoExporting: 0
         enabled: 0
       wgittools:
@@ -364,24 +248,6 @@ module:
         path: 'npm:///wnpmtools'
         autoExporting: 0
         enabled: 0
-      tar:
-        path: 'npm:///tar#6.0.2'
-        autoExporting: 0
-        enabled: 0
-      proper-lockfile:
-        path: 'npm:///proper-lockfile#4.1.1'
-        autoExporting: 0
-        enabled: 0
-      needle:
-        path: 'npm:///needle#2.5.0'
-        autoExporting: 0
-        enabled: 0
-      wFiles:
-        path: 'hd://..'
-        autoExporting: 0
-        enabled: 0
-        criterion:
-          development: 1
       eslint:
         path: 'npm:///eslint#7.1.0'
         autoExporting: 0
@@ -1136,68 +1002,8 @@ module:
         path: 'npm:///wTools'
         autoExporting: 0
         enabled: 0
-      wstringer:
-        path: 'npm:///wstringer'
-        autoExporting: 0
-        enabled: 0
-      wstringsextra:
-        path: 'npm:///wstringsextra'
-        autoExporting: 0
-        enabled: 0
-      wConsequence:
-        path: 'npm:///wConsequence'
-        autoExporting: 0
-        enabled: 0
-      wCopyable:
-        path: 'npm:///wCopyable'
-        autoExporting: 0
-        enabled: 0
-      wgdf:
-        path: 'npm:///wgdf'
-        autoExporting: 0
-        enabled: 0
-      wintrospectorbasic:
-        path: 'npm:///wintrospectorbasic'
-        autoExporting: 0
-        enabled: 0
-      wpathbasic:
-        path: 'npm:///wpathbasic'
-        autoExporting: 0
-        enabled: 0
-      wpathtools:
-        path: 'npm:///wpathtools'
-        autoExporting: 0
-        enabled: 0
-      wuribasic:
-        path: 'npm:///wuribasic'
-        autoExporting: 0
-        enabled: 0
-      wweburibasic:
-        path: 'npm:///wweburibasic'
-        autoExporting: 0
-        enabled: 0
-      wprocess:
-        path: 'npm:///wprocess'
-        autoExporting: 0
-        enabled: 0
-      wfieldsstack:
-        path: 'npm:///wfieldsstack'
-        autoExporting: 0
-        enabled: 0
-      wRegexpObject:
-        path: 'npm:///wRegexpObject'
-        autoExporting: 0
-        enabled: 0
-      wselector:
-        path: 'npm:///wselector'
-        autoExporting: 0
-        enabled: 0
-      wverbal:
-        path: 'npm:///wverbal'
-        autoExporting: 0
-        enabled: 0
-      wLogger:
-        path: 'npm:///wLogger'
+      wfilesimap:
+        path: 'npm:///wfilesimap'
         autoExporting: 0
         enabled: 0
       wgittools:
@@ -1208,24 +1014,6 @@ module:
         path: 'npm:///wnpmtools'
         autoExporting: 0
         enabled: 0
-      tar:
-        path: 'npm:///tar#6.0.2'
-        autoExporting: 0
-        enabled: 0
-      proper-lockfile:
-        path: 'npm:///proper-lockfile#4.1.1'
-        autoExporting: 0
-        enabled: 0
-      needle:
-        path: 'npm:///needle#2.5.0'
-        autoExporting: 0
-        enabled: 0
-      wFiles:
-        path: 'hd://.'
-        autoExporting: 0
-        enabled: 0
-        criterion:
-          development: 1
       eslint:
         path: 'npm:///eslint#7.1.0'
         autoExporting: 0
@@ -1770,5 +1558,5 @@ module:
           - 'build::npm'
     consistency:
       ../will.yml:
-        hash: 3e68fc77327ccf0ba915bb3b74266efc
-        size: 9330
+        hash: d9e57b21cc8ec8f173c18f3f2c5c93f2
+        size: 8192

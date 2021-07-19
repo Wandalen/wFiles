@@ -1,24 +1,16 @@
 {
   "name": "wFiles",
-  "version": "0.6.1050",
+  "version": "0.6.1051",
   "engine": "node >= 10.0.0",
   "enabled": 1,
   "description": "Collection of classes to abstract files systems. Many interfaces provide files, but not called as file systems and treated differently. For example server-side gives access to local files and browser-side HTTP/HTTPS protocol gives access to files as well, but in the very different way, it does the first. This problem forces a developer to break fundamental programming principle DRY and make code written to solve a problem not applicable to the same problem, on another platform/technology. Files treats any file-system-like interface as files system. Files combines all files available to the application into the single namespace where each file has unique Path/URI, so that operating with several files on different files systems is not what user of the module should worry about. If Files does not have an adapter for your files system you may design it providing a short list of stupid methods fulfilling completely or partly good defined API and get access to all sophisticated general algorithms on files for free. Is concept of file applicable to external entities of an application? Files makes possible to treat internals of a program as files system(s). Use the module to keep DRY.",
   "license": "MIT",
   "author": "Kostiantyn Wandalen <wanalen@01.school>",
   "contributors": [
-    {
-      "name": "Kostiantyn Wandalen",
-      "email": "wanalen@01.school"
-    },
-    {
-      "name": "Volodymyr M.",
-      "email": "volodymyr.migdal@gmail.com"
-    },
-    {
-      "name": "Ihor Ostash",
-      "email": "iostashvxi@gmail.com"
-    }
+    "Kostiantyn Wandalen <wanalen@01.school>",
+    "Volodymyr M. <volodymyr.migdal@gmail.com>",
+    "Ihor O. <iostashvxi@gmail.com>",
+    "Dmytro Kryvoruchko <dm.vict.kr@gmail.com>"
   ],
   "main": "proto/node_modules/wFiles",
   "files": [
@@ -29,7 +21,7 @@
     "proto/node_modules/wFiles"
   ],
   "scripts": {
-    "test": "wtest .run 'proto/**' rapidity:-1",
+    "test": "wtest .run 'proto/**' rapidity:-3",
     "docgen": "wdocgen proto"
   },
   "repository": {
@@ -40,28 +32,10 @@
     "url": "https://github.com/Wandalen/wFiles/issues"
   },
   "dependencies": {
-    "wweburibasic": "latest",
-    "wverbal": "latest",
-    "wuribasic": "latest",
     "wTools": "latest",
-    "wstringsextra": "latest",
-    "wstringer": "latest",
-    "wselector": "latest",
-    "wRegexpObject": "latest",
-    "wprocess": "latest",
-    "wpathtools": "latest",
-    "wpathbasic": "latest",
     "wnpmtools": "latest",
-    "wLogger": "latest",
-    "wintrospectorbasic": "latest",
     "wgittools": "latest",
-    "wgdf": "latest",
-    "wfieldsstack": "latest",
-    "wCopyable": "latest",
-    "wConsequence": "latest",
-    "tar": "=6.0.2",
-    "proper-lockfile": "=4.1.1",
-    "needle": "=2.5.0"
+    "wfilesbasic": "latest"
   },
   "devDependencies": {
     "wTesting": "latest",

@@ -118,7 +118,6 @@ function statReadAct( o )
   function fileSizeGet()
   {
 
-    debugger;
     let request = new XMLHttpRequest();
     request.open( 'HEAD', o.filePath, !o.sync );
     request.onreadystatechange = function( e )
@@ -129,7 +128,8 @@ function statReadAct( o )
         return errorGive( '#' + this.status + ' : ' + this.statusText );
       }
 
-      if( this.readyState == this.DONE )
+      // if( this.readyState == this.DONE )
+      if( this.readyState === this.DONE )
       {
         let size = parseInt( request.getResponseHeader( 'Content-Length' ) );
         result.size = size;
@@ -152,7 +152,6 @@ function statReadAct( o )
     }
     catch( err )
     {
-      debugger;
       return errorGive( err );
     }
     return result;
@@ -216,7 +215,6 @@ function fileReadAct( o )
 
   /* advanced */
 
-  // debugger;
   o.advanced = _.routine.options_( fileReadAct, o.advanced || {}, fileReadAct.advanced );
   o.advanced.method = o.advanced.method.toUpperCase();
 
@@ -224,12 +222,16 @@ function fileReadAct( o )
 
   if( typeof XMLHttpRequest !== 'undefined' )
   Reqeust = XMLHttpRequest;
-  else if( typeof ActiveXObject !== 'undefined' )
-  Reqeust = new ActiveXObject( 'Microsoft.XMLHTTP' );
+  else if( typeof ActiveXObject === 'undefined' )
+  throw _.err( 'not implemented' );
   else
-  {
-    throw _.err( 'not implemented' );
-  }
+  Reqeust = new ActiveXObject( 'Microsoft.XMLHTTP' );
+  // if( typeof XMLHttpRequest !== 'undefined' )
+  // Reqeust = XMLHttpRequest;
+  // else if( typeof ActiveXObject !== 'undefined' )
+  // Reqeust = new ActiveXObject( 'Microsoft.XMLHTTP' );
+  // else
+  // throw _.err( 'not implemented' );
 
   /* set */
 
@@ -339,7 +341,6 @@ function fileReadAct( o )
 
     o.ended = 1;
 
-    debugger;
     err = _._err
     ({
       // args : [ stack, '\nfileReadAct( ', o.filePath, ' )\n', err ],
@@ -486,7 +487,6 @@ encoders[ 'blob' ] =
   responseType : 'blob',
   onBegin : function( e )
   {
-    debugger;
     throw _.err( 'not tested' );
     e.operation.encoding = 'blob';
   },
@@ -499,7 +499,6 @@ encoders[ 'document' ] =
   responseType : 'document',
   onBegin : function( e )
   {
-    debugger;
     throw _.err( 'not tested' );
     e.operation.encoding = 'document';
   },

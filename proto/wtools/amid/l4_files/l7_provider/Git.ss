@@ -386,7 +386,14 @@ function filesReflectSingle_body( o )
 
   /* no repository yet */
 
-  if( !gitConfigExists )
+  if( gitConfigExists )
+  {
+    if( o.extra.fetching ) /* qqq : what is it for? */
+    shell( 'git fetch origin' );
+    if( o.extra.fetchingTags )
+    shell( 'git fetch --tags -f origin' ); /* fetch new tags from remote updating existing local tags */
+  }
+  else
   {
     /* !!! delete dst dir maybe */
     ready.then( () => _.git.repositoryClone
@@ -395,15 +402,25 @@ function filesReflectSingle_body( o )
       localPath : dstPath,
       logger : o.verbosity - 1
     }))
-
   }
-  else
-  {
-    if( o.extra.fetching ) /* qqq : what is it for? */
-    shell( 'git fetch origin' );
-    if( o.extra.fetchingTags )
-    shell( 'git fetch --tags -f origin' ); /* fetch new tags from remote updating existing local tags */
-  }
+  // if( !gitConfigExists )
+  // {
+  //   /* !!! delete dst dir maybe */
+  //   ready.then( () => _.git.repositoryClone
+  //   ({
+  //     remotePath : parsed,
+  //     localPath : dstPath,
+  //     logger : o.verbosity - 1
+  //   }))
+  //
+  // }
+  // else
+  // {
+  //   if( o.extra.fetching ) /* qqq : what is it for? */
+  //   shell( 'git fetch origin' );
+  //   if( o.extra.fetchingTags )
+  //   shell( 'git fetch --tags -f origin' ); /* fetch new tags from remote updating existing local tags */
+  // }
 
   let localChanges = false;
   let mergeIsNeeded = false;

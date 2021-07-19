@@ -7,18 +7,10 @@
   "license": "MIT",
   "author": "Kostiantyn Wandalen <wanalen@01.school>",
   "contributors": [
-    {
-      "name": "Kostiantyn Wandalen",
-      "email": "wanalen@01.school"
-    },
-    {
-      "name": "Volodymyr M.",
-      "email": "volodymyr.migdal@gmail.com"
-    },
-    {
-      "name": "Ihor Ostash",
-      "email": "iostashvxi@gmail.com"
-    }
+    "Kostiantyn Wandalen <wanalen@01.school>",
+    "Volodymyr M. <volodymyr.migdal@gmail.com>",
+    "Ihor O. <iostashvxi@gmail.com>",
+    "Dmytro Kryvoruchko <dm.vict.kr@gmail.com>"
   ],
   "main": "proto/node_modules/wFiles",
   "files": [
@@ -29,7 +21,7 @@
     "proto/node_modules/wFiles"
   ],
   "scripts": {
-    "test": "wtest .run 'proto/**' rapidity:-1",
+    "test": "wtest .run 'proto/**' rapidity:-3",
     "docgen": "wdocgen proto"
   },
   "repository": {
@@ -40,28 +32,10 @@
     "url": "https://github.com/Wandalen/wFiles/issues"
   },
   "dependencies": {
-    "wweburibasic": "",
-    "wverbal": "",
-    "wuribasic": "",
     "wTools": "",
-    "wstringsextra": "",
-    "wstringer": "",
-    "wselector": "",
-    "wRegexpObject": "",
-    "wprocess": "",
-    "wpathtools": "",
-    "wpathbasic": "",
+    "wfilesbasic": "",
     "wnpmtools": "",
-    "wLogger": "",
-    "wintrospectorbasic": "",
-    "wgittools": "",
-    "wgdf": "",
-    "wfieldsstack": "",
-    "wCopyable": "",
-    "wConsequence": "",
-    "tar": "=6.0.2",
-    "proper-lockfile": "=4.1.1",
-    "needle": "=2.5.0"
+    "wgittools": ""
   },
   "devDependencies": {
     "wTesting": "",

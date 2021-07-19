@@ -9,7 +9,7 @@ if( typeof module !== 'undefined' )
 
   _.include( 'wTesting' );
 
-  require( '../l4_files/entry/Files.s' );
+  require( '../l4_files/entry/Npm.ss' );
 }
 
 const _ = _global_.wTools;
@@ -26,7 +26,7 @@ function onSuiteBegin( test )
   context.providerDst = _.FileProvider.HardDrive();
   context.system = _.FileProvider.System({ providers : [ context.providerSrc, context.providerDst ] });
 
-  context.suiteTempPath = _.fileProvider.path.tempOpen( _.fileProvider.path.join( __dirname, '../..'  ), 'FileProviderNpm' );
+  context.suiteTempPath = _.fileProvider.path.tempOpen( _.fileProvider.path.join( __dirname, '../..' ), 'FileProviderNpm' );
 }
 
 //

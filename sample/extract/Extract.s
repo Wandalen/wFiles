@@ -35,7 +35,7 @@ var filesDelete = _.time.out( 100, function ()
 
 // asynchronous copying of files
 
-var fileCopy = extract.fileCopy( { dstPath : '/user/File.txt', srcPath : '/root/folder/File.txt', sync : 0  } );
+var fileCopy = extract.fileCopy({ dstPath : '/user/File.txt', srcPath : '/root/folder/File.txt', sync : 0 });
 
 // copy files to hard drive
 

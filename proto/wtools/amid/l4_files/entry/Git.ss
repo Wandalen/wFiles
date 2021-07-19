@@ -4,9 +4,9 @@
 'use strict';
 
 /**
- * File provider implements strategy for module files to access files over git.
-  @module Tools/mid/FilesGit
-*/
+ * Implements file provider to access files over Git.
+ * @module Tools/mid/FilesGit
+ */
 
 if( typeof module !== 'undefined' )
 {

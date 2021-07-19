@@ -4,9 +4,9 @@
 'use strict';
 
 /**
- * File provider implements strategy for module files to access files over npm.
-  @module Tools/mid/FilesNpm
-*/
+ * Implements file provider to access files over NPM.
+ *  @module Tools/mid/FilesNpm
+ */
 
 if( typeof module !== 'undefined' )
 {

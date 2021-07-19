@@ -10,7 +10,7 @@ let hub = new _.FileProvider.Hub
   providers : [],
 });
 
-hub.providerRegister( new _.FileProvider.Extract({ protocol : 'src'  }) );
+hub.providerRegister( new _.FileProvider.Extract({ protocol : 'src' }) );
 hub.providerRegister( new _.FileProvider.HardDrive({ protocol : 'dst' }) );
 
 var srcPath = 'src:///file';
@@ -35,7 +35,7 @@ console.log( 'dstFile.size:', dstStat.size );
 
 var srcFile = hub.fileRead( srcPath );
 var dstFile = hub.fileRead( dstPath );
-console.log( 'srcFile.length:', srcFile.length )
-console.log( 'dstFile.length:', dstFile.length  )
-console.log( 'Diff: ', _.entityDiff( srcFile, dstFile ) )
+console.log( 'srcFile.length:', srcFile.length );
+console.log( 'dstFile.length:', dstFile.length );
+console.log( 'Diff: ', _.entityDiff( srcFile, dstFile ) );
 

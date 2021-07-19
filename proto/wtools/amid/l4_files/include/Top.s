@@ -5,13 +5,11 @@
 
 if( typeof module !== 'undefined' )
 {
-  const _ = require( './Mid.s' );
+  const _ = require( 'Tools' );
+  _.include( 'wFilesBasic' );
 
   /* l7_provider */
 
-  require( './Extract.s' );
-  if( Config.interpreter === 'njs' )
-  require( './HardDrive.ss' );
   require( './Http.s' );
 
   if( Config.interpreter === 'njs' )

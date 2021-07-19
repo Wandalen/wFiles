@@ -16,8 +16,6 @@ var factory = _.FileRecordFactory.TolerantFrom( o, { dirPath : dir } ).form();
 if( _.FileRecord )
 {
 
-  debugger;
-
   //var fileRecord = wFileRecord( 'tmp' );
   //var fileRecord = wFileRecord( 'tmp/sample/FilesPathTest/tmp/copy/test_original.txt' );
 

@@ -57,9 +57,6 @@ function unform()
 {
   let operator = this;
 
-  if( operator.missionSet.size )
-  debugger;
-
   _.container.each( operator.missionSet, ( mission ) => mission.finit() );
   _.container.each( operator.operationArray.slice(), ( operation ) => operation.finit() );
 
@@ -119,9 +116,9 @@ function fileFor( globalPath, localPath )
   {
     file = _.files.operator.File
     ({
-      globalPath : globalPath,
+      globalPath,
       localPath : localPath || null,
-      operator : operator,
+      operator,
     });
     // file.form();
   }

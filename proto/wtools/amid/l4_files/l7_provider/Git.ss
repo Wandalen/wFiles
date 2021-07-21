@@ -396,12 +396,15 @@ function filesReflectSingle_body( o )
   else
   {
     /* !!! delete dst dir maybe */
-    ready.then( () => _.git.repositoryClone
-    ({
+    const o2 =
+    {
       remotePath : parsed,
       localPath : dstPath,
-      logger : o.verbosity - 1
-    }))
+      logger : o.verbosity - 1,
+    };
+    if( o.extra.fetchingDefaults )
+    _.mapSupplementNulls( o2, o.extra.fetchingDefaults );
+    ready.then( () => _.git.repositoryClone( o2 ) );
   }
   // if( !gitConfigExists )
   // {
@@ -627,6 +630,7 @@ var extra = filesReflectSingle_body.extra = Object.create( null );
 extra.fetching = 1;
 extra.fetchingTags = 0;
 extra.stashing = 0;
+extra.fetchingDefaults = null;
 
 var defaults = filesReflectSingle_body.defaults;
 let filesReflectSingle =

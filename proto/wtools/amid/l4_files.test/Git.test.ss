@@ -1996,6 +1996,96 @@ filesReflectUpdateSwitchToOutdatedBranch.timeOut = 30000;
 
 //
 
+function filesReflectCheckOptionFetchingDefaults( test )
+{
+  let context = this;
+  let providerSrc = context.providerSrc;
+  let providerDst = context.providerDst;
+  let system = context.system;
+
+  let a = test.assetFor( false );
+  let clonePathGlobal = providerDst.path.globalFromPreferred( a.abs( '.' ) );
+  let remotePath = 'git+https:///github.com/Wandalen/wModuleForTesting1.git';
+
+  // if( process.platform === 'win32' || process.platform === 'darwin' || !_.process.insideTestContainer() )
+  // return test.true( true );
+
+  /* - */
+
+  let netInterfaces = __.test.netInterfacesGet({ activeInterfaces : 1, sync : 1 });
+  a.ready.then( () => __.test.netInterfacesDown({ interfaces : netInterfaces }) );
+
+  /* */
+
+  a.ready.then( () =>
+  {
+    test.case = `default options`;
+    var onErrorCallback = ( err, arg ) =>
+    {
+      test.true( _.error.is( err ) );
+      test.identical( arg, undefined );
+      var exp = `Attempts is exhausted, made 3 attempts`;
+      test.identical( _.strCount( err.originalMessage, exp ), 1 );
+      test.identical( _.strCount( err.originalMessage, `Could not resolve host` ), 1 );
+      return null;
+    };
+    return test.shouldThrowErrorAsync( () =>
+    {
+      return system.filesReflect
+      ({
+        reflectMap : { [ remotePath ] : clonePathGlobal },
+        verbosity : 5
+      });
+    }, onErrorCallback );
+  });
+
+  /* */
+
+  a.ready.then( () =>
+  {
+    test.case = `not default options`;
+    var start = _.time.now();
+    var onErrorCallback = ( err, arg ) =>
+    {
+      var spent = _.time.now() - start;
+      test.ge( spent, 3500 )
+      test.true( _.error.is( err ) );
+      test.identical( arg, undefined );
+      var exp = `Attempts is exhausted, made 4 attempts`;
+      test.identical( _.strCount( err.originalMessage, exp ), 1 );
+      test.identical( _.strCount( err.originalMessage, `Could not resolve host` ), 1 );
+      return null;
+    };
+    return test.shouldThrowErrorAsync( () =>
+    {
+      var fetchingDefaults  =
+      {
+        attemptLimit : 4,
+        attemptDelay : 500,
+        attemptDelayMultiplier : 2,
+      };
+      return system.filesReflect
+      ({
+        reflectMap : { [ remotePath ] : clonePathGlobal },
+        verbosity : 5,
+        extra : { fetchingDefaults }
+      });
+    }, onErrorCallback );
+  });
+
+  /* */
+
+  a.ready.finally( () => __.test.netInterfacesUp({ interfaces : netInterfaces }) );
+
+  /* - */
+
+  return a.ready;
+}
+
+filesReflectCheckOptionFetchingDefaults.timeOut = 60000;
+
+//
+
 // function filesReflectPerformance( test )
 // {
 //   let context = this;
@@ -2228,6 +2318,7 @@ const Proto =
     filesReflectEol,
     filesReflectFetchingTags,
     filesReflectUpdateSwitchToOutdatedBranch,
+    filesReflectCheckOptionFetchingDefaults,
     filesReflectPerformance,
   },
 

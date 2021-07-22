@@ -2007,8 +2007,8 @@ function filesReflectCheckOptionFetchingDefaults( test )
   let clonePathGlobal = providerDst.path.globalFromPreferred( a.abs( '.' ) );
   let remotePath = 'git+https:///github.com/Wandalen/wModuleForTesting1.git';
 
-  // if( process.platform === 'win32' || process.platform === 'darwin' || !_.process.insideTestContainer() )
-  // return test.true( true );
+  if( process.platform !== 'linux' || !_.process.insideTestContainer() || process.env.CIRCLECI !== undefined )
+  return test.true( true );
 
   /* - */
 

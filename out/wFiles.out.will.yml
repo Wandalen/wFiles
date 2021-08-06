@@ -3,8 +3,8 @@ root:
   - wFiles.out
 consistency:
   ../will.yml: &ref_0
-    hash: d9e57b21cc8ec8f173c18f3f2c5c93f2
-    size: 8192
+    hash: 97ac98c4282e569d7a742d157d4dc8f3
+    size: 8253
 module:
   wFiles.out:
     about:
@@ -191,13 +191,11 @@ module:
           - ../proto/wtools/amid/l4_files/entry/-Basic.s
           - ../proto/wtools/amid/l4_files/entry/Files.s
           - ../proto/wtools/amid/l4_files/entry/Git.ss
-          - ../proto/wtools/amid/l4_files/entry/Http.s
           - ../proto/wtools/amid/l4_files/entry/Imap.ss
           - ../proto/wtools/amid/l4_files/entry/Npm.ss
           - ../proto/wtools/amid/l4_files/entry/Reroot.s
           - ../proto/wtools/amid/l4_files/include
           - ../proto/wtools/amid/l4_files/include/Git.ss
-          - ../proto/wtools/amid/l4_files/include/Http.s
           - ../proto/wtools/amid/l4_files/include/Imap.ss
           - ../proto/wtools/amid/l4_files/include/Npm.ss
           - ../proto/wtools/amid/l4_files/include/Operator.s
@@ -217,8 +215,6 @@ module:
           - ../proto/wtools/amid/l4_files/l7_operator/l5/Operation.s
           - ../proto/wtools/amid/l4_files/l7_provider
           - ../proto/wtools/amid/l4_files/l7_provider/Git.ss
-          - ../proto/wtools/amid/l4_files/l7_provider/Http.js
-          - ../proto/wtools/amid/l4_files/l7_provider/Http.ss
           - ../proto/wtools/amid/l4_files/l7_provider/Imap.ss
           - ../proto/wtools/amid/l4_files/l7_provider/Npm.ss
           - ../proto/wtools/amid/l4_files/l8_filter
@@ -228,7 +224,6 @@ module:
           - ../proto/wtools/amid/l4_files/l9/Namespace.s
           - ../proto/wtools/amid/l4_files.test
           - ../proto/wtools/amid/l4_files.test/Git.test.ss
-          - ../proto/wtools/amid/l4_files.test/Http.test.ss
           - ../proto/wtools/amid/l4_files.test/Npm.test.ss
           - ../proto/wtools/atop
     submodule:
@@ -236,8 +231,12 @@ module:
         path: 'npm:///wTools'
         autoExporting: 0
         enabled: 0
-      wfilesimap:
-        path: 'npm:///wfilesimap'
+      wfilesbasic:
+        path: 'npm:///wfilesbasic'
+        autoExporting: 0
+        enabled: 0
+      wfileshttp:
+        path: 'npm:///wfileshttp'
         autoExporting: 0
         enabled: 0
       wgittools:
@@ -1002,8 +1001,12 @@ module:
         path: 'npm:///wTools'
         autoExporting: 0
         enabled: 0
-      wfilesimap:
-        path: 'npm:///wfilesimap'
+      wfilesbasic:
+        path: 'npm:///wfilesbasic'
+        autoExporting: 0
+        enabled: 0
+      wfileshttp:
+        path: 'npm:///wfileshttp'
         autoExporting: 0
         enabled: 0
       wgittools:
@@ -1558,5 +1561,5 @@ module:
           - 'build::npm'
     consistency:
       ../will.yml:
-        hash: d9e57b21cc8ec8f173c18f3f2c5c93f2
-        size: 8192
+        hash: 97ac98c4282e569d7a742d157d4dc8f3
+        size: 8253

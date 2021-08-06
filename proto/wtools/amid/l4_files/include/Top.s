@@ -10,7 +10,7 @@ if( typeof module !== 'undefined' )
 
   /* l7_provider */
 
-  require( './Http.s' );
+  _.include( 'wFilesHttp' );
 
   if( Config.interpreter === 'njs' )
   require( './Npm.ss' );

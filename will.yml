@@ -319,8 +319,11 @@ submodule:
   wTools:
     path: 'npm:///wTools'
     enabled: 0
-  wfilesimap:
-    path: 'npm:///wfilesimap'
+  wfilesbasic:
+    path: 'npm:///wfilesbasic'
+    enabled: 0
+  wfileshttp:
+    path: 'npm:///wfileshttp'
     enabled: 0
   wgittools:
     path: 'npm:///wgittools'

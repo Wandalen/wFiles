@@ -29,7 +29,7 @@ if( typeof module !== 'undefined' )
 
   require( '../l9/Namespace.s' );
 
-  _.assert( _.path.currentAtBegin !== undefined );
+  _.assert( _.path.currentAtBeginGet() !== undefined );
 
   module[ 'exports' ] = _;
 }

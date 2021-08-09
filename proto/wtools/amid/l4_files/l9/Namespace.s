@@ -21,8 +21,16 @@ function _Setup()
   if( !_.fileProvider )
   _.FileProvider.Default.MakeDefault();
 
-  _.path.currentAtBegin = _.path.current();
+  _.path.currentAtBeginGet = _currentAtBeginGet_functor();
+  _.path.currentAtBeginGet.functor = _currentAtBeginGet_functor;
 
+  /* */
+
+  function _currentAtBeginGet_functor()
+  {
+    const currentPath = _.path.current();
+    return () => currentPath;
+  }
 }
 
 // --

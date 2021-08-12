@@ -224,6 +224,7 @@ module:
           - ../proto/wtools/amid/l4_files/l9/Namespace.s
           - ../proto/wtools/amid/l4_files.test
           - ../proto/wtools/amid/l4_files.test/Git.test.ss
+          - ../proto/wtools/amid/l4_files.test/Namespace.test.ss
           - ../proto/wtools/amid/l4_files.test/Npm.test.ss
           - ../proto/wtools/atop
     submodule:

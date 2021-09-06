@@ -325,11 +325,11 @@ submodule:
   wfileshttp:
     path: 'npm:///wfileshttp'
     enabled: 0
+  wfilesnpm:
+    path: 'npm:///wfilesnpm'
+    enabled: 0
   wgittools:
     path: 'npm:///wgittools'
-    enabled: 0
-  wnpmtools:
-    path: 'npm:///wnpmtools'
     enabled: 0
   eslint:
     path: 'npm:///eslint#7.1.0'

@@ -33,9 +33,9 @@
   },
   "dependencies": {
     "wTools": "",
-    "wnpmtools": "",
     "wgittools": "",
     "wfileshttp": "",
+    "wfilesnpm": "",
     "wfilesbasic": ""
   },
   "devDependencies": {

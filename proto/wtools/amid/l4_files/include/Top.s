@@ -13,7 +13,7 @@ if( typeof module !== 'undefined' )
   _.include( 'wFilesHttp' );
 
   if( Config.interpreter === 'njs' )
-  require( './Npm.ss' );
+  _.include( 'wFilesNpm' );
   if( Config.interpreter === 'njs' )
   require( './Git.ss' );
 

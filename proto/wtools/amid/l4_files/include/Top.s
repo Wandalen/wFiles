@@ -15,7 +15,7 @@ if( typeof module !== 'undefined' )
   if( Config.interpreter === 'njs' )
   _.include( 'wFilesNpm' );
   if( Config.interpreter === 'njs' )
-  require( './Git.ss' );
+  _.include( 'wFilesGit' );
 
   require( './Operator.s' );
 

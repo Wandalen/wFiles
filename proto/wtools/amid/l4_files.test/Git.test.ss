@@ -1860,7 +1860,7 @@ function filesReflectFetchingTags( test )
   return a.ready;
 }
 
-filesReflectFetchingTags.timeOut = 60000;
+filesReflectFetchingTags.timeOut = 120000;
 
 //
 

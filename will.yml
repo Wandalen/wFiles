@@ -328,8 +328,8 @@ submodule:
   wfilesnpm:
     path: 'npm:///wfilesnpm'
     enabled: 0
-  wgittools:
-    path: 'npm:///wgittools'
+  wfilesgit:
+    path: 'npm:///wfilesgit'
     enabled: 0
   eslint:
     path: 'npm:///eslint#7.1.0'

@@ -24,7 +24,7 @@
 ## Tutorials
 
 <details>
-  <summary><a href="./tutorial/HowToStartDevelopment.md">
+  <summary><a href="./tutorial/HowToStartDev.md">
     How to start development
   </a></summary>
     Explain how to start extending tests and the functionality of the module.

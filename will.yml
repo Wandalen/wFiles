@@ -38,7 +38,7 @@ about:
     - chrome >= 60.0.0
     - firefox >= 60.0.0
   npm.scripts:
-    test: wtest .run "proto/**" rapidity:-3
+    test: 'wtest .run "proto/**" rapidity:-3'
     test2: >-
       wtest .run proto/**/wtools/amid/file.test/Provider.HardDrive.test.ss
       routine : linkHardSyncRunner
@@ -59,12 +59,6 @@ build:
       export: 1
     steps:
       - 'step::doc.export'
-  npm.export:
-    criterion:
-      content: npm
-      export: 1
-    steps:
-      - 'step::npm.publish'
   export:
     criterion:
       default: 1
@@ -263,8 +257,6 @@ step:
     tar: 0
     criterion:
       content: npm
-  npm.publish:
-    shell: npm publish
   npm.generate:
     inherit: npm.generate
     entryPath: 'path::entry.out.*=1'

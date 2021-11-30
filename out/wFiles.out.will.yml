@@ -33,14 +33,14 @@ module:
       version: 0.7.0
       license: MIT
       npm.name: wFiles
-      author: Kostiantyn Wandalen <wanalen@01.school>
+      author: Kostiantyn Wandalen <wandalen@obox.systems>
       keywords: &ref_1
         - wTools
         - wFiles
         - file
         - standardized abstract interface
       contributors: &ref_2
-        - Kostiantyn Wandalen <wanalen@01.school>
+        - Kostiantyn Wandalen <wandalen@obox.systems>
         - Volodymyr M. <volodymyr.migdal@gmail.com>
         - Ihor O. <iostashvxi@gmail.com>
         - Dmytro Kryvoruchko <dm.vict.kr@gmail.com>
@@ -866,7 +866,7 @@ module:
       version: 0.7.0
       license: MIT
       npm.name: wFiles
-      author: Kostiantyn Wandalen <wanalen@01.school>
+      author: Kostiantyn Wandalen <wandalen@obox.systems>
       keywords: *ref_1
       contributors: *ref_2
       interpreters: *ref_3
